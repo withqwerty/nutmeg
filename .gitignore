@@ -6,4 +6,5 @@ dist/
 .env.*
 !.env.example
 .DS_Store
-mcp/football-docs-server/data/
+# Keep docs.db (pre-built index) but ignore other data files
+mcp/football-docs-server/data/*.tmp
