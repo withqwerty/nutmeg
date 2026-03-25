@@ -1,0 +1,35 @@
+{
+  "name": "nutmeg",
+  "owner": {
+    "name": "withqwerty",
+    "url": "https://github.com/withqwerty"
+  },
+  "metadata": {
+    "description": "Football data analytics toolkit for Claude Code",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "nutmeg",
+      "description": "Football data analytics toolkit. Covers Opta, StatsBomb, Wyscout, SportMonks, and free sources. Acquire, wrangle, compute, analyse, and learn across any programming language. Includes a searchable MCP docs server with 400+ indexed documentation chunks across 6 providers. 10 skills, 2 agents.",
+      "author": {
+        "name": "withqwerty",
+        "url": "https://github.com/withqwerty"
+      },
+      "homepage": "https://github.com/withqwerty/nutmeg",
+      "tags": [
+        "football",
+        "soccer",
+        "analytics",
+        "data",
+        "opta",
+        "statsbomb",
+        "wyscout",
+        "sportmonks",
+        "xg",
+        "sports"
+      ],
+      "source": "."
+    }
+  ]
+}
