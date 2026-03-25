@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.local
+*.local.md
+.env
+.env.*
+!.env.example
+.DS_Store
+mcp/football-docs-server/data/

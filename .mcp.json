@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "football-docs": {
+      "command": "npx",
+      "args": ["tsx", "${CLAUDE_PLUGIN_ROOT}/mcp/football-docs-server/src/index.ts"]
+    }
+  }
+}
