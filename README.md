@@ -17,28 +17,43 @@ It adapts to your experience level, preferred programming language, and availabl
 
 ## Install
 
+### Full install (Claude Code plugin)
+
+Includes skills, agents, and the football docs MCP server.
+
 ```bash
-claude --plugin-dir /path/to/nutmeg
+# From Claude Code
+/plugin install nutmeg@withqwerty/nutmeg
 ```
+
+### Skills only (any AI coding agent)
+
+Works with Claude Code, Cursor, Codex, Windsurf, and 40+ other agents via the [Agent Skills](https://agentskills.io) standard.
+
+```bash
+npx skills add withqwerty/nutmeg
+```
+
+This installs the 10 skills but not the agents or MCP docs server. For the full experience (searchable provider docs, pipeline builder agent, data reviewer agent), use the plugin install above.
 
 ## Setup
 
-Run `/nutmeg:init` to create your profile. This tells nutmeg about your experience, tools, and data access so all skills adapt accordingly.
+Run `/nutmeg-init` to create your profile. This tells nutmeg about your experience, tools, and data access so all skills adapt accordingly.
 
 ## Skills
 
 | Skill | What it does |
 |-------|-------------|
-| `/nutmeg:init` | Set up your profile |
-| `/nutmeg:credentials` | Manage API keys and data access |
-| `/nutmeg:providers` | Search provider documentation (Opta qualifiers, StatsBomb event types, etc.) |
-| `/nutmeg:acquire` | Fetch, scrape, or download football data |
-| `/nutmeg:heal` | Fix broken scrapers, submit upstream issues |
-| `/nutmeg:wrangle` | Transform, filter, reshape data |
-| `/nutmeg:compute` | Calculate derived metrics (xG, PPDA, passing networks) |
-| `/nutmeg:store` | Choose storage format and publishing method |
-| `/nutmeg:analyse` | Explore and interpret football data |
-| `/nutmeg:learn` | Glossary, papers, courses, community resources |
+| `/nutmeg-init` | Set up your profile |
+| `/nutmeg-credentials` | Manage API keys and data access |
+| `/nutmeg-providers` | Search provider documentation (Opta qualifiers, StatsBomb event types, etc.) |
+| `/nutmeg-acquire` | Fetch, scrape, or download football data |
+| `/nutmeg-heal` | Fix broken scrapers, submit upstream issues |
+| `/nutmeg-wrangle` | Transform, filter, reshape data |
+| `/nutmeg-compute` | Calculate derived metrics (xG, PPDA, passing networks) |
+| `/nutmeg-store` | Choose storage format and publishing method |
+| `/nutmeg-analyse` | Explore and interpret football data |
+| `/nutmeg-learn` | Glossary, papers, courses, community resources |
 
 ## Football Docs MCP Server
 
