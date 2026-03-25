@@ -1,4 +1,5 @@
 ---
+name: acquire
 description: "Fetch, scrape, or download football data from any source. Use when the user wants to get data from StatsBomb, Opta, FBref, Understat, SportMonks, Wyscout, Kaggle, or any football data source. Also use when they ask how to get specific data like 'Premier League xG data' or 'match events for a game'."
 argument-hint: "[what data to get]"
 allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__football-docs__search_docs"]

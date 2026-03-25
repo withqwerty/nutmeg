@@ -1,4 +1,5 @@
 ---
+name: analyse
 description: "Explore, interpret, and draw conclusions from football data. Use when the user wants to analyse match events, compare teams or players, understand tactical patterns, build visualisations, or needs guidance on what questions to ask of their data. Adapts to the user's experience level."
 argument-hint: "[analysis question or topic]"
 allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__football-docs__search_docs"]

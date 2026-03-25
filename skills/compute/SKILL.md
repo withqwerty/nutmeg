@@ -1,4 +1,5 @@
 ---
+name: compute
 description: "Calculate derived football metrics and models. Use when the user wants to compute xG, xGOT, PPDA, passing networks, expected threat, possession value, pressing intensity, or any derived football statistic from raw data."
 argument-hint: "[metric to compute]"
 allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__football-docs__search_docs"]

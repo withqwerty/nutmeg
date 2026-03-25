@@ -1,4 +1,5 @@
 ---
+name: learn
 description: "Learn about football data analytics. Use when the user asks to explain concepts (xG, PPDA, expected threat), wants learning resources, asks for recommended papers or courses, or is new to football analytics and wants a starting point."
 argument-hint: "[concept or 'getting started']"
 allowed-tools: ["Read", "mcp__football-docs__search_docs"]

@@ -1,4 +1,5 @@
 ---
+name: heal
 description: "Fix broken data scrapers and pipelines. Use when data acquisition fails, a scraper breaks, an API returns errors, or data format has changed. Also handles submitting upstream issues or PRs when the problem is in a dependency like soccerdata or kloppy."
 argument-hint: "[error or issue description]"
 allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "WebFetch", "WebSearch"]
