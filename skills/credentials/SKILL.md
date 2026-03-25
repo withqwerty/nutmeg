@@ -1,5 +1,5 @@
 ---
-name: credentials
+name: nutmeg-credentials
 description: "Manage API keys and data access for football data providers. Use when the user asks about API keys, authentication, setting up access to Opta, StatsBomb, SportMonks, Wyscout, or any football data source. Also use when they ask what data is available for free vs paid."
 argument-hint: "[provider name or 'list']"
 allowed-tools: ["Read", "Write", "Bash", "AskUserQuestion"]

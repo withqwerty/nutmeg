@@ -1,5 +1,5 @@
 ---
-name: init
+name: nutmeg-init
 description: "Set up your football data profile. Use when the user first installs nutmeg, says 'set up nutmeg', 'configure nutmeg', 'nutmeg init', or when any other nutmeg skill detects that .user.md does not exist."
 argument-hint: ""
 allowed-tools: ["Read", "Write", "AskUserQuestion"]

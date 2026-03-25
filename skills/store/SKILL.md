@@ -1,5 +1,5 @@
 ---
-name: store
+name: nutmeg-store
 description: "Choose how and where to store football data. Use when the user asks about database choices, file formats, cloud storage, data pipelines, or how to organise their football data project. Also covers publishing and sharing outputs (Streamlit, Observable, GitHub Pages)."
 argument-hint: "[storage question or 'publish']"
 allowed-tools: ["Read", "Write", "Bash", "AskUserQuestion", "mcp__football-docs__search_docs"]

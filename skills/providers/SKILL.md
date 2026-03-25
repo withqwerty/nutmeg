@@ -1,5 +1,5 @@
 ---
-name: providers
+name: nutmeg-providers
 description: "Search and compare football data provider documentation. Use when the user asks about event types, qualifier IDs, data fields, coordinate systems, API endpoints, or wants to compare what different providers offer. Examples: 'what is Opta qualifier 76', 'how does StatsBomb represent shots', 'compare Opta and Wyscout coordinates', 'does SportMonks have xG'."
 argument-hint: "[search query]"
 allowed-tools: ["Read", "mcp__football-docs__search_docs", "mcp__football-docs__list_providers", "mcp__football-docs__compare_providers"]
