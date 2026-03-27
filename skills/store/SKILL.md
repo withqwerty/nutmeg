@@ -9,6 +9,9 @@ allowed-tools: ["Read", "Write", "Bash", "AskUserQuestion", "mcp__football-docs_
 
 Help the user choose storage formats, locations, and publishing methods for their football data.
 
+## Accuracy
+
+Read and follow `docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 ## First: check profile
 
 Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg:init` first.

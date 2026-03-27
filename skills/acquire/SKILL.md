@@ -9,6 +9,9 @@ allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__football
 
 Help the user get football data from any source into their local environment.
 
+## Accuracy
+
+Read and follow `docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 ## First: check profile
 
 Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg:init` first. Use their profile to determine preferred language and available providers.
