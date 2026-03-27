@@ -55,6 +55,7 @@ Run `/nutmeg-init` to create your profile. This tells nutmeg about your experien
 | `/nutmeg-analyse` | Explore and interpret football data |
 | `/nutmeg-learn` | Glossary, papers, courses, community resources |
 | `/nutmeg-brainstorm` | Research-backed visualisation ideation and chart design |
+| `/nutmeg-review` | Review data code and charts for correctness, conventions, and edge cases |
 
 ## Football Docs MCP Server
 
