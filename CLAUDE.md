@@ -39,9 +39,16 @@ docs/
 - Skills adapt to user's language (Python/R/JS), experience level, and available data sources
 - Reference docs in skills/brainstorm/references/ are loaded on-demand, not all upfront
 
-## Related project
+## Related projects
 
 **football-docs** (npm: `football-docs`, repo: `withqwerty/football-docs`)
 - MCP server providing searchable documentation for 16 football data providers
 - Connected via `.mcp.json` — starts automatically when the plugin loads
 - Skills query it via `mcp__football-docs__search_docs`, `list_providers`, `compare_providers`
+
+**nutmeg-site** (local: `../nutmeg-site`)
+- Marketing/landing page for the plugin, built with Astro 6 (static output)
+- Components: Hero, SkillsGrid, ProvidersGrid, ExampleQueries, InstallRow, etc.
+
+**plugins** (repo: `withqwerty/plugins`, local: `../plugins`)
+- Plugin marketplace listing — nutmeg is registered here for discovery via `/plugin marketplace`
