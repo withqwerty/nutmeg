@@ -9,3 +9,6 @@ dist/
 
 # Claude Code local config
 .claude/
+
+# Local reference docs
+docs/setup-guide.md

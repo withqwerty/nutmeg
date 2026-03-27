@@ -1,8 +1,14 @@
 # nutmeg
 
-A Claude Code plugin for football data analytics. Covers every stage of the pipeline, from acquiring raw data to publishing analysis, across all major providers.
+A Claude Code plugin that makes Claude an expert at football data analytics.
 
-## What it does
+**Who it's for:** Anyone who works with football data — analysts, developers, journalists, researchers, hobbyists. If you've ever spent an hour figuring out which Opta qualifier is xG, or why your StatsBomb coordinates are upside down, or how to normalise a heatmap properly, this is for you.
+
+**What it does:** Gives Claude deep, verified knowledge of football data providers, libraries, and conventions. Claude looks up the actual docs instead of guessing from training data, writes code adapted to your stack, and catches football-specific mistakes in your work.
+
+**Why not just ask Claude directly?** Claude knows football data exists but its knowledge is frozen and often wrong on specifics — qualifier IDs, API endpoints, coordinate systems, method signatures. These change. nutmeg connects Claude to a live, searchable index of real provider documentation so it gets the details right.
+
+## Capabilities
 
 nutmeg gives Claude deep knowledge of football data so it can help you:
 
