@@ -68,6 +68,60 @@ jobs:
           fi
           echo "All agent files have valid frontmatter"
 
+      - name: Verify plugin version consistency
+        run: |
+          plugin_ver=$(grep -o '"version": *"[^"]*"' .claude-plugin/plugin.json | head -1 | grep -o '[0-9.]*')
+          marketplace_ver=$(grep -o '"version": *"[^"]*"' .claude-plugin/marketplace.json | head -1 | grep -o '[0-9.]*')
+
+          if [ "$plugin_ver" != "$marketplace_ver" ]; then
+            echo "ERROR: plugin.json ($plugin_ver) and marketplace.json ($marketplace_ver) versions differ"
+            exit 1
+          fi
+          echo "Plugin version: $plugin_ver (consistent)"
+
+      - name: Verify MCP server is installable
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Test football-docs MCP dependency
+        run: |
+          # Extract the MCP command from .mcp.json
+          if [ ! -f .mcp.json ]; then
+            echo "ERROR: .mcp.json not found"
+            exit 1
+          fi
+
+          # Install the npm package (same as what Claude Code does)
+          npm install --no-save football-docs 2>&1
+
+          # Verify the binary exists and the DB is present
+          if [ ! -f node_modules/.bin/football-docs ]; then
+            echo "ERROR: football-docs binary not found after install"
+            exit 1
+          fi
+
+          if [ ! -f node_modules/football-docs/data/docs.db ]; then
+            echo "ERROR: docs.db not found in package"
+            exit 1
+          fi
+
+          # Check the DB has the expected schema (source_type column = v0.2.0+)
+          npm install --no-save better-sqlite3 2>&1
+          node -e "
+            const Database = require('better-sqlite3');
+            const path = require('path');
+            const db = new Database(path.join('node_modules', 'football-docs', 'data', 'docs.db'), { readonly: true });
+            const cols = db.pragma('table_info(docs)').map(c => c.name);
+            if (!cols.includes('source_type')) {
+              console.error('ERROR: docs.db missing source_type column (needs football-docs >=0.2.0)');
+              process.exit(1);
+            }
+            const count = db.prepare('SELECT COUNT(*) as n FROM docs').get();
+            console.log('football-docs installed: ' + count.n + ' chunks, schema OK');
+            db.close();
+          "
+
       - name: Count skills and agents
         run: |
           skills=$(ls skills/*/SKILL.md 2>/dev/null | wc -l | tr -d ' ')
