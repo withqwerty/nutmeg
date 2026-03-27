@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate SKILL.md frontmatter
+        run: |
+          errors=0
+          for file in skills/*/SKILL.md; do
+            if ! head -1 "$file" | grep -q "^---$"; then
+              echo "ERROR: $file missing frontmatter opening ---"
+              errors=$((errors + 1))
+              continue
+            fi
+
+            if ! awk 'NR>1 && /^---$/{found=1; exit} END{exit !found}' "$file"; then
+              echo "ERROR: $file missing frontmatter closing ---"
+              errors=$((errors + 1))
+              continue
+            fi
+
+            frontmatter=$(awk 'NR==1{next} /^---$/{exit} {print}' "$file")
+            for field in name description; do
+              if ! echo "$frontmatter" | grep -q "^${field}:"; then
+                echo "ERROR: $file missing required field: $field"
+                errors=$((errors + 1))
+              fi
+            done
+          done
+
+          if [ "$errors" -gt 0 ]; then
+            echo "Found $errors frontmatter errors"
+            exit 1
+          fi
+          echo "All SKILL.md files have valid frontmatter"
+
+      - name: Validate agent frontmatter
+        run: |
+          errors=0
+          for file in agents/*.md; do
+            if ! head -1 "$file" | grep -q "^---$"; then
+              echo "ERROR: $file missing frontmatter opening ---"
+              errors=$((errors + 1))
+              continue
+            fi
+
+            frontmatter=$(awk 'NR==1{next} /^---$/{exit} {print}' "$file")
+            for field in name description; do
+              if ! echo "$frontmatter" | grep -q "^${field}:"; then
+                echo "ERROR: $file missing required field: $field"
+                errors=$((errors + 1))
+              fi
+            done
+          done
+
+          if [ "$errors" -gt 0 ]; then
+            echo "Found $errors agent frontmatter errors"
+            exit 1
+          fi
+          echo "All agent files have valid frontmatter"
+
+      - name: Count skills and agents
+        run: |
+          skills=$(ls skills/*/SKILL.md 2>/dev/null | wc -l | tr -d ' ')
+          agents=$(ls agents/*.md 2>/dev/null | wc -l | tr -d ' ')
+          refs=$(find skills -name "*.md" -path "*/references/*" 2>/dev/null | wc -l | tr -d ' ')
+          echo "Skills: $skills | Agents: $agents | Reference docs: $refs"
