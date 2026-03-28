@@ -2,7 +2,7 @@
 name: nutmeg-acquire
 description: "Fetch, scrape, or download football data from any source. Use when the user wants to get data from StatsBomb, Opta, FBref, Understat, SportMonks, Wyscout, Kaggle, or any football data source. Also use when they ask how to get specific data like 'Premier League xG data' or 'match events for a game'."
 argument-hint: "[what data to get]"
-allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__football-docs__search_docs"]
+allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__football-docs__search_docs", "mcp__football-docs__resolve_entity"]
 ---
 
 # Acquire
@@ -31,6 +31,7 @@ When the user asks for data, determine the best source:
 | Historical results | football-data.co.uk | SportMonks |
 | Elo ratings | ClubElo (free API) | - |
 | Player valuations | Transfermarkt (scraping) | - |
+| Cross-provider entity IDs | Reep Register (free CSV + API) | - |
 
 ### 2. Write acquisition code
 
@@ -80,6 +81,24 @@ After acquiring data, always:
 - Verify key fields are present (coordinates, player IDs, timestamps)
 - Check for missing data (some providers have gaps for certain competitions)
 - Warn about coordinate system differences if combining sources
+
+## Entity ID resolution
+
+When joining data from different providers (e.g. FBref stats with Transfermarkt valuations), use the **Reep Register** to map entity IDs across providers.
+
+Use the `resolve_entity` MCP tool (from football-docs) to look up any player, team, or coach:
+
+```
+resolve_entity(name: "Cole Palmer")                          # search by name
+resolve_entity(provider: "transfermarkt", id: "568177")      # resolve provider ID
+resolve_entity(qid: "Q99760796")                             # Wikidata QID lookup
+```
+
+Returns IDs for Transfermarkt, FBref, Sofascore, Opta, Soccerway, 11v11, and more.
+
+For bulk/offline use, download the CSV register:
+- GitHub: https://github.com/withqwerty/reep
+- `data/people.csv` (430K players+coaches), `data/teams.csv` (45K teams)
 
 ## Self-discovery
 
