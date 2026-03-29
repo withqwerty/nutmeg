@@ -1,20 +1,50 @@
 ---
 name: nutmeg-acquire
-description: "Fetch, scrape, or download football data from any source. Use when the user wants to get data from StatsBomb, Opta, FBref, Understat, SportMonks, Wyscout, Kaggle, or any football data source. Also use when they ask how to get specific data like 'Premier League xG data' or 'match events for a game'."
+description: "Fetch, scrape, or download football data from any source. Also handles API key setup and credential management. Use when the user wants to get data from StatsBomb, Opta, FBref, Understat, SportMonks, Wyscout, Kaggle, or any football data source. Also use when they ask about API keys, authentication, setting up access to a provider, or what data is available free vs paid."
 argument-hint: "[what data to get]"
-allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__football-docs__search_docs", "mcp__football-docs__resolve_entity"]
+allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "AskUserQuestion", "mcp__football-docs__search_docs", "mcp__football-docs__resolve_entity"]
 ---
 
 # Acquire
 
-Help the user get football data from any source into their local environment.
+Help the user get football data from any source into their local environment. This includes setting up credentials for providers that require them.
 
 ## Accuracy
 
 Read and follow `docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
+
 ## First: check profile
 
-Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg:init` first. Use their profile to determine preferred language and available providers.
+Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` first. Use their profile to determine preferred language and available providers.
+
+## Credentials
+
+If the user needs to set up API keys or asks "what can I access for free?", handle it here.
+
+**Key management rules:**
+- Keys go in `.env` (gitignored), environment variables, or `.nutmeg.credentials.local` (gitignored)
+- Never commit keys to git. Verify `.gitignore` includes `.env` and `*.local`
+- Test the key works with a minimal API call
+- Never print or log API keys
+
+**Provider access reference:**
+
+| Source | Access | Free? | Env var |
+|--------|--------|-------|---------|
+| StatsBomb open data | GitHub / statsbombpy | Yes | — |
+| FBref | Web scraping (soccerdata) | Yes | — |
+| Understat | Web scraping (soccerdata) | Yes | — |
+| ClubElo | HTTP API | Yes | — |
+| football-data.co.uk | CSV download | Yes | — |
+| Transfermarkt | Web scraping | Yes (fragile) | — |
+| SportMonks | REST API | Free tier | `SPORTMONKS_API_TOKEN` |
+| Football-data.org | REST API | Free tier | `FOOTBALL_DATA_API_KEY` |
+| FPL | Unofficial API | Yes | — |
+| Opta/Perform | Feed | No | `OPTA_FEED_TOKEN` |
+| StatsBomb API | REST API | No | `STATSBOMB_API_KEY`, `STATSBOMB_API_PASSWORD` |
+| Wyscout | REST API | No | `WYSCOUT_API_KEY` |
+| Kaggle | Download | Yes | — |
+| GitHub datasets | Download | Yes | — |
 
 ## Decision tree
 
@@ -120,7 +150,7 @@ Always recommend caching fetched data locally:
 Remind users about rate limits:
 - FBref: 10 requests/minute recommended
 - Understat: no official limit but be respectful
-- SportMonks: varies by plan (check with `/nutmeg:credentials`)
+- SportMonks: varies by plan (check their dashboard)
 - StatsBomb open data: no limit (static files on GitHub)
 
 ## Security

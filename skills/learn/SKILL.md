@@ -1,13 +1,13 @@
 ---
 name: nutmeg-learn
-description: "Learn about football data analytics. Use when the user asks to explain concepts (xG, PPDA, expected threat), wants learning resources, asks for recommended papers or courses, or is new to football analytics and wants a starting point."
-argument-hint: "[concept or 'getting started']"
-allowed-tools: ["Read", "mcp__football-docs__search_docs"]
+description: "Learn about football analytics concepts and explore provider documentation. Use when the user asks what a metric means (xG, PPDA, expected threat, xT), wants learning resources, papers, or courses, is new to football analytics, or wants a learning path. Also use when the user asks about data provider documentation — qualifier IDs, coordinate systems, event types, API schemas, field mappings — or wants to compare providers, look something up in the docs, or find out what data a provider offers."
+argument-hint: "[concept, 'getting started', or provider query]"
+allowed-tools: ["Read", "mcp__football-docs__search_docs", "mcp__football-docs__list_providers", "mcp__football-docs__compare_providers"]
 ---
 
 # Learn
 
-Teach football analytics concepts, recommend resources, and provide a learning path adapted to the user's level.
+Teach football analytics concepts, recommend resources, provide a learning path, and answer questions about data provider documentation — all adapted to the user's level.
 
 ## Accuracy
 
@@ -15,7 +15,7 @@ Read and follow `docs/accuracy-guardrail.md` before answering any question about
 
 ## First: check profile
 
-Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg:init` first.
+Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` first.
 
 ## Glossary of core concepts
 
@@ -136,3 +136,39 @@ Why: a player with 2 goals in 180 minutes (per 90: 1.0) is performing the same a
 3. **"This player has 0.8 xG per 90, so they'll score 30 goals."** Small samples, regression to the mean, context all matter.
 4. **"Data analytics replaces scouting."** It complements it. Data finds candidates; humans evaluate fit, personality, potential.
 5. **"All xG models are the same."** They vary significantly by input features, training data, and methodology.
+
+## Provider documentation
+
+When the user asks about provider-specific details — event types, qualifier IDs, coordinate systems, API schemas, field mappings — use the football-docs MCP tools.
+
+### Answering specific questions
+
+Use `search_docs` with the user's query. Add a `provider` filter if they're asking about a specific provider.
+
+Examples:
+- "What qualifier ID is a headed goal in Opta?" → `search_docs(query="headed goal qualifier", provider="opta")`
+- "How does StatsBomb represent xG?" → `search_docs(query="xG expected goals", provider="statsbomb")`
+- "What free data sources have shot-level data?" → `search_docs(query="shot data free", provider="free-sources")`
+
+### Comparing providers
+
+Use `compare_providers` when the user wants to understand differences.
+
+Examples:
+- "How do Opta and StatsBomb represent passes differently?" → `compare_providers(topic="pass event types", providers=["opta", "statsbomb"])`
+- "Which providers have xG data?" → `compare_providers(topic="xG expected goals")`
+
+### Discovering what's available
+
+Use `list_providers` to show what documentation is indexed and its coverage.
+
+### Cross-referencing with kloppy
+
+When comparing providers, also search for kloppy's mapping documentation. kloppy defines how each provider's events map to a canonical model, which helps the user understand what maps cleanly between providers, what information is lost in translation, and what becomes a GenericEvent (unmapped).
+
+### Response format
+
+1. Give the direct answer first (the qualifier ID, the field name, etc.)
+2. Add context about how it works in practice
+3. If relevant, mention how other providers handle the same concept
+4. Adapt technical depth to the user's experience level

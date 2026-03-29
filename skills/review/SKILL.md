@@ -15,7 +15,7 @@ Read and follow `docs/accuracy-guardrail.md` before answering any question about
 
 ## First: check profile
 
-Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg-init` first.
+Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` first.
 
 ## Determine scope
 

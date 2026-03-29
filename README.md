@@ -44,24 +44,33 @@ This installs the 10 skills but not the agents or MCP docs server. For the full 
 
 ## Setup
 
-Run `/nutmeg-init` to create your profile. This tells nutmeg about your experience, tools, and data access so all skills adapt accordingly.
+Run `/nutmeg` and describe what you want to do. On first run, it creates your profile (experience, tools, data access) so all skills adapt accordingly.
 
 ## Skills
 
+Most users only need two commands — `/nutmeg` routes everything else automatically.
+
+### Entry points
+
 | Skill | What it does |
 |-------|-------------|
-| `/nutmeg-init` | Set up your profile |
-| `/nutmeg-credentials` | Manage API keys and data access |
-| `/nutmeg-providers` | Search provider documentation (Opta qualifiers, StatsBomb event types, etc.) |
-| `/nutmeg-acquire` | Fetch, scrape, or download football data |
-| `/nutmeg-heal` | Fix broken scrapers, submit upstream issues |
+| `/nutmeg` | **Start here.** Describe what you want — it handles setup, routing, and dispatch |
+| `/nutmeg-learn` | Concepts, resources, provider docs, learning paths |
+
+### Sub-skills (auto-dispatched or direct)
+
+These are invoked automatically by `/nutmeg` based on what you're doing. Power users can call them directly.
+
+| Skill | What it does |
+|-------|-------------|
+| `/nutmeg-acquire` | Fetch, scrape, or download data + manage API keys |
 | `/nutmeg-wrangle` | Transform, filter, reshape data |
 | `/nutmeg-compute` | Calculate derived metrics (xG, PPDA, passing networks) |
-| `/nutmeg-store` | Choose storage format and publishing method |
 | `/nutmeg-analyse` | Explore and interpret football data |
-| `/nutmeg-learn` | Glossary, papers, courses, community resources |
 | `/nutmeg-brainstorm` | Research-backed visualisation ideation and chart design |
-| `/nutmeg-review` | Review data code and charts for correctness, conventions, and edge cases |
+| `/nutmeg-store` | Choose storage format and publishing method |
+| `/nutmeg-review` | Review data code and charts for correctness and conventions |
+| `/nutmeg-heal` | Fix broken scrapers, submit upstream issues |
 
 ## Football Docs MCP Server
 

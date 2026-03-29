@@ -15,7 +15,7 @@ Read and follow `docs/accuracy-guardrail.md` before answering any question about
 
 ## First: check profile
 
-Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg-init` first. Use their profile for:
+Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` first. Use their profile for:
 - Programming language (Python/R/JS)
 - Visualisation libraries they use (mplsoccer, matplotlib, ggplot2, d3, Observable)
 - Experience level (adapt complexity of suggestions)

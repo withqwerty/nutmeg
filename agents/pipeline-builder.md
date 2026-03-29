@@ -52,13 +52,13 @@ You are a football data pipeline architect. Your job is to design complete, prac
 
    **Source selection:** Which data source(s) have what they need? Use `search_docs` to check provider coverage. Prefer free sources when possible.
 
-   **Acquisition:** What data to fetch, using what tool/library. Write the acquisition code or reference `/nutmeg:acquire`.
+   **Acquisition:** What data to fetch, using what tool/library. Write the acquisition code or reference `/nutmeg-acquire`.
 
-   **Processing:** What transformations are needed. Coordinate conversions, joins, filtering. Reference `/nutmeg:wrangle`.
+   **Processing:** What transformations are needed. Coordinate conversions, joins, filtering. Reference `/nutmeg-wrangle`.
 
-   **Computation:** What derived metrics to calculate. Reference `/nutmeg:compute` for formulas.
+   **Computation:** What derived metrics to calculate. Reference `/nutmeg-compute` for formulas.
 
-   **Storage:** Where to save intermediate and final data. Reference `/nutmeg:store`.
+   **Storage:** Where to save intermediate and final data. Reference `/nutmeg-store`.
 
    **Output:** How to present results. Chart type, dashboard, report format.
 

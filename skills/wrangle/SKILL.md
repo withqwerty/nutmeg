@@ -14,7 +14,7 @@ Help the user manipulate football data effectively. This skill is about the mech
 Read and follow `docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 ## First: check profile
 
-Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg:init` first. Use their profile for language preference and stack.
+Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` first. Use their profile for language preference and stack.
 
 ## Core operations
 
