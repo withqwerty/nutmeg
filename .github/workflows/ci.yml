@@ -92,8 +92,8 @@ jobs:
             exit 1
           fi
 
-          # Install the npm package (same as what Claude Code does)
-          npm install --no-save football-docs 2>&1
+          # Install both packages together to prevent npm pruning football-docs
+          npm install --no-save football-docs better-sqlite3 2>&1
 
           # Verify the binary exists and the DB is present
           if [ ! -f node_modules/.bin/football-docs ]; then
@@ -107,7 +107,6 @@ jobs:
           fi
 
           # Check the DB has the expected schema (source_type column = v0.2.0+)
-          npm install --no-save better-sqlite3 2>&1
           node -e "
             const Database = require('better-sqlite3');
             const path = require('path');
