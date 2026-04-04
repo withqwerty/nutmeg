@@ -20,7 +20,7 @@ Last updated: 2026-03-27
 
 ### For nutmeg specifically
 
-1. Plugin install (Claude Code): `/plugin install nutmeg@withqwerty/nutmeg`
+1. Plugin install (Claude Code): `/plugin marketplace add withqwerty/plugins` then `/plugin install nutmeg@withqwerty`
 2. Skills only (33+ agents): `npx skills add withqwerty/nutmeg`
 3. MCP only (any MCP client): `npx -y football-docs`
 

@@ -28,8 +28,9 @@ It adapts to your experience level, preferred programming language, and availabl
 Includes skills, agents, and the football docs MCP server.
 
 ```bash
-# From Claude Code
-/plugin install nutmeg@withqwerty/nutmeg
+# From Claude Code — add the marketplace first (one-time), then install
+/plugin marketplace add withqwerty/plugins
+/plugin install nutmeg@withqwerty
 ```
 
 ### Skills only (any AI coding agent)
