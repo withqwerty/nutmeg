@@ -1,241 +1,355 @@
 ---
-title: Campos — football UI component registry
-status: draft
+title: Campos — football UI component library (multi-flavour-capable monorepo)
+status: draft-v2
 date: 2026-04-05
 authors: [rahaluha]
+revisions:
+  - v1 (2026-04-05): initial draft — shadcn-style registry, dual-flavour, 9 components
+  - v2 (2026-04-05): restructured after adversarial review — Python-first pip library from a multi-flavour-capable monorepo, one-way dep from nutmeg, risk-first launch, interim measurement tripwires
 related:
-  - nutmeg (Claude Code plugin, sibling project)
-  - football-docs (MCP server, reference architecture for Campos MCP)
+  - nutmeg (Claude Code plugin — consumes Campos as a PyPI dependency)
+  - football-docs (MCP server — architectural sibling, not a dependency)
 ---
 
-# Campos — design spec
+# Campos — design spec (v2)
 
-> Beautiful, battle-tested football UI components. Shadcn for football.
+> Beautiful, battle-tested football UI components. Pythonic today, multi-flavour tomorrow.
 
 ## Summary
 
-Campos is a copy-paste component registry for football data applications. It ships production-quality, football-specific UI components — player heroes, percentile ribbons, radar charts, shot maps, scouting tables — in two flavours per component: a **Python** flavour (matplotlib / mplsoccer) and a **web** flavour (framework-agnostic HTML + CSS + inline SVG). It is MIT-licensed, open source, and distributed as a shadcn-style registry: users copy source files into their own projects via a CLI, own the code, and modify freely.
+Campos is a standalone, open-source football UI component library. v1 ships as a Python package (`pip install campos`) with ~8 components + a design system, all rendering via matplotlib and mplsoccer. The source repository is structured as a **multi-flavour-capable monorepo**: components live in language-neutral folders with a JSON Schema contract for data types and a JSON tokens file for theming. v1 populates only the Python flavour. Future web (HTML + CSS + inline SVG) and React flavours can be added file-by-file without forking the project, duplicating schemas, or maintaining separate repositories.
 
-Campos is a sibling to the `nutmeg` Claude Code plugin. nutmeg helps agents *acquire, wrangle, compute, and analyse* football data; Campos helps agents *render* it. Together they form a complete agent-driven football analytics pipeline, but each can be adopted independently.
+Campos is a separate project from the `nutmeg` Claude Code plugin, with a one-way dependency: nutmeg lists Campos in its `pyproject.toml` and invokes it from a rendering skill. Campos has no awareness of nutmeg, no scraped adapters, no Claude-specific coupling, and no MCP server in v1. It is a Python library that can be used from any script, notebook, Streamlit app, FastAPI endpoint, or Quarto document — with or without Claude Code.
+
+The differentiator is a **12-axis quality bar** every component must pass before shipping: the full edge-case matrix (empty/sparse/dense/missing/extreme/i18n/responsive/themeable/composable/mpl-hygiene/a11y/tested) made visible per component on the docs site. This is what the project is selling — not breadth, not interactivity, but *production-grade* components in a domain where the status quo is one-off gists.
+
+## Motivation and context
+
+The existing Python football viz ecosystem (mplsoccer, soccerplots, plotnine snippets, bespoke Streamlit apps) is stuck in gist culture. Every scouting dashboard reinvents the same components — player cards, percentile ribbons, radars, shot maps, ranked lists — from scratch, with inconsistent quality, no edge-case handling, and no shared design language. The Scout Lab and Teams Lab apps referenced in the brainstorm are evidence of *how good* this work can be when someone fights hard enough; they're also evidence of *how much fighting* it takes to reach that quality inside a framework (Streamlit) that wasn't built for it.
+
+Campos proposes that the right level of abstraction is a component library, not a framework. It does not compete with Streamlit, Marimo, Jupyter, mplsoccer, or any existing tool. It slots underneath them — import a Campos component, hand it canonical data, get back a rendered artefact that looks good and handles every edge case you didn't have time to think about.
 
 ## Goals
 
-1. **Raise the ceiling of what a Python football analyst can ship visually**, without asking them to learn React, fight Streamlit CSS, or hire a designer.
-2. **Be the default UI vocabulary for agent-generated football apps.** When an LLM writes football code, Campos is what it reaches for.
-3. **Meet a production quality bar**, not a demo quality bar. Every component handles every edge case. No loose ends.
-4. **Stay complementary to the existing Python football ecosystem** (matplotlib, mplsoccer, Streamlit, Marimo, Jupyter, Quarto, FastAPI). Never compete with it. Slot into any of them.
-5. **Ship a visibly complete scouting dashboard** in v1 — enough components to build a Scout-Lab-quality player-oriented app end-to-end.
+1. **Be the default football UI primitives** that Python analysts reach for when they want to ship something that looks finished.
+2. **Raise the quality floor**, not just the ceiling. A novice using Campos should get the same rendering quality as a Scout-Lab-level expert, because all 12 axes of the quality bar are handled inside the component, not by the caller.
+3. **Preserve the option** to add web (HTML/CSS/SVG) and React flavours later *without* rewriting, forking, or duplicating the schema and design tokens.
+4. **Stay a library**, not a framework. No app structure, no opinions about state management, no runtime. Every component is a function that takes data and returns a rendered output.
+5. **Be discoverable in the Python ecosystem** (PyPI, pip, standard docs tooling), not locked inside Claude Code.
 
 ## Non-goals (v1)
 
-- **Generic UI primitives** (buttons, dropdowns, navs, dialogs). Agents can scaffold these from the theme tokens; Campos stays football-specific on purpose.
-- **A React flavour.** Framework-agnostic HTML+CSS+SVG works inside React, Vue, Astro, Streamlit, Quarto, and email. A React flavour is v2+ if demand materialises.
-- **A hosted service.** Campos is a registry and a CLI. No accounts, no servers, no billing.
-- **Team / match / league-level components.** v1 is scouting-dashboard-shaped and player-oriented. Match heros, formation diagrams, league projection tables, xG race charts — all v2.
-- **Comparison views** as standalone components. `PlayerHero` handles a single entity; a comparison is a v2 composition on top.
-- **Interactive brushing / linked views** across components. Hover tooltips are acceptable; cross-chart selection is not a v1 feature.
+- **Web and React flavours in v1.** The monorepo structure preserves these as zero-rework future additions. v1 ships Python only.
+- **A CLI or copy-paste distribution model.** Python users expect `pip install`. A shadcn-style CLI is reserved for later — only if and when multiple flavours exist and fork-and-modify becomes the more idiomatic pattern.
+- **An MCP server for agent discovery.** Deferred. v1 relies on standard Python introspection, docstrings, type hints, and the docs site. If the agent validation eval (below) shows this is insufficient, an MCP server can be added without architectural change.
+- **Scraped data adapters.** Campos accepts *only* canonical schema objects and never touches raw provider data. Adapters for Opta, WhoScored, StatsBomb, Wyscout, etc. live in nutmeg's `acquire` skill where they belong architecturally.
+- **Generic UI primitives** (buttons, dropdowns, navs, dialogs). Agents can scaffold these from Campos's theme tokens; Campos stays football-specific on purpose.
+- **Team / match / league components.** v1 is scouting-flow and player-oriented. Match heroes, formation diagrams, league projection tables, xG race charts — all v1.x+.
+- **Comparison-dedicated components.** `PlayerHero` renders a single entity; a comparison view is a composition of primitives in v1.x.
+- **Interactive cross-chart brushing.** Hover tooltips are allowed inside a single component; cross-component linked selection is not a v1 feature.
+- **Scatter-with-label-collision** (the ScatterWithLabels component from the v1 draft). Force-directed label placement is a research problem even in matplotlib and does not fit the quality bar for v1. Deferred to v1.x.
 
 ## Target users
 
-Campos serves three overlapping audiences, all using AI agents to write their code:
+All three audiences use AI agents as their primary code-authoring surface. None of them will hand-write Campos calls; agents will compose components into their projects.
 
-1. **The Python analyst who already ships Streamlit apps** (the Scout Lab / Teams Lab authors). They have taste, they know their data, they lose weeks to custom CSS and HTML component workarounds. Campos gives them the design system their apps already deserve, without the fight.
-2. **The notebook-native analyst** who works in Jupyter / Quarto / nbdev and wants publication-quality artefacts (match reports, scouting PDFs, social-ready cards) without learning a web stack. They use the Python flavour exclusively.
-3. **The app builder** who is scaffolding a football dashboard with an AI agent. They may not have any football viz background at all — the agent handles that. They benefit from Campos without knowing they are using it, because the agent picks it.
+1. **The ambitious Python analyst** who already ships Streamlit / Marimo / Quarto apps and loses weeks to visual polish. Scout Lab / Teams Lab authors. Has taste, owns their data, wants the design system their work deserves.
+2. **The notebook-native analyst** who lives in Jupyter / Quarto / nbdev and wants publication-quality match reports, scouting PDFs, and social-ready images without a web stack. Uses matplotlib natively; Campos feels like a well-styled extension of what they already do.
+3. **The agent-assisted app builder** who describes a football dashboard in natural language and expects an agent to produce working code. May have no football viz background; benefits from Campos transparently because the agent picks it.
 
-Common thread: **none of them will write Campos code by hand.** They will describe what they want, and an agent (Claude Code, Cursor, Copilot) will compose Campos components into their project. Every design decision below is made with "an agent will read this" as the primary constraint.
+Common thread: **every design decision is made with "an agent will read and invoke this" as a primary constraint.** Docstrings, type hints, examples, and error messages must be legible to an LLM that has never seen the project before.
 
 ## Architecture
 
-### Two flavours per component
+### Monorepo with language-neutral truth, language-specific flavours
 
-Every component ships in two parallel implementations:
-
-| Flavour | Output | Primary use |
-|---|---|---|
-| **`python`** | Returns a matplotlib `Figure` (or `Axes` for composables) | Notebooks, scripts, Quarto, static exports, PDF reports, Twitter posts |
-| **`web`** | Returns an HTML string (inline SVG for charts, CSS variables for theming, optional vanilla JS for hover) | Streamlit `st.html()`, Marimo, FastAPI responses, Astro, Quarto HTML, email, any web framework |
-
-The web flavour is **framework-agnostic**. No React, no build step, no npm install. HTML that any framework can drop in trivially.
-
-Component authors write both flavours and maintain them in parallel. The quality bar (below) applies independently to each.
-
-### Canonical data schema (S1)
-
-Components accept **only** a canonical Campos schema, never provider-specific DataFrames. Messiness is isolated to adapters.
-
-```python
-# conceptual — exact types TBD in implementation plan
-campos.schema.Player        # id, name, photo_url, club_id, league_id, nation, position, age, minutes
-campos.schema.Club          # id, name, crest_url, league_id, colour_primary, colour_secondary
-campos.schema.Shot          # x, y (normalised 0-1), xg, body_part, outcome, minute, player_id
-campos.schema.Action        # start_x, start_y, end_x, end_y, action_type, xt, outcome, player_id
-campos.schema.PercentileRow # stat_id, label, category, value, percentile, comparison_percentile?
-campos.schema.RadarCategory # label, value, comparison_value?, max
-```
-
-Coordinates are always normalised to 0–1 (both axes) so pitch plots are provider-agnostic. Adapters do the conversion.
-
-### Adapters
-
-v1 ships **two adapters**, deliberately chosen for the widest reach at launch: both are Opta-lineage and both are scrapable by end users, so no paid API access is required to use Campos.
-
-| Adapter | Schema source | Notes |
-|---|---|---|
-| **Opta** | Scraped theanalyst.com feeds — event stream + f9 season stats + qualifier taxonomy | Schema reference lives in [`withqwerty/www`](file:///Volumes/WQ/projects/www): `docs/OPTA-DATA-ATLAS.md`, `data/opta-definitions/opta-events.json`, `opta-f9-stats.json`, `opta-qualifiers.json`. Coordinate system normalises to 0–1; qualifier codes map to Campos action types. |
-| **WhoScored** | Scraped WhoScored match centre data | Also Opta-sourced downstream, so schema overlap with the Opta adapter is substantial — much of the adapter code is shared. Slightly different event taxonomy and a coarser qualifier set; adapter handles the translation. |
-
-Both adapters deliberately target **scrapable** sources. Paid-tier adapters (StatsBomb, Wyscout, Stats Perform Opta Sports API) are explicit v2 candidates, added once the core registry is proven. This keeps v1's addressable audience as wide as possible — any hobbyist with a Python script and a bit of patience can use Campos.
-
-Adapters live at `campos.adapters.<provider>` and expose a flat API:
-
-```python
-campos.adapters.opta.to_shots(df) -> list[Shot]
-campos.adapters.opta.to_players(df) -> list[Player]
-campos.adapters.whoscored.to_actions(df) -> list[Action]
-# etc.
-```
-
-Because both v1 adapters share Opta lineage, Campos can ship a shared `campos.adapters._opta_base` module that handles the common qualifier translation, with thin provider-specific wrappers on top. This keeps the battle-testing burden manageable — the hardest transformation logic is written and tested once.
-
-The nutmeg plugin's `acquire` skill can return data pre-adapted to Campos schema, so the common end-to-end agent flow is: *acquire → canonical → Campos component → rendered output* with no manual mapping.
-
-### Registry structure
-
-Campos is distributed as a GitHub repository with a registry layout modelled on shadcn:
+The source repository is a single Git monorepo with this shape:
 
 ```
-campos/
-├── registry/
-│   ├── components/
-│   │   ├── player-hero/
-│   │   │   ├── python.py          # matplotlib Figure
-│   │   │   ├── web.html           # HTML + inline SVG + CSS
-│   │   │   ├── meta.json          # name, description, deps, props, flavours, tags
-│   │   │   └── README.md          # usage, examples, edge cases, quality matrix
-│   │   ├── percentile-ribbon/
-│   │   └── ...
-│   ├── theme/
-│   │   ├── dark.css               # CSS variables
-│   │   ├── light.css
-│   │   └── rcparams.py            # matplotlib rcParams
-│   ├── schema/
-│   └── adapters/
-├── cli/
-│   └── campos                     # Python CLI (campos add, campos list, campos init)
-├── site/                          # registry website (Astro or similar, static)
-└── mcp/                           # MCP server exposing the registry to agents
+campos/                             # repo root — one source of truth
+├── schema/                         # language-neutral data contracts
+│   ├── player.schema.json
+│   ├── club.schema.json
+│   ├── shot.schema.json
+│   ├── action.schema.json
+│   ├── percentile_row.schema.json
+│   └── radar_category.schema.json
+├── theme/                          # language-neutral design tokens
+│   └── tokens.json                 # colours, spacing, typography, motion
+├── python/                         # Python flavour — v1 PyPI package lives here
+│   ├── pyproject.toml              # package name: campos
+│   ├── src/campos/
+│   │   ├── __init__.py             # public API re-exports
+│   │   ├── schema/                 # pydantic types generated from /schema
+│   │   ├── theme/                  # matplotlib rcParams generated from /theme
+│   │   └── components/
+│   │       ├── player_hero.py
+│   │       ├── percentile_ribbon.py
+│   │       ├── percentile_group.py
+│   │       ├── category_score_card.py
+│   │       ├── radar_chart.py
+│   │       ├── player_table.py
+│   │       ├── ranked_list.py
+│   │       └── shot_map.py
+│   └── tests/
+│       ├── fixtures/               # canonical test data — the 12-axis corpus
+│       └── components/             # 12-axis snapshot tests per component
+├── web/                            # v2+ web flavour — empty in v1
+├── react/                          # vN+ React flavour — empty in v1
+├── scripts/
+│   ├── generate_python_types.py    # /schema → pydantic (src/campos/schema/)
+│   └── generate_python_theme.py    # /theme/tokens.json → rcParams module
+├── docs/                           # docs site source (Quarto or similar)
+└── README.md
 ```
 
-### CLI
+**Why this layout**
 
-```bash
-campos init                         # sets up theme in user's project
-campos add player-hero              # agent-detects flavour, copies file in
-campos add player-hero --flavour web
-campos list                         # lists available components
-campos list --flavour python
-campos doctor                       # checks theme is installed correctly
-```
+- `schema/` and `theme/` are the truth. Every flavour *generates* or *consumes* them, never duplicates them. A schema change propagates to every flavour automatically via the generator scripts.
+- Each language flavour is a self-contained project in its own top-level folder (`python/`, `web/`, `react/`). A flavour can be developed, tested, versioned, and released without touching the others.
+- v1 populates only `python/`. `web/` and `react/` are empty placeholders that document *where future flavours go*, making the path from v1 to v2 a matter of adding files, not restructuring.
+- Test fixtures live under each flavour because snapshot formats differ (matplotlib SVGs for Python, Playwright screenshots for web). The *inputs* to those fixtures (canonical data) are the same across flavours and can be shared via symlinks or generators when web/react arrive.
+- The repo root has a `pyproject.toml` for monorepo-wide dev tooling (linting, formatting, type checking, schema generation), independent of the `python/pyproject.toml` that defines the publishable package.
 
-The CLI is Python (`pip install campos`) so it works in any Python project. For pure-web projects without Python, users copy files directly from the registry site.
+### Canonical data schema (JSON Schema as source of truth)
 
-### MCP server (agent-native discovery)
+Components accept only canonical Campos types. Provider-specific DataFrames are never passed directly.
 
-An MCP server exposes the component registry to agents directly, the same way `football-docs` exposes provider documentation to nutmeg today:
+The canonical schema is defined in **JSON Schema** at `schema/*.schema.json`. This is the single source of truth for data shapes. Language-specific types are *generated* from it:
 
-```
-mcp__campos__list_components()
-mcp__campos__search_components(query: str)   # "show player progression over seasons"
-mcp__campos__get_component(name, flavour)    # returns source + README + props
-mcp__campos__get_theme_tokens()
-```
+- **Python**: `scripts/generate_python_types.py` produces pydantic models at `python/src/campos/schema/*.py`.
+- **TypeScript** (future, for web/react): a generator will produce `.d.ts` files at `web/src/schema/` and `react/src/schema/`.
 
-This is the primary agent integration surface. The CLI is for humans; MCP is for agents. In practice agents will use MCP to discover and read components, then call the CLI (via Bash tool) to install them.
+v1 canonical types (conceptual — exact field names finalised during implementation):
 
-## Component inventory — v1 (9 components + theme)
-
-All components exist in both `python` and `web` flavours unless noted.
-
-| # | Component | Purpose | Hardest edge cases |
-|---|---|---|---|
-| 0 | **Theme** | CSS variables + matplotlib rcParams. Dark default, light variant, token-based rebrand. | Collision with user's existing matplotlib rcParams; CSS specificity inside Streamlit iframes. |
-| 1 | **PlayerHero** | Photo + name + chip row (nation / league / club / age / mins) + team-crest watermark + position pill. The centrepiece. | Missing photo (fallback initials); very long names; unicode; RTL names; missing crest; missing position; 2-line name; gradient fallback when no crest colour known. |
-| 2 | **PercentileRibbon** | Single labelled bar: stat name + value + percentile fill. | `NaN` percentile; negative values; values >100; zero minutes; comparison overlay; P90 vs Total mode; padj vs raw toggle. |
-| 3 | **PercentileGroup** | Collapsible category header with aggregate score + nested ribbons. | Single-ribbon group; 20-ribbon group; missing aggregate; categories with zero eligible stats. |
-| 4 | **CategoryScoreCard** | Small tile: category label + subject score (+ optional comparison score). Grid-composable. | Missing comparison; score >100; negative deltas; narrow viewport reflow. |
-| 5 | **RadarChart** | Football-aware radar: category labels around edge, subject polygon, optional comparison polygon, percentile rings, companion category-score tile grid. | 3 categories (minimum); 12 categories (maximum, label collision); missing categories; ties; reversed scales (lower=better stats like xGA). |
-| 6 | **PlayerTable** | Sortable football-flavoured table: crest+name cell, position pill cell, colour-scaled metric cells, minutes cell, alternating row treatment. | 1000+ rows (virtualisation in web flavour); missing crests; tied values; mixed data types; column sorting state; column overflow. |
-| 7 | **RankedList** | Rank + crest + name + subtext (club, pos) + value bar. Reused for leaderboards *and* similarity via a `mode` prop. | Tied ranks; 100 rows; very short value ranges; missing crests; subtext overflow. |
-| 8 | **ShotMap** | Hex-binned or point-based shot map with xG colour scale, shot-type shape encoding, legend, companion distribution bee-swarm ("you are here"). Python flavour wraps mplsoccer. | 0 shots; 1 shot; 500 shots; missing xG; shot on top of shot; pitch orientation (attack L→R or R→L); mirrored for away view. |
-| 9 | **ScatterWithLabels** | Scatter plot with top-N player annotations, league-colour legend, highlight list, optional quadrant lines. | Label overlap (force-directed layout in web, adjustText in python); very clustered data; missing values; highlight of non-existent player; log-scale axes. |
-
-Explicitly **not** in v1: PlayerComparisonHero, ActionMap, MultiPitchPanel, MatchHero, TrendLine, XGRace, PassNetwork, FormationDiagram, LeagueHeatmapTable, SeasonProjectionTable.
-
-## Quality bar
-
-Every component, in every flavour, must pass this 12-axis state-coverage checklist before it ships. Each axis is a row in the component's README quality matrix, with a green/red indicator and a linked snapshot test.
-
-| # | Axis | What "pass" means |
-|---|---|---|
-| 1 | **Empty** | `None` / empty DataFrame / empty list renders a graceful placeholder with explanatory text. Never raises. |
-| 2 | **Sparse** | 1 data point works without broken layouts (legends, gridlines, axes, tooltips all render sensibly). |
-| 3 | **Dense** | 1000+ rows / 500+ shots / 60 list items renders without overflow, label collision, or performance issues. Deterministic truncation where needed. |
-| 4 | **Missing** | `NaN` numerics, `None` strings, missing photos/crests/positions all have fallbacks. Every field has a defined empty-state. |
-| 5 | **Extreme values** | Negative percentiles, >100 percentiles, zero minutes, infinite xG, duplicate ranks: handled without corruption. |
-| 6 | **Text edges** | 30-character names, unicode (Ø, ñ, 张伟, Müller), RTL (عمر مرموش), 2-line names, all-caps: typeset correctly, no clipping. |
-| 7 | **Responsive** | Renders at 400px (mobile), 800px (embed), 1200px+ (dashboard). Print-to-A4 works for static outputs. |
-| 8 | **Theming** | Dark + light via CSS variables. One-line club rebrand by swapping `--campos-accent` and `--campos-surface`. |
-| 9 | **Composability** | Works inside a CSS grid, flex column, scroll container, Streamlit column, Quarto callout. No fixed positioning. |
-| 10 | **Matplotlib hygiene** | Python flavour respects `campos.use_theme()` without polluting the user's other plots. Figure is returned, never shown. |
-| 11 | **A11y** | Semantic HTML, alt text on images, `aria-label` on SVG, keyboard focus order, WCAG AA contrast. |
-| 12 | **Tested** | Snapshot tests exist for every row above. Fixtures stored in the registry so anyone can reproduce. |
-
-**This checklist is the product.** It is the single biggest differentiator versus the status quo (where football viz components are one-off gists with no edge-case handling). The registry site displays the quality matrix for every component prominently.
-
-## Integration with nutmeg
-
-Campos is a sibling, not a dependency, but the two integrate deeply:
-
-1. **The `nutmeg` plugin ships a `render` skill** that knows how to call Campos. When an agent completes an `acquire → wrangle → compute → analyse` flow, `render` composes Campos components into the user's project.
-2. **The MCP server from Campos is declared in nutmeg's `.mcp.json`** alongside football-docs. Agents using nutmeg automatically have component discovery.
-3. **`acquire` skill output is pre-adapted** to Campos schema where possible, so the agent can pass data directly into components without manual mapping.
-4. **Cross-linking on both landing pages.** nutmeg's site has a "render with Campos" section; Campos's site has a "get your data with nutmeg" section.
-5. **Shared design language.** The Campos website uses Campos components to demo itself; nutmeg-site (existing Astro project) will adopt Campos theme tokens for visual consistency across the brand family.
-
-## Distribution
-
-| Channel | Purpose |
+| Schema | Purpose |
 |---|---|
-| **GitHub repository** (`withqwerty/campos`) | Source of truth, issue tracker, contribution surface, MIT license |
-| **PyPI package** (`campos`) | CLI + schema + adapters; `pip install campos` |
-| **Registry website** (`campos.football` or similar — see open questions) | Browse components, see live examples, read quality matrix, copy source directly |
-| **MCP server** (bundled with package, declared in `.mcp.json`) | Agent-native component discovery |
-| **Plugin marketplace link** from nutmeg | Discoverability for Claude Code users |
+| `Player` | id, name, photo_url?, club_id?, league_id?, nation?, position?, age?, minutes?, birth_date? |
+| `Club` | id, name, crest_url?, league_id?, colour_primary?, colour_secondary? |
+| `Shot` | x, y (0–1 normalised), xg, body_part, outcome, minute, player_id? |
+| `Action` | start_x, start_y, end_x, end_y (0–1), action_type, xt?, outcome, player_id? |
+| `PercentileRow` | stat_id, label, category, value, percentile, comparison_percentile? |
+| `RadarCategory` | label, value, comparison_value?, max, reversed? |
 
-Launch order:
-1. GitHub repo with 3 components (PlayerHero, PercentileRibbon, ShotMap) — both flavours, both tested, both documented with quality matrix. Internal dogfood.
-2. Remaining 6 components + theme + adapters. Private beta with 3–5 friendly users from the football Python community.
-3. Registry website launch. Public announcement. Twitter thread with camponents pun.
-4. MCP server + nutmeg plugin integration.
-5. v1.0 tag once all 9 components have full green quality matrices.
+**Critical constraints:**
+
+- All pitch coordinates are normalised to 0–1 on both axes, never provider-native (120×80, 100×100, etc.). Normalisation is the job of whoever produces the data (in the Campos+nutmeg pipeline, that's nutmeg's acquire skill).
+- Every field that can be absent is explicitly optional in the schema. Components handle missing fields as part of the 12-axis quality bar; no field is "assumed present."
+- Schema evolution is versioned. Breaking changes bump a major version on the Campos package. Non-breaking additions (new optional fields) are minor version bumps. Deprecation follows semver conventions.
+
+### Distribution (v1)
+
+**v1 = one PyPI package: `campos`.**
+
+```
+pip install campos
+```
+
+That's the entire install story. There is no CLI. There is no website copy-paste. There is no registry of files to clone. Users `pip install`, `import`, and call functions. Exactly as idiomatic Python expects.
+
+```python
+import campos
+import matplotlib.pyplot as plt
+
+campos.use_theme("dark")
+
+fig = campos.player_hero(
+    campos.schema.Player(name="Michael Olise", club_id="bayern", ...),
+    club=campos.schema.Club(id="bayern", name="Bayern München", crest_url=...),
+)
+plt.show()
+```
+
+Docs site (content in `docs/`, built with Quarto or similar) is hosted on GitHub Pages at launch. PyPI package is published from `python/`. No other distribution surface in v1.
+
+### Relationship with nutmeg (one-way dependency)
+
+nutmeg and Campos are **separate projects with a one-way dependency**: nutmeg imports Campos, Campos does not know nutmeg exists. This is the same architectural relationship nutmeg has with `football-docs` today.
+
+Concretely:
+
+1. `nutmeg/pyproject.toml` (the nutmeg Claude Code plugin) adds `campos>=0.1` as a Python dependency.
+2. nutmeg adds a new skill (working name: `render`) that imports `campos` and composes components from the data produced by `acquire → wrangle → compute → analyse`.
+3. nutmeg's `acquire` skill is updated to output canonical Campos-schema-shaped data wherever sensible, so the render skill can pass acquired data into Campos components directly.
+4. Campos has no knowledge of nutmeg's existence anywhere in its source, docs, issues, or release notes. A non-nutmeg Python user should never encounter nutmeg by installing Campos.
+
+This resolves the earlier spec's "independent siblings" fiction: the projects are not siblings, they are a library and a consumer. The coupling is asymmetric, one-way, and completely honest.
+
+**Adapter location (ownership clarification):** scraped data adapters (Opta, WhoScored, and eventually StatsBomb, Wyscout) live **in nutmeg's acquire skill**, not in Campos. They are an acquisition concern, not a rendering concern. Campos accepts canonical schema only. This removes all scraping, all upstream HTML-change on-call burden, and all ToS exposure from Campos entirely.
+
+## Component inventory — v1 (8 components + theme)
+
+All Python flavour. Ordered here by *build priority* (risk-first), not alphabetically.
+
+| Build order | Component | Purpose | Why this position |
+|---|---|---|---|
+| 1 | **ShotMap** | Pitch plot with xG colour scale, shot-type shapes, companion distribution bee-swarm. Wraps mplsoccer. | **Riskiest component first** (per F3 in review). If the 12-axis bar is unachievable here, the whole plan reshapes. Dogfoods every hard decision: pitch orientation, dense-state handling, legend layout, bee-swarm composability, mplsoccer wrapping discipline. |
+| 2 | **RadarChart** | Football-aware radar with category labels, subject polygon, companion category-score tile grid, reversed-scale support. | Second-hardest. Validates label-collision handling at the 3-to-12-category range and tests the "companion grid" composition pattern also used by ShotMap. |
+| 3 | **PlayerTable** | Sortable table with crest+name cells, position pills, colour-scaled metric cells. | Third-hardest. Tests dense-state handling (1000+ rows), pandas-Styler integration, and table typography — a different set of edge cases from charts. |
+| 4 | **Theme** | `tokens.json` → rcParams. Dark default + light variant + club rebrand tokens. | Not risky, but every subsequent component depends on the theme being stable. Built alongside component 1 and refined iteratively as components 2–3 reveal gaps. |
+| 5 | **PlayerHero** | Photo + name + chip row + team-crest watermark + position pill + season badge. The showcase. | Typography + layout, harder than it looks (missing photos, unicode, long names, gradient fallback). First of the "chrome" components. |
+| 6 | **PercentileRibbon** | Single labelled bar with value and percentile fill; supports comparison overlay and P90/Total/padj/raw modes. | Simple visually, complex in mode handling. |
+| 7 | **PercentileGroup** | Category header + aggregate score + collapsible nested ribbons. | Pure composition on top of PercentileRibbon. Tests composability axis of the quality bar. |
+| 8 | **CategoryScoreCard** | Small tile with category label, subject score, optional comparison score. | Smallest, simplest component. Built last as a sanity check on the theme and to fill out the Scout-Lab-style player card grid. |
+| 9 | **RankedList** | Rank + crest + name + subtext + value bar. Used for leaderboards and similarity lists via a `mode` prop. | Last. Composition of typography + bar charts. Validates that the theme supports tabular visual rhythm. |
+
+**Total: 8 components + theme. 9 build units.**
+
+**Explicitly deferred to v1.x:** ScatterWithLabels (force-directed label collision is too hard for v1), PlayerComparisonHero (composition on top of PlayerHero), ActionMap, MultiPitchPanel.
+
+**Explicitly deferred to v2+:** match-level components, team/league components, web flavour, React flavour, MCP server, CLI.
+
+## Quality bar (12 axes, Python flavour)
+
+Every component must pass this checklist before it is considered done. Each axis is a row in the component's `README.md` quality matrix with a green/red indicator and a linked snapshot test.
+
+| # | Axis | Pass criteria |
+|---|---|---|
+| 1 | **Empty** | `None`, empty list, empty DataFrame → graceful placeholder, never raises. |
+| 2 | **Sparse** | 1 data point → legends/axes/tooltips sensible, no broken layout assumptions. |
+| 3 | **Dense** | 1000+ rows / 500+ shots / 60 list items → no overflow, deterministic truncation, no performance cliff. |
+| 4 | **Missing** | `NaN` numerics, `None` strings, absent photos/crests/positions → every field has a fallback. |
+| 5 | **Extreme** | Negative percentiles, >100 percentiles, zero minutes, infinite xG, duplicate ranks → no corruption. |
+| 6 | **Text edges** | 30-char names, unicode (Ø, ñ, 张伟, Müller), RTL (عمر مرموش), 2-line names, all-caps → typeset, no clipping. |
+| 7 | **Responsive** | Matplotlib figure renders at 400 / 800 / 1200 / 1600 px output widths. Print-to-A4 works. |
+| 8 | **Themeable** | Dark + light via theme swap. One-line club rebrand by overriding `--campos-accent` (in the tokens layer) / equivalent rcParam (in the matplotlib layer). |
+| 9 | **Composable** | Works inside a matplotlib subplot grid, a Streamlit column, a Quarto figure block. Returns `Figure` or `Axes`, never calls `plt.show()`. |
+| 10 | **Matplotlib hygiene** | `campos.use_theme()` does not mutate global rcParams beyond the call scope. No side effects on the user's other plots. |
+| 11 | **A11y** | Contrast ratios meet WCAG AA on all theme variants. Alt text in figure metadata. Colour is not the only encoding. |
+| 12 | **Tested** | Snapshot tests exist for every row above. Fixtures stored in `python/tests/fixtures/`. Tests reproducible by anyone. |
+
+**The checklist is the product.** It is what distinguishes Campos from gist-level football viz. The docs site displays the matrix prominently for every component; green cells are a promise.
+
+**Escape hatch (per F3):** if any single component's 12-axis matrix cannot be closed in 10 working days, that component is cut from v1 and the launch proceeds with the remaining components. No sunk-cost grinding. The 10-day rule is committed *before* building begins and enforced by the author on themselves.
+
+## Agent validation (the most important pre-build experiment)
+
+**The entire product thesis depends on agents being effective at picking, reading, and invoking Campos components from natural-language task descriptions.** This is untested. It will be tested before any component is built beyond the seed.
+
+### Experiment design
+
+**Inputs:**
+
+- Stub implementations of 3 components (PlayerHero, PercentileRibbon, ShotMap) with real docstrings, type hints, and minimal working behaviour.
+- Canonical schema pydantic types (real, generated from `schema/*.schema.json`).
+- A README that describes Campos at the level an LLM will encounter it in a user's project.
+- A representative dataset (StatsBomb Open Data for 1–2 players, pre-adapted to Campos schema).
+
+**Tasks:** 20 natural-language prompts of the form:
+
+1. "Build me a player report for Mohamed Salah using the data in `df`."
+2. "Show Olise's shot map alongside his top percentile stats."
+3. "Make a one-page scouting card I can share on Twitter."
+4. "I want to compare two players' shooting output visually."
+5. … (15 more variations covering different phrasings, different player archetypes, different output formats)
+
+**Agents tested:** Claude Code, Cursor, one open-source agent (e.g. Aider or Continue).
+
+**Measures:**
+
+- **Selection accuracy:** did the agent pick components that could plausibly satisfy the task?
+- **Schema compliance:** did the agent construct valid canonical-schema objects, or did it confabulate field names?
+- **Execution success:** did the generated code run without errors?
+- **Output quality:** did the rendered result look like what the user asked for? (Manual rubric, author-scored.)
+
+**Pass criteria:**
+
+- ≥70% of tasks produce working code on first attempt.
+- ≥85% of component selections are reasonable (no confabulated components, no obvious mismatches).
+- Zero schema hallucinations (agents do not invent fields that don't exist on Campos types).
+
+**If the experiment fails** (below the pass thresholds), the design assumptions in this spec are wrong and the project is paused for a rethink. The entire post-agent-validation plan is conditional on passing this eval.
+
+**Budget:** 1–2 days of author time to build the stubs, write the 20 tasks, run them, and score the results. This runs *before* the full build phase and is the cheapest available falsification of the core thesis.
+
+## Audience validation (the F1 experiment)
+
+Running in parallel with the agent eval:
+
+- **Find 5 existing open-source Python football apps** on GitHub that hand-rolled components Campos proposes to provide.
+- **For each, identify the specific component and the gap** — what was hand-written, why wasn't mplsoccer/an existing library sufficient?
+- **If you cannot find 5**, the audience is smaller than assumed and the scope should contract (or the project should pause).
+- **If the gaps all cluster around Typography/Layout components** (PlayerHero, PercentileRibbon, etc.), the reviewer's scope concern (F8) is validated and Campos can afford to drop the chart components from v1 in favour of a focused ship.
+- **If the gaps are chart components** (shot maps, radars, tables), the current scope is validated.
+
+This audit costs ~half a day and is a prerequisite to committing build time.
+
+## Launch plan (risk-first ordering)
+
+| Stage | Content | Gate |
+|---|---|---|
+| **S0 — Validation** | Agent eval (20 tasks, 3 stub components) + audience audit (5 GitHub apps) | Pass/fail decision before any real implementation begins. |
+| **S1 — Risk-first dogfood** | Build ShotMap (hardest) to full 12-axis green. Theme built alongside. | If ShotMap closes in ≤10 days, scope is survivable. If not, re-plan. |
+| **S2 — Chart dogfood** | Build RadarChart + PlayerTable to full green. | Confirms chart-heavy components are all achievable. |
+| **S3 — Chrome build-out** | Build PlayerHero, PercentileRibbon, PercentileGroup, CategoryScoreCard, RankedList. | Typography/layout components. Should be fastest stage. |
+| **S4 — Private beta** | 3–5 friendly users from Python football community install `campos==0.1.0rc1` and attempt to build something. | Interim success metric (see measurement plan). |
+| **S5 — Public v1.0** | Announcement, docs site, blog post, nutmeg plugin integration. | Full 8 components + theme green on all 12 axes. |
+
+Each stage has a kill-criterion (see measurement plan). No stage is allowed to start before the previous stage's gate has been passed.
+
+## Measurement plan (interim tripwires)
+
+The v1 (2026-04-05) draft listed 5 success criteria all measured at month 6. That is not a measurement plan; it is an obituary. v2 adds interim tripwires so the project can fail fast if the thesis is wrong.
+
+| Checkpoint | Signal | Kill-criterion |
+|---|---|---|
+| **End of S0** (~1 week in) | Agent eval ≥70% / ≥85% / 0 hallucinations + audience audit finds ≥5 real gaps | If any fail, pause and rethink the product. Do not proceed to S1. |
+| **End of S1** (~3 weeks in) | ShotMap closes 12-axis matrix in ≤10 working days | If it takes >15 days, cut scope by 1–2 chart components. If it takes >20, cut all charts and reassess whether Campos is viable. |
+| **End of S3** (~8 weeks in) | All 8 components + theme on main, half with green matrices | If <4 components are green, delay public launch and narrow scope. |
+| **End of S4** (~10 weeks in) | ≥1 beta user ships something without direct author help; ≥3 unsolicited feature/bug reports | If neither happens, the audience signal from S0 was false and the library is solving a problem the audience doesn't have. Delay public launch; reconsider target users. |
+| **v1.0 launch + 1 month** | ≥5 installs from non-author PyPI downloads; ≥1 external GitHub star from outside the author's network | If either fails, distribution strategy needs rework before investing in v1.1. |
+| **v1.0 launch + 6 months** | The original 5 success criteria (see below) | Final check. |
+
+## Success criteria (long-term, 6-month terminal)
+
+1. At least one independent developer has shipped a public football app using Campos, without direct help from the author.
+2. At least one Claude Code user has asked `/nutmeg` to "build me a scouting dashboard" and received a working Campos-based app.
+3. The quality matrix is fully green across the 8 components.
+4. At least 5 external contributions (bug reports, PRs, theme variants, new fixtures).
+5. At least 100 PyPI downloads per month from non-author sources.
+
+(Vibes metrics like "someone made the camponents joke on football Twitter" have been removed. They were not measurable signals.)
+
+## What this spec explicitly does NOT adopt from shadcn
+
+The previous draft leaned heavily on the shadcn analogy. The adversarial review correctly pointed out that shadcn's preconditions (React monoculture, copy-paste-comfortable audience, primitives not domain objects) don't transfer to Python football viz. v2 takes only the one idea from shadcn that genuinely transfers:
+
+- **Multi-flavour-capable source structure**: the ability to add new language flavours without duplicating schema or forking the repo.
+
+It does **not** adopt:
+
+- The copy-paste distribution model (Python users expect `pip install`).
+- The CLI (unnecessary without copy-paste).
+- The "you own the source and modify freely" ethos (users modify via theme tokens and component props; deep customisation means forking, same as any library).
+- The registry website pattern (the docs site is a docs site, not a source registry).
+- The claim that shadcn's success validates Campos's model (it doesn't; Campos is a new pattern in a new domain).
+
+This is a Python library with a monorepo structure that *keeps options open*, not a shadcn clone.
 
 ## Open questions
 
-1. **Adapter list confirmation.** Spec currently reflects author's 2026-04-05 revision: v1 ships **Opta + WhoScored** (both scrapable, both Opta-lineage), with StatsBomb + Wyscout deferred to v2. This replaces an earlier proposal of Opta/StatsBomb/Wyscout. Confirm during spec review.
-2. **Domain name.** `campos.dev`, `campos.football`, `camponents.dev`, `getcampos.com`. Check availability. Leaning `campos.football` for on-brand signalling.
-3. **MCP server packaging.** Ship as part of the `campos` Python package, or as a separate `@campos/mcp` npm package like football-docs? If the CLI is Python, bundling is simpler, but cross-ecosystem discoverability may favour npm.
-4. **Snapshot testing strategy.** Python flavour: pytest + matplotlib image comparison (mpl-testing). Web flavour: Playwright visual regression? Something lighter? Needs a decision before the quality-bar tests can be written.
-5. **Theme token naming.** `--campos-*` prefix is safest but verbose. `--cmp-*` is tight but collides with common abbreviations. Bikeshed during implementation.
-6. **Contribution model.** PRs welcome from v1, or closed during the battle-testing phase? Leaning closed until v1.0, then opened with a strict quality matrix requirement for any new component.
-7. **Pricing / sustainability.** MIT open source and free forever for the registry itself. Optional paid tier later for private component registries, club-branded theme packs, or commercial support? Out of scope for this spec but worth noting as a future lever.
+1. **Docs site tooling.** Quarto, MkDocs Material, Sphinx, or something custom? Leaning Quarto because it handles matplotlib figure embedding natively and matches the target audience's existing tooling.
+2. **Snapshot testing tooling.** `pytest-mpl` (matplotlib image comparison) for v1. Tolerance thresholds, baseline regeneration workflow, and fixture storage strategy all need to be pinned during S1.
+3. **Schema-to-pydantic generator choice.** `datamodel-code-generator` is the obvious pick. Confirm during S0.
+4. **Python version floor.** 3.10, 3.11, or 3.12? Leaning 3.10 for compatibility with the Streamlit / Marimo install base.
+5. **Matplotlib version floor.** 3.7+ for tight integration with the latest typography features; mplsoccer's own floor will constrain this.
+6. **Name final-check.** "Campos" vs distribution-friendlier alternatives (pitchkit, etc.). Reviewer flagged this as identity-over-distribution. Test by describing Campos to 5 Python analysts and measuring recognition before buying a domain.
+7. **Licence.** MIT for v1. Contribution-back clause for anyone shipping commercial products on top? Out of scope for v1; flag for v1.x.
+8. **nutmeg `render` skill scope.** Is it a new skill, or a capability added to the existing `analyse` skill? Decision belongs in nutmeg's repo, not this spec, but the coupling is worth noting.
 
-## Success criteria
+## Summary of changes from v1 → v2
 
-Campos v1 is successful if, 6 months after launch:
+The v1 (2026-04-05 earlier-same-day) draft proposed a shadcn-style dual-flavour registry with a CLI, MCP server, scraped adapters, and 9 components each maintained in two flavours. Adversarial review identified 4 blockers and 5 serious findings. v2 responds as follows:
 
-1. At least one independent developer has shipped a public football app using Campos components, without direct help from the author.
-2. At least one Claude Code user has asked `/nutmeg` to "build me a scouting dashboard" and received a working Campos-based app.
-3. The quality matrix has zero red cells across the 9 components.
-4. There are at least 5 external contributions (bug reports, PRs, theme variants, new adapters).
-5. Someone on football Twitter has made the "camponents" joke without being prompted.
+| Finding | v1 position | v2 position |
+|---|---|---|
+| **F1** — Audience evidence asserted, not shown | No evidence | S0 audience audit is a build gate |
+| **F2** — Dual-flavour maintenance burden infeasible solo | 9 × 2 × 12 = 216 cells | 8 × 1 × 12 = 96 cells; web flavour deferred but structurally enabled |
+| **F3** — Launch order starts with easy components | Seed = PlayerHero, PercentileRibbon, ShotMap | Build order 1 = ShotMap (hardest first); 10-day escape hatch per component |
+| **F4** — Scraped adapters = unacknowledged op debt | Adapters in Campos | Adapters moved to nutmeg entirely; Campos accepts canonical schema only |
+| **F5** — Agent-first premise unvalidated | Asserted | S0 agent eval (20 tasks, 3 thresholds) is a build gate |
+| **F6** — "Independent siblings" fiction | 5 mutual integration points | One-way dependency: nutmeg → campos. Campos has zero nutmeg awareness |
+| **F7** — shadcn analogy doesn't transfer | Implicit validation | Explicit rejection of shadcn distribution model; only the monorepo-structure idea is retained |
+| **F8** — Scope cuts breadth but kept hardest components | 9 components including ScatterWithLabels | Dropped ScatterWithLabels; kept chart-heavy per author's "complexity is where the value is" call; risk-first ordering + 10-day escape hatch |
+| **F9** — "Campos" name is identity-work | Committed | Deferred until docs site decision; recognition test added to open questions |
+| **F10** — No interim tripwires | Single 6-month terminal | Six interim checkpoints with explicit kill-criteria |
