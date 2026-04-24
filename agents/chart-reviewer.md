@@ -31,6 +31,7 @@ tools:
   - Grep
   - Glob
   - Bash
+  - WebFetch
   - mcp__football-docs__search_docs
 ---
 
@@ -118,6 +119,30 @@ For charts with interactivity, filters, or dynamic data:
 - Scroll while tooltip is open — does it dismiss or follow?
 - Click the same filter option twice — does it toggle or no-op?
 - Refresh the page — does state persist or reset correctly?
+
+### Mode 4: React + Campos
+
+Triggered when the reviewed code imports from `@withqwerty/campos-*`. Run alongside Mode 1. Load `skills/_shared/campos-bridge.md` for context; echo `CAMPOS_BRIDGE_LOADED_v1` once at the start of your review output to confirm the bridge was read.
+
+Before flagging, fetch the relevant chart's metadata:
+```
+WebFetch https://campos.withqwerty.com/r/charts/<Name>.json
+```
+to ground recipe suggestions and peer-dep expectations in current registry data rather than training-data memory. On `status: "degraded"`, skip Discoverability checks and reduce Conventions confidence.
+
+Sub-sectioned by severity so a single dispatch produces graded output:
+
+**Correctness (Critical / Warning — always run):**
+- **Canonical-frame enforcement** (Critical): any hand-written coordinate transform (`100 - y`, `* pitchWidth`, `scaleX(-1)` applied to shot data) inside a campos chart's consumer is a smell. The adapter should own the transform. Flag and point at `fromOpta.shots()` / `fromStatsBomb.shots()` / etc.
+- **Schema-vs-provider** (Critical): the chart consumer should take canonical types (`Shot[]`, `PassEvent[]`), not provider-shaped payloads. If raw `StatsBombEvent[]` / `OptaEvent[]` flows directly into `<ShotMap>` / `<PassMap>` without going through an adapter, flag.
+- **Peer-dep completeness** (Warning): warn if the consumer imports from `@withqwerty/campos-react` but not `@withqwerty/campos-stadia` when the chart requires it (check the registry's `peerDependencies` for that chart).
+
+**Conventions (Info unless user asked for a style review):**
+- **`attackingDirection`, not CSS transforms**: butterfly/rotated layouts must use the `attackingDirection` prop, not CSS `scaleX(-1)` applied via wrapper divs. Per campos `CLAUDE.md`.
+- **Zero-config invariant**: a campos chart should render without any non-data props. If a beginner-level user's JSX has more than 4 prop overrides, suggest a recipe instead.
+
+**Discoverability (Info, low priority, skip if chart is degraded):**
+- **Recipe usage**: if the consumer reimplements styling that exists as a named recipe in the registry's `recipes/<Name>.json`, recommend the recipe. Name it explicitly.
 
 ## Output format
 

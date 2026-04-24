@@ -29,6 +29,7 @@ This skill has two reference documents. Load them when relevant — don't read b
 |---|---|---|
 | **Chart Canon** | When discussing specific football chart types, conventions, or anti-patterns | `skills/brainstorm/references/chart-canon.md` |
 | **Viz Styles** | When helping the user choose a design approach or aesthetic direction | `skills/brainstorm/references/viz-styles.md` |
+| **Campos Bridge** | Strong React/campos signal in cwd — loads the bridge; soft signals surface a mention only | `skills/_shared/campos-bridge.md` |
 
 ## Process
 
@@ -41,6 +42,14 @@ Ask one question at a time to understand:
 - **What format?** Static image, interactive, animation, part of a larger report?
 
 Don't ask all of these upfront. Start with the most important one based on what they said, then follow up.
+
+**Detect React/campos context before proposing approaches:**
+
+- **Strong signal** — Read cwd's `package.json`; if it contains `react` or `@withqwerty/campos-react` in `dependencies`/`devDependencies`, load `skills/_shared/campos-bridge.md` and include campos options alongside Python/R in Phase 3.
+- **Soft signal** — user mentions React/TS/Next/Vite/campos/browser chart in conversation AND cwd does not have `pyproject.toml` / `requirements.txt` / `renv.lock` / `Gemfile`. Do not auto-load; mention the bridge exists and offer to load if the user confirms they want a React chart.
+- **Conflicting signal** — cwd is a Python/R/Ruby project. Keep the existing mplsoccer/ggplot2 path; soft signals are ignored. Strong signals still win (monorepo case).
+- **Integration-self signal** — cwd IS the campos or nutmeg repo itself (see the bridge doc for detection). Downgrade to soft — working on the integration is not the same as using it.
+- **No signal** — existing path unchanged.
 
 **Determine their style early.** Load `references/viz-styles.md` and identify which style fits their context (Analytical, Social Media, Editorial, Minimal/Academic). For advanced users, skip the style discussion — they know what they want. Focus on the specific technique.
 
@@ -84,6 +93,8 @@ Lead with your recommendation and explain why. Adapt to their style:
 - For **social media** users: emphasise visual impact, self-contained-ness
 - For **editorial** users: emphasise narrative power, annotation, metaphor
 - For **academic** users: emphasise precision, reproducibility, uncertainty
+
+**When the campos bridge is loaded (React/campos strong signal):** at least one of the 2-3 proposals must be a campos chart. Fetch the registry catalogue (`https://campos.withqwerty.com/r/registry.json`) and rank `featured: true` charts first for beginner and competent users. Cite the capability status per the bridge's refusal templates — don't propose a chart for a provider/chart pair flagged `unsupported` without naming the gap.
 
 ### Phase 4: Refine and build
 

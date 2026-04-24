@@ -2,7 +2,7 @@
 name: nutmeg-review
 description: "Review football data code and visualisations for correctness. Use after building a chart, data pipeline, or analysis. Dispatches specialised reviewers for data correctness, chart conventions, visual inspection, and interactive edge cases."
 argument-hint: "[what to review, e.g. 'my shot map code' or 'the passmap page']"
-allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__football-docs__search_docs"]
+allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "WebFetch", "mcp__football-docs__search_docs"]
 ---
 
 # Review
@@ -27,9 +27,12 @@ Look at what the user wants reviewed. Read the relevant files. Then decide which
 | Code renders a chart or visualisation | **chart-reviewer** agent (Mode 1: Code Review) |
 | User provides a URL or says "check how it looks" | **chart-reviewer** agent (Mode 2: Visual Inspection) |
 | Chart has filters, tooltips, state, or dynamic data | **chart-reviewer** agent (Mode 3: Interactive Edge Cases) |
+| Code imports `@withqwerty/campos-*` (React + campos) | **chart-reviewer** agent (Mode 4: React + Campos) — pass `skills/_shared/campos-bridge.md` in context |
 | Code does both data processing AND chart rendering | **Both agents** in parallel |
 
 **Always dispatch at least one.** If unclear, dispatch both — redundant findings are better than missed issues.
+
+Detection for Mode 4: grep the reviewed files for `@withqwerty/campos-` or `from "@withqwerty/campos`. Any match activates Mode 4 alongside Mode 1.
 
 ## Dispatch
 
