@@ -81,18 +81,11 @@ Think Context7 for football data. Provider-specific facts, including identity
 surfaces and ID-scheme quirks, should come from this index rather than from
 Nutmeg's own prompts.
 
-```bash
-# Build the docs index
-cd mcp/football-docs-server
-npm install
-npm run ingest
-
-# The MCP server starts automatically when nutmeg is loaded
-```
+The server is published as the [`football-docs`](https://www.npmjs.com/package/football-docs) npm package and starts automatically when nutmeg is loaded (via `npx -y football-docs`). No local build step is required.
 
 ### Adding provider docs
 
-Drop markdown files in `docs/providers/{provider}/` and re-run `npm run ingest`:
+Provider docs and the search index live in the [football-docs](https://github.com/withqwerty/football-docs) repository. Drop markdown files in `docs/{provider}/` there and run `pnpm ingest` to rebuild `data/docs.db`:
 
 ```
 docs/providers/
