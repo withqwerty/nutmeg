@@ -51,6 +51,11 @@ You are a football data pipeline architect. Your job is to design complete, prac
 3. Design the pipeline with these stages:
 
    **Source selection:** Which data source(s) have what they need? Use `search_docs` to check provider coverage. Prefer free sources when possible.
+   For entity-resolution or provider-ID matching steps, read
+   `docs/entity-resolution-routing.md`: provider facts come from
+   `football-docs`, reusable matching code belongs in `reep-scripts`, and
+   private matching logic pack material is referenced only when the user has
+   access.
 
    **Acquisition:** What data to fetch, using what tool/library. Write the acquisition code or reference `/nutmeg-acquire`.
 

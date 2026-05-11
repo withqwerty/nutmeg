@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "nutmeg",
-      "description": "Football data analytics toolkit. Covers 16 providers including Opta, StatsBomb, Wyscout, SportMonks, soccerdata, mplsoccer, databallpy, and free sources. Acquire, wrangle, compute, analyse, brainstorm visualisations, and review your work. Includes a searchable MCP docs server with 640+ indexed documentation chunks. 12 skills, 3 agents.",
+      "description": "Football data analytics toolkit. Covers football provider docs, identity surfaces, and analytics workflows including Opta, StatsBomb, Wyscout, SportMonks, soccerdata, mplsoccer, databallpy, and free sources. Acquire, wrangle, compute, analyse, brainstorm visualisations, and review your work. Includes a searchable MCP docs server, Reep Register lookup routing, 10 skills, and 3 agents.",
       "author": {
         "name": "withqwerty",
         "url": "https://github.com/withqwerty"

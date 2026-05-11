@@ -1,8 +1,8 @@
 ---
 name: nutmeg-learn
-description: "Learn about football analytics concepts and explore provider documentation. Use when the user asks what a metric means (xG, PPDA, expected threat, xT), wants learning resources, papers, or courses, is new to football analytics, or wants a learning path. Also use when the user asks about data provider documentation — qualifier IDs, coordinate systems, event types, API schemas, field mappings — or wants to compare providers, look something up in the docs, or find out what data a provider offers."
+description: "Learn about football analytics concepts and explore provider documentation. Use when the user asks what a metric means (xG, PPDA, expected threat, xT), wants learning resources, papers, or courses, is new to football analytics, or wants a learning path. Also use when the user asks about data provider documentation — qualifier IDs, coordinate systems, event types, API schemas, field mappings, identity surfaces, provider ID schemes — or wants to compare providers, look something up in the docs, or find out what data a provider offers."
 argument-hint: "[concept, 'getting started', or provider query]"
-allowed-tools: ["Read", "mcp__football-docs__search_docs", "mcp__football-docs__list_providers", "mcp__football-docs__compare_providers"]
+allowed-tools: ["Read", "mcp__football-docs__search_docs", "mcp__football-docs__list_providers", "mcp__football-docs__compare_providers", "mcp__football-docs__resolve_entity"]
 ---
 
 # Learn
@@ -139,7 +139,7 @@ Why: a player with 2 goals in 180 minutes (per 90: 1.0) is performing the same a
 
 ## Provider documentation
 
-When the user asks about provider-specific details — event types, qualifier IDs, coordinate systems, API schemas, field mappings — use the football-docs MCP tools.
+When the user asks about provider-specific details — event types, qualifier IDs, coordinate systems, API schemas, field mappings, identity surfaces, or provider ID schemes — use the football-docs MCP tools.
 
 ### Answering specific questions
 
@@ -149,6 +149,19 @@ Examples:
 - "What qualifier ID is a headed goal in Opta?" → `search_docs(query="headed goal qualifier", provider="opta")`
 - "How does StatsBomb represent xG?" → `search_docs(query="xG expected goals", provider="statsbomb")`
 - "What free data sources have shot-level data?" → `search_docs(query="shot data free", provider="free-sources")`
+- "Is Transfermarkt player ID safe to bridge?" → `search_docs(query="identity surfaces player ID bridge quirks", provider="transfermarkt")`
+- "How should I interpret Soccerdonna match reports?" → `search_docs(query="identity surfaces match reports player profile", provider="soccerdonna")`
+
+### Entity resolution
+
+For entity-resolution questions, also read `docs/entity-resolution-routing.md`.
+Keep the boundary clear:
+
+- provider facts and quirks come from `football-docs`;
+- public Reep ID lookup uses the Reep Register tooling where available;
+- reusable matching code and public-safe schemas belong in `reep-scripts`;
+- private matching logic pack material is referenced only when the user has
+  access or provides the relevant contents.
 
 ### Comparing providers
 

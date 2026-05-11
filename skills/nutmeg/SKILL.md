@@ -33,6 +33,7 @@ Read what the user is asking. Classify it into one of these intents:
 | **Learn / explain** | "what is xG", "explain", "teach me", "resources", "how does X work" | Invoke `/nutmeg-learn` |
 | **Manage credentials** | "API key", "authentication", "set up access" | Invoke `/nutmeg-acquire` (credentials are part of acquisition) |
 | **Provider docs** | "qualifier ID", "coordinate system", "what fields does X have" | Invoke `/nutmeg-learn` (provider docs are part of learning) |
+| **Entity resolution / ID matching** | "same player", "match IDs", "provider bridge", "map Transfermarkt to Opta", "candidate match", "identity surface" | Read `docs/entity-resolution-routing.md`; use `football-docs` for provider facts, Reep Register lookup for public IDs, and `reep-scripts` for matching code |
 | **Plan a pipeline** | "I want to build...", "how do I approach...", multi-step goal | Dispatch `pipeline-builder` agent |
 | **Update profile** | "update my profile", "change my settings", "nutmeg init" | Run init flow from `references/init-flow.md` |
 
@@ -50,6 +51,16 @@ For provider-specific lookups that are quick (single qualifier ID, one field nam
 - `search_docs(query, provider?)` for specific questions
 - `compare_providers(topic, providers?)` for comparisons
 - `list_providers()` to show coverage
+
+For entity-resolution requests, read `docs/entity-resolution-routing.md` before
+answering. Nutmeg should route the work, not become the source of truth:
+
+- provider ID grains, quirks, and source access constraints come from
+  `football-docs`;
+- public ID lookup uses Reep Register through `resolve_entity` when available;
+- reusable matching/candidate code belongs in `reep-scripts`;
+- the matching logic pack is mentioned only for users who have access to that
+  private partner material.
 
 Follow the accuracy guardrail: read `docs/accuracy-guardrail.md`. Never guess provider-specific facts from training data.
 

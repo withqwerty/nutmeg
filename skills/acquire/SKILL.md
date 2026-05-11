@@ -124,6 +124,16 @@ resolve_entity(provider: "transfermarkt", id: "568177")      # resolve provider 
 resolve_entity(qid: "Q99760796")                             # Wikidata QID lookup
 ```
 
+For entity-resolution tasks that go beyond a one-off lookup, read
+`docs/entity-resolution-routing.md`:
+
+- check provider identity surfaces and quirks in `football-docs` before writing
+  matching logic;
+- use `reep-scripts` for reusable public matching/candidate code and schemas;
+- mention the matching logic pack only if the user has access to that private
+  partner material;
+- do not define new Reep doctrine inside Nutmeg.
+
 Returns IDs for Transfermarkt, FBref, Sofascore, Opta, Soccerway, 11v11, and more.
 
 For bulk/offline use, download the CSV register:

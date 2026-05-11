@@ -14,6 +14,7 @@ nutmeg gives Claude deep knowledge of football data so it can help you:
 
 - **Acquire** data from Opta, StatsBomb, Wyscout, SportMonks, FBref, Understat, and more
 - **Wrangle** event streams, transform coordinates, join datasets, handle large files
+- **Route entity-resolution work** to the right public surface: provider facts in football-docs, public ID lookup in Reep Register, reusable matching code in reep-scripts
 - **Compute** derived metrics like xG, PPDA, passing networks, expected threat
 - **Store** data in the right format and publish results via Streamlit, Observable, or static sites
 - **Analyse** matches, players, and teams with statistical rigour
@@ -75,7 +76,10 @@ These are invoked automatically by `/nutmeg` based on what you're doing. Power u
 
 ## Football Docs MCP Server
 
-nutmeg includes a searchable index of football data provider documentation. Think Context7 for football data.
+nutmeg includes a searchable index of football data provider documentation.
+Think Context7 for football data. Provider-specific facts, including identity
+surfaces and ID-scheme quirks, should come from this index rather than from
+Nutmeg's own prompts.
 
 ```bash
 # Build the docs index

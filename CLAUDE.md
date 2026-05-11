@@ -43,6 +43,10 @@ docs/
 
 - Every provider-touching skill includes the accuracy guardrail section
 - Skills use `search_docs` from the football-docs MCP server for all provider-specific facts
+- Entity-resolution tasks route through `docs/entity-resolution-routing.md`:
+  provider facts in `football-docs`, public ID lookup through Reep Register,
+  reusable matching code in `reep-scripts`, and private matching logic pack
+  material only when the user has access
 - User profile lives at `.nutmeg.user.md` (created by `/nutmeg` on first run)
 - Skills adapt to user's language (Python/R/JS), experience level, and available data sources
 - Reference docs in skills/brainstorm/references/ are loaded on-demand, not all upfront
@@ -51,7 +55,8 @@ docs/
 ## Related projects
 
 **football-docs** (npm: `football-docs`, repo: `withqwerty/football-docs`)
-- MCP server providing searchable documentation for 16 football data providers
+- MCP server providing searchable documentation for football data providers
+  and identity surfaces
 - Connected via `.mcp.json` — starts automatically when the plugin loads
 - Skills query it via `mcp__football-docs__search_docs`, `list_providers`, `compare_providers`
 

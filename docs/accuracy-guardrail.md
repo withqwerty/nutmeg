@@ -7,6 +7,7 @@ Football data providers change their APIs, schemas, event types, qualifier IDs, 
 **Always use `search_docs` for:**
 - Qualifier IDs and type IDs (e.g., Opta qualifier 76, StatsBomb type 30)
 - API endpoint URLs and request/response schemas
+- Provider ID grains, identity surfaces, URL handles, and bridge quirks
 - Field names, data types, and value ranges
 - Coordinate system origins, ranges, and conversion formulas
 - Rate limits, authentication methods, and access requirements
@@ -28,3 +29,11 @@ Football data providers change their APIs, schemas, event types, qualifier IDs, 
 - Look up the exact field names and types via `search_docs` before writing access patterns
 - Verify coordinate system before any spatial calculation
 - Check the provider's event type IDs before filtering or mapping
+
+**When handling entity resolution:**
+- Use `docs/entity-resolution-routing.md` to route the request.
+- Use `football-docs` for provider facts and quirks.
+- Use Reep Register tooling for public ID lookup where available.
+- Point reusable matching/candidate code to `reep-scripts`.
+- Do not duplicate private Reep doctrine or matching logic pack material inside
+  Nutmeg.
