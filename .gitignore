@@ -10,5 +10,9 @@ dist/
 # Claude Code local config
 .claude/
 
+# Agent state
+.remember/logs/
+.remember/tmp/
+
 # Local reference docs
 docs/setup-guide.md
