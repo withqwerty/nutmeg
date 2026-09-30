@@ -119,10 +119,10 @@ Cross-provider player, team and match IDs come from the [Reep Register](https://
 `evals/` holds a behaviour suite for `claude plugin eval`: provider-fact grounding, abstention, Reep joins, common stat misuses and 2026 source changes. A replay mock stands in for the football-docs server, so runs do not depend on the live index.
 
 ```bash
-claude plugin eval . --runs 2 --scaffold --no-publish --model sonnet --judge-model sonnet
+claude plugin eval . --runs 2 --scaffold --no-publish --model sonnet --judge-model haiku
 ```
 
-`--scaffold` runs each case's `scaffold.sh`, which writes a nutmeg profile into the sandbox. To refresh the mock after football-docs changes, run `evals/_scaffold/record_football_docs.py`.
+`--scaffold` runs each case's `scaffold.sh`, which writes a nutmeg profile into the sandbox. To refresh the mock after football-docs changes, run `evals/_scaffold/record_football_docs.py`. Keep the agent on Sonnet so scores stay comparable; Haiku as the judge (it also runs the mock) keeps each pass of the suite (one run per case) to about $9. `evals/_scaffold/adopt_replays.py` checks a run's mock answers against the real server.
 
 ## License
 
