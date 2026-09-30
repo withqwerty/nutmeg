@@ -3,7 +3,7 @@ type: agent
 tools: [search_docs, get_provider_docs, compare_providers, list_providers, resolve_provider_id, resolve_entity, request_update]
 ---
 
-You are a replay of the football-docs MCP server, version 0.14.0.
+You are a replay of the football-docs MCP server, version 0.15.0.
 You never write new documentation content. Every answer is one recorded response below, copied exactly.
 
 How to answer a call:
@@ -65,6 +65,8 @@ How to answer a call:
 ````text
 Found 4 result(s) for "big chance qualifier" in opta:
 
+Results 1-2 match every term. Results 3-4 match only some terms.
+
 ## [1] Zone and low-xG proxies
 **Provider:** opta | **Category:** charting-shot-placement | **Source:** curated by football-docs contributors
 
@@ -125,13 +127,13 @@ charting-shot-placement for the full zone list.
 ---
 
 ## [3] Pass Qualifiers
-**Provider:** opta | **Category:** qualifiers | **Source:** curated by football-docs contributors
+**Provider:** opta | **Category:** qualifiers | **Source:** curated by football-docs contributors | **Match:** partial
 
 ## Pass Qualifiers
 
 | ID | Name | Notes |
 |----|------|-------|
-| 1 | longBall | Pass longer than 32 metres |
+| 1 | longBall | Intended long ball, including launches. The definition is about intent, not a fixed length: in Premier League 2025/26 data almost every pass of 32 metres or more has Q1, and some shorter passes have it too |
 | 2 | cross | Cross (Q2). Corners commonly carry Q2 + Q6; free-kick crosses commonly carry Q2 + Q5; open-play crosses are Q2 without Q5/Q6. |
 | 3 | headPass | Headed pass (Q3). Distinct from Q15, the headed shot qualifier. |
 | 4 | throughBall | Through ball (Q4). Do not confuse with Q5 free-kick delivery. |
@@ -141,7 +143,7 @@ charting-shot-placement for the full zone list.
 | 124 | goalKick | Goal kick pass. For goal-kick distribution charts, combine with pass end coordinates Q140/Q141. |
 | 279 | kickOff | Kick-off pass. Value `S` is the kick-off that starts a period; `G` is the kick-off after a goal. |
 | 7 | playersCaughtOffside | On an offside pass (typeId 2). The value is the ID of the player caught offside. It is not a goal-kick flag; goal kicks are Q124. |
-| 154 | intentionalAssist | Pass that creates a scoring chance, for example a cross into the box or a through ball |
+| 154 | intentionalAssist | The assist was intentional: the passer meant the pass, with no deflection. It appears on the assisting pass and on the shot. For the pass that set up a shot use Q210; for an assisted shot use Q29 |
 | 210 | assist | The pass set up a shot, a goal or a missed chance |
 | 196 | switchOfPlay | Pass crossing centre zone, y-distance > 60 |
 | 212 | length | Estimated distance in metres that the ball travelled on the pass or clearance |
@@ -149,39 +151,34 @@ charting-shot-placement for the full zone list.
 
 ---
 
-## [4] Shot context and consequence filters
-**Provider:** opta | **Category:** charting-shot-placement | **Source:** curated by football-docs contributors
+## [4] Shot event and result fields
+**Provider:** opta | **Category:** charting-shot-placement | **Source:** curated by football-docs contributors | **Match:** partial
 
-## Shot context and consequence filters
+## Shot event and result fields
 
-Shot-placement stories often ask whether a miss, save, post hit, or weak finish
-changed the match state. Join each shot row to a running scoreline timeline before
-building late-game, close-game, or "mattered" filters.
+| Event or qualifier | Meaning |
+|---|---|
+| typeId `13` | miss / off target |
+| typeId `14` | shot on post |
+| typeId `15` | attempt saved |
+| typeId `16` | goal |
+| qualifier `82` | blocked shot |
+| qualifier `102` | `GoalMouthY`, horizontal endpoint across the goal mouth |
+| qualifier `103` | `GoalMouthZ`, vertical endpoint / height |
+| qualifier `146` | X coordinate where the shot was blocked |
+| qualifier `147` | Y coordinate where the shot was blocked |
 
-| Derived field | How to derive it | Use |
-|---|---|---|
-| `team_score_at_shot` / `opp_score_at_shot` | Count valid goals strictly before the shot clock, from the shooting team's perspective | Tooltip, score-state splits, consequence labels |
-| `goal_diff_at_shot` | `team_score_at_shot - opp_score_at_shot` | Classify whether the shooter was leading, level, or trailing |
-| `state_at_shot` | `winning`, `drawing`, or `losing` from `goal_diff_at_shot` | Filter shot maps by game state or pressure context |
-| `is_late` | minute threshold such as `minute >= 80`, using expanded minutes when available | Late-shot and stoppage-time story filters |
-| `is_close_final` | final margin within one goal, after converting to the shooting team's perspective | Avoid overstating misses in already-decided matches |
-| `mattered` | shot taken while the goal difference was within one and the final margin was within one | Narrative filter for chances that could plausibly change the result |
-
-Use the goal-timeline reconstruction in [charting-game-state.md](charting-game-state.md):
-drop disallowed goals with qualifier `8`, credit own goals with qualifier `28` to
-the opposing team, and sort by period-aware clock or `expandedMinute`. Count only
-goals before the shot; a goal event at the same clock should not retroactively
-change the shot's pre-shot state unless the provider explicitly links them.
-
-Keep these consequence fields separate from provider facts. `mattered`,
-`late`, `close final`, and `pressure shot` are analysis labels layered on top of
-Opta events, not Opta event types.
+When deriving a shot result, handle qualifier `82` before treating typeId `15` as
+a normal saved shot. Some serializers classify a shot as blocked from the qualifier
+even when the broader type branch would otherwise be "attempt saved".
 ````
 
 ### s02 — search_docs {"query": "expected goals xG qualifier", "provider": "opta", "max_results": 4}
 
 ````text
 Found 4 result(s) for "expected goals xG qualifier" in opta:
+
+Results 1-3 match every term. Results 4-4 match only some terms.
 
 ## [1] Shot placement data surfaces
 **Provider:** opta | **Category:** charting-shot-placement | **Source:** curated by football-docs contributors
@@ -265,7 +262,7 @@ Implementation notes:
 ---
 
 ## [4] Edge cases to test
-**Provider:** opta | **Category:** charting-game-state | **Source:** curated by football-docs contributors
+**Provider:** opta | **Category:** charting-game-state | **Source:** curated by football-docs contributors | **Match:** partial
 
 ## Edge cases to test
 
@@ -273,7 +270,7 @@ Add tests or fixtures for these cases when implementing game-state logic:
 
 | Case | Expected handling |
 |---|---|
-| Disallowed goal with qualifier `8` | does not change scoreline |
+| Goal ruled out by VAR (typeId `84`, qualifier `436` = `16`) | does not change scoreline |
 | Own goal with qualifier `28` | increments the opposing team's score |
 | Multiple goals in stoppage time | sorted by expanded minute / period-aware clock |
 | Goal before a pass-map window | affects every later pass in that team's state |
@@ -286,6 +283,8 @@ Add tests or fixtures for these cases when implementing game-state logic:
 ````text
 Found 4 result(s) for "own goal event" in statsbomb:
 
+Results 1-3 match every term. Results 4-4 match only some terms.
+
 ## [1] Event Type Reference
 **Provider:** statsbomb | **Category:** event-types | **Source:** curated by football-docs contributors
 
@@ -296,7 +295,7 @@ Found 4 result(s) for "own goal event" in statsbomb:
 | 2 | Ball Recovery | Player regains possession from a loose ball |
 | 3 | Dispossessed | Player loses the ball through opponent action (not a failed dribble) |
 | 4 | Duel | Contested situation between two players (aerial or ground) |
-| 5 | Camera On* | Signals the stop of the camera capturing gameplay for a replay/video cut (deprecated; superseded by `off_camera`) |
+| 5 | Camera On* | Camera coverage resumes after a break, for example a replay (deprecated; superseded by `off_camera`) |
 | 6 | Block | Player blocks a shot, pass, or cross |
 | 8 | Offside | Player caught in an offside position |
 | 9 | Clearance | Defensive action to remove the ball from a dangerous area |
@@ -315,6 +314,7 @@ Found 4 result(s) for "own goal event" in statsbomb:
 | 26 | Player On | Player enters the pitch (substitution on) |
 | 27 | Player Off | Player leaves the pitch (substitution off) |
 | 28 | Shield | Player shields the ball from an opponent |
+| 29 | Camera off | Camera coverage stops, for example for a replay (deprecated with Camera On; superseded by `off_camera`) |
 | 30 | Pass | Any pass between players, including crosses, through balls, etc. |
 | 33 | 50/50 | Contested loose ball between two players |
 | 34 | Half End | Marks the end of each half/period |
@@ -391,7 +391,7 @@ shot-stopping). See `xg-model.md`.
 ---
 
 ## [4] Goals & expected goals
-**Provider:** statsbomb | **Category:** team-season-stats | **Source:** curated by football-docs contributors
+**Provider:** statsbomb | **Category:** team-season-stats | **Source:** curated by football-docs contributors | **Match:** partial
 
 ## Goals & expected goals
 
@@ -624,6 +624,8 @@ npxg = sum(
 ````text
 Found 4 result(s) for "FBref xG progressive passes":
 
+Results 1-1 match every term. Results 2-4 match only some terms.
+
 ## [1] free-sources - fbref
 **Provider:** free-sources | **Category:** fbref | **Source:** curated by football-docs contributors
 
@@ -645,7 +647,7 @@ basic statistics and squad information across 100+ competitions.
 ---
 
 ## [2] Player reports
-**Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03
+**Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03 | **Match:** partial
 
 ## Player reports
 
@@ -664,7 +666,7 @@ Source: [https://dataglossary.wyscout.com/player_reports/](https://dataglossary.
 ---
 
 ## [3] Team stats (per season)
-**Provider:** free-sources | **Category:** fbref | **Source:** curated by football-docs contributors
+**Provider:** free-sources | **Category:** fbref | **Source:** curated by football-docs contributors | **Match:** partial
 
 ### Team stats (per season)
 
@@ -682,7 +684,7 @@ Source: [https://dataglossary.wyscout.com/player_reports/](https://dataglossary.
 ---
 
 ## [4] FBref
-**Provider:** free-sources | **Category:** overview | **Source:** curated by football-docs contributors
+**Provider:** free-sources | **Category:** overview | **Source:** curated by football-docs contributors | **Match:** partial
 
 ## FBref
 
@@ -815,6 +817,8 @@ many leagues. Advanced metrics covered 2017/18 to January 2026 only.
 ````text
 Found 4 result(s) for "Reep register download DuckDB":
 
+Results 1-3 match every term. Results 4-4 match only some terms.
+
 ## [1] reep - download-duckdb-csv
 **Provider:** reep | **Category:** download-duckdb-csv | **Source:** curated by football-docs contributors | crawled 2026-09-29
 
@@ -887,7 +891,7 @@ that answers the question from the download. Example MCP configuration:
 ---
 
 ## [4] Keeping a local copy current
-**Provider:** reep | **Category:** download-duckdb-csv | **Source:** curated by football-docs contributors | crawled 2026-09-29
+**Provider:** reep | **Category:** download-duckdb-csv | **Source:** curated by football-docs contributors | crawled 2026-09-29 | **Match:** partial
 
 ## Keeping a local copy current
 
@@ -909,6 +913,8 @@ before any bulk matching job.
 
 ````text
 Found 3 result(s) for "identity surfaces player ID" in transfermarkt:
+
+Results 1-1 match every term. Results 2-3 match only some terms.
 
 ## [1] Entity ID fields
 **Provider:** transfermarkt | **Category:** identity-surfaces | **Source:** curated by football-docs contributors
@@ -932,7 +938,7 @@ competitions, and match or game IDs for fixtures.
 ---
 
 ## [2] transfermarkt - identity-surfaces
-**Provider:** transfermarkt | **Category:** identity-surfaces | **Source:** curated by football-docs contributors
+**Provider:** transfermarkt | **Category:** identity-surfaces | **Source:** curated by football-docs contributors | **Match:** partial
 
 # Transfermarkt Identity Surfaces
 
@@ -943,7 +949,7 @@ community exports.
 ---
 
 ## [3] Other fields
-**Provider:** transfermarkt | **Category:** identity-surfaces | **Source:** curated by football-docs contributors
+**Provider:** transfermarkt | **Category:** identity-surfaces | **Source:** curated by football-docs contributors | **Match:** partial
 
 ## Other fields
 
@@ -962,8 +968,10 @@ community exports.
 ````text
 Found 4 result(s) for "identity surfaces player ID" in fbref (free-sources):
 
+No indexed doc matches every term, so these are partial matches. Check that they answer the question before relying on them.
+
 ## [1] Project use
-**Provider:** free-sources | **Category:** understat | **Source:** curated by football-docs contributors
+**Provider:** free-sources | **Category:** understat | **Source:** curated by football-docs contributors | **Match:** partial
 
 ## Project use
 
@@ -984,7 +992,7 @@ When joining to Opta, SportMonks, football-data.co.uk, or another fixture source
 ---
 
 ## [2] Base fixture authority
-**Provider:** free-sources | **Category:** contextual-story-joins | **Source:** curated by football-docs contributors
+**Provider:** free-sources | **Category:** contextual-story-joins | **Source:** curated by football-docs contributors | **Match:** partial
 
 ## Base fixture authority
 
@@ -1005,7 +1013,7 @@ and mark the enrichment fields unavailable.
 ---
 
 ## [3] StatsBomb Open Data
-**Provider:** free-sources | **Category:** overview | **Source:** curated by football-docs contributors
+**Provider:** free-sources | **Category:** overview | **Source:** curated by football-docs contributors | **Match:** partial
 
 ## StatsBomb Open Data
 
@@ -1040,7 +1048,7 @@ dataset = statsbomb.load_open_data(match_id=3788741)
 ---
 
 ## [4] API Response Keys
-**Provider:** free-sources | **Category:** understat | **Source:** curated by football-docs contributors
+**Provider:** free-sources | **Category:** understat | **Source:** curated by football-docs contributors | **Match:** partial
 
 ### API Response Keys
 
@@ -1057,8 +1065,10 @@ dataset = statsbomb.load_open_data(match_id=3788741)
 ````text
 Found 4 result(s) for "Sofascore 403 challenge scraper":
 
+No indexed doc matches every term, so these are partial matches. Check that they answer the question before relying on them.
+
 ## [1] Supported Sources
-**Provider:** soccerdata | **Category:** overview | **Source:** curated by football-docs contributors
+**Provider:** soccerdata | **Category:** overview | **Source:** curated by football-docs contributors | **Match:** partial
 
 ## Supported Sources
 
@@ -1076,7 +1086,7 @@ Found 4 result(s) for "Sofascore 403 challenge scraper":
 ---
 
 ## [2] Sofascore (sd.Sofascore)
-**Provider:** soccerdata | **Category:** data-sources | **Source:** curated by football-docs contributors
+**Provider:** soccerdata | **Category:** data-sources | **Source:** curated by football-docs contributors | **Match:** partial
 
 ## Sofascore (sd.Sofascore)
 
@@ -1094,7 +1104,7 @@ Source: sofascore.com API. HTTP-based JSON API.
 ---
 
 ## [3] Challenge intensity
-**Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03
+**Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03 | **Match:** partial
 
 ## Challenge intensity
 
@@ -1107,7 +1117,7 @@ Source: [https://dataglossary.wyscout.com/challenge_intensity/](https://dataglos
 ---
 
 ## [4] Result: 403 Forbidden
-**Provider:** sportmonks | **Category:** error-codes | **Source:** llms_txt (https://docs.sportmonks.com/football/llms-full.txt) | v3 | crawled 2026-08-31T00:17:40.848Z
+**Provider:** sportmonks | **Category:** error-codes | **Source:** llms_txt (https://docs.sportmonks.com/football/llms-full.txt) | v3 | crawled 2026-08-31T00:17:40.848Z | **Match:** partial
 
 # Result: 403 Forbidden
 ```
@@ -1121,6 +1131,8 @@ Source: [https://dataglossary.wyscout.com/challenge_intensity/](https://dataglos
 
 ````text
 Found 4 result(s) for "post-shot xG goalkeeper goals prevented":
+
+Results 1-1 match every term. Results 2-4 match only some terms.
 
 ## [1] Goalkeeping
 **Provider:** statsbomb | **Category:** player-season-stats | **Source:** curated by football-docs contributors
@@ -1149,7 +1161,7 @@ Found 4 result(s) for "post-shot xG goalkeeper goals prevented":
 ---
 
 ## [2] Post-Shot xG (PSxG) and goalkeeping value
-**Provider:** statsbomb | **Category:** iq-metrics-glossary | **Source:** curated by football-docs contributors
+**Provider:** statsbomb | **Category:** iq-metrics-glossary | **Source:** curated by football-docs contributors | **Match:** partial
 
 ## Post-Shot xG (PSxG) and goalkeeping value
 
@@ -1186,7 +1198,7 @@ shot-stopping). See `xg-model.md`.
 ---
 
 ## [3] Post-Shot xG (PSxG / xGOT)
-**Provider:** statsbomb | **Category:** xg-model | **Source:** curated by football-docs contributors
+**Provider:** statsbomb | **Category:** xg-model | **Source:** curated by football-docs contributors | **Match:** partial
 
 ## Post-Shot xG (PSxG / xGOT)
 
@@ -1203,7 +1215,7 @@ decomposition) appears.
 ---
 
 ## [4] xG
-**Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03
+**Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03 | **Match:** partial
 
 ## xG
 
@@ -1344,63 +1356,70 @@ The glossary says "Deep completions"; the event API tag is
 ````text
 Found 4 result(s) for "tackles won lost challenges":
 
+Results 1-1 match every term. Results 2-4 match only some terms.
+
 ## [1] Event Type Reference
 **Provider:** opta | **Category:** event-types | **Source:** curated by football-docs contributors
 
 ## Event Type Reference
 
+Per-match averages count events of each type in Premier League 2025/26 match event
+data (318 matches), so they include both events of a pair. Outcome rules are from
+F24 Appendix 8 unless the note says otherwise.
+
 | typeId | Name | Per match avg | Outcome | Notes |
 |--------|------|---------------|---------|-------|
-| 1 | Pass | ~925 | 0=miss, 1=success | Includes open play, goal kicks, corners, free kicks played as passes |
+| 1 | Pass | ~957 | 0=miss, 1=success | Includes open play, goal kicks, corners, free kicks played as passes |
 | 2 | Offside pass | ~3 | always 1 | Receiving player called offside |
-| 3 | Take on | ~35 | 0=fail, 1=success | Dribble past opponent |
-| 4 | Foul | ~44 | 0=committed, 1=fouled | Events come in pairs (one per team) |
-| 5 | Out | ~106 | 0=put out, 1=gains possession | Ball out of play |
-| 6 | Corner awarded | ~18 | 0=conceded, 1=won | |
-| 7 | Tackle | ~32 | 0=fail, 1=wins ball | Legal ground-level challenge |
-| 8 | Interception | ~13 | always 1 | Intercepts opposition pass |
-| 10 | Save | ~11 | always 1 | GK prevents goal (also outfield with qual 94) |
+| 3 | Take on | ~36 | 0=fail, 1=success | Dribble past opponent |
+| 4 | Foul | ~43 | 0=committed, 1=fouled | Events come in pairs (one per team), so a match has about 22 fouls |
+| 5 | Out | ~104 | 0=put out, 1=gains possession | Ball out of play. Events come in pairs |
+| 6 | Corner awarded | ~20 | 0=conceded, 1=won | Events come in pairs |
+| 7 | Tackle | ~34 | 0=fail, 1=wins ball | Legal ground-level challenge |
+| 8 | Interception | ~17 | always 1 | Intercepts opposition pass |
+| 10 | Save | ~13 | always 1 | GK prevents goal (also outfield with qual 94) |
 | 11 | Claim | ~2 | 0=drops, 1=catches | GK catches crossed ball |
-| 12 | Clearance | ~53 | always 1 | Defensive clearance |
+| 12 | Clearance | ~57 | always 1 | Defensive clearance |
 | 13 | Miss | ~9 | always 1 | Shot wide or over |
 | 14 | Post | <1 | always 1 | Ball hits frame |
-| 15 | Attempt saved | ~11 | always 1 | Shot on target, saved |
-| 16 | Goal | ~2.5 | always 1 | Own goals have qualifier 28 |
-| 17 | Card | ~4 | always 1 | Yellow/second yellow/red via qualifiers |
-| 18 | Player off | ~9 | always 1 | Substituted off |
-| 19 | Player on | ~1 | always 1 | Substituted on |
-| 20 | Player retired | — | — | Player leaves the pitch |
-| 21 | Player returns | — | — | Player comes back on after leaving the pitch |
-| 27 | Start delay | ~3 | always 1 | Play stops for a delay. With qualifier 364, a VAR review |
-| 28 | End delay | ~3 | always 1 | The delay ends and play restarts |
+| 15 | Attempt saved | ~13 | always 1 | Shot on target, saved |
+| 16 | Goal | ~2.7 | always 1 | Own goals have qualifier 28 |
+| 17 | Card | ~4 | always 1 | Yellow/second yellow/red via qualifiers 31/32/33 |
+| 18 | Player off | ~8 | always 1 | Substituted off |
+| 19 | Player on | ~8 | always 1 | Substituted on |
+| 20 | Player retired | <1 | always 1 | Player leaves the pitch, for example injured, with no substitution. Not a red card |
+| 21 | Player returns | <1 | always 1 | Player comes back on after leaving the pitch |
+| 27 | Start delay | ~5 | always 1 | Play stops for a delay. With qualifier 364, a VAR review |
+| 28 | End delay | ~5 | always 1 | The delay ends and play restarts |
 | 30 | End | ~6 | always 1 | End of a period. kloppy reads the period end time from it |
-| 32 | Start | — | — | Start of a period. kloppy reads the period start time from it |
-| 34 | Team set up | ~2 | always 1 | Formation/lineup event |
-| 37 | Collection end | — | — | |
-| 40 | Formation change | — | — | In-game formation change |
-| 41 | Punch | — | — | GK punches the ball |
-| 42 | Good skill | — | — | |
-| 43 | Deleted event | — | — | Opta removed this event. Drop it before analysis; kloppy does |
-| 44 | Aerial | ~60 | 0=lost, 1=won | Aerial duel |
-| 45 | Challenge | ~15 | always 0 | Unsuccessful tackle attempt |
-| 49 | Ball recovery | ~80 | always 1 | Player gathers loose ball |
-| 50 | Dispossessed | ~10 | always 1 | Loses ball via opponent tackle |
-| 51 | Error | ~1 | always 1 | Mistake losing ball |
-| 52 | Keeper pick-up | ~5 | always 1 | GK picks up ball |
+| 32 | Start | ~4 | always 1 | Start of a period. kloppy reads the period start time from it |
+| 34 | Team set up | 2 | always 1 | Formation/lineup event |
+| 37 | Collection end | 2 | always 1 | |
+| 40 | Formation change | ~3 | always 1 | In-game formation change |
+| 41 | Punch | ~1 | always 1 in F24; the 2025/26 data has both 0 and 1 | GK punches the ball |
+| 42 | Good skill | <1 | always 1 | |
+| 43 | Deleted event | ~36 | always 1 | Opta removed this event. Drop it before analysis; kloppy does |
+| 44 | Aerial | ~64 | 0=lost, 1=won | Aerial duel. Events come in pairs |
+| 45 | Challenge | ~14 | always 0 | Unsuccessful tackle attempt |
+| 49 | Ball recovery | ~81 | always 1 | Player gathers loose ball |
+| 50 | Dispossessed | ~17 | always 1 | Loses ball via opponent tackle |
+| 51 | Error | ~2 | always 1 | Mistake losing ball |
+| 52 | Keeper pick-up | ~12 | always 1 | GK picks up ball |
 | 54 | Smother | <1 | always 1 | GK covers ball at attacker's feet |
 | 55 | Offside provoked | ~3 | always 1 | Defender's position causes offside |
-| 59 | Keeper sweeper | ~5 | always 1 | GK comes off line to clear/claim |
-| 61 | Ball touch | ~3 | always 1 | Bad touch / loss of control |
-| 67 | 50/50 | ~2 | 0=lost, 1=won | Two players contest loose ball |
-| 74 | Blocked pass | ~10 | always 1 | Player blocks an opponent's pass |
-| 83 | Attempted tackle | ~15 | always 0 | Unsuccessful tackle |
+| 59 | Keeper sweeper | ~1 | 0=possession goes to the other team, 1=kept or put out of play | GK comes off line to clear/claim |
+| 61 | Ball touch | ~70 | 0=lost control, 1=ball hit the player unintentionally | Bad touch / loss of control |
+| 67 | 50/50 | 0 | 0=lost, 1=won | Two players contest loose ball. F24: not collected since 10 July 2023 |
+| 74 | Blocked pass | ~15 | always 1 | Player blocks an opponent's pass |
+| 83 | Attempted tackle | ~27 | not defined in F24; mostly 0 in the 2025/26 data | Unsuccessful tackle |
+| 84 | Deleted after review | <1 | — | An event deleted after a VAR review (from 1 March 2021). Qualifier 436 gives its typeId before deletion; a goal ruled out by VAR has 436 = `16` |
 
-A dash means the per-match average or outcome has not been checked for that type.
+A dash means the outcome has not been checked for that type.
 
 ---
 
 ## [2] Defending
-**Provider:** statsbomb | **Category:** player-match-stats | **Source:** curated by football-docs contributors
+**Provider:** statsbomb | **Category:** player-match-stats | **Source:** curated by football-docs contributors | **Match:** partial
 
 ## Defending
 
@@ -1425,7 +1444,7 @@ A dash means the per-match average or outcome has not been checked for that type
 ---
 
 ## [3] Defending
-**Provider:** statsbomb | **Category:** player-season-stats | **Source:** curated by football-docs contributors
+**Provider:** statsbomb | **Category:** player-season-stats | **Source:** curated by football-docs contributors | **Match:** partial
 
 ## Defending
 
@@ -1460,7 +1479,7 @@ A dash means the per-match average or outcome has not been checked for that type
 ---
 
 ## [4] Wyscout Index
-**Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03
+**Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03 | **Match:** partial
 
 ## Wyscout Index
 
@@ -1494,6 +1513,8 @@ Source: [https://dataglossary.wyscout.com/wyscout_index/](https://dataglossary.w
 
 ````text
 Found 4 result(s) for "distance covered high speed running physical metrics":
+
+Results 1-3 match every term. Results 4-4 match only some terms.
 
 ## [1] Physical metrics
 **Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03
@@ -1598,7 +1619,7 @@ Implementation notes:
 ---
 
 ## [4] Physical speed bands
-**Provider:** skillcorner | **Category:** concepts | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31
+**Provider:** skillcorner | **Category:** concepts | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31 | **Match:** partial
 
 ## Physical speed bands
 
@@ -1610,8 +1631,10 @@ Physical metrics bucket movement by intensity: **running**, **HSR** (High Speed 
 ````text
 Found 5 result(s) for "Catapult PlayerLoad high speed running export fields":
 
+No indexed doc matches every term, so these are partial matches. Check that they answer the question before relying on them. No indexed doc mentions "playerload". If the question is about that, it is not indexed.
+
 ## [1] Tracking-derived off-ball runs recipe
-**Provider:** kloppy | **Category:** tracking-rendering | **Source:** curated by football-docs contributors
+**Provider:** kloppy | **Category:** tracking-rendering | **Source:** curated by football-docs contributors | **Match:** partial
 
 ## Tracking-derived off-ball runs recipe
 
@@ -1654,7 +1677,7 @@ Implementation notes:
 ---
 
 ## [2] Physical speed bands
-**Provider:** skillcorner | **Category:** concepts | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31
+**Provider:** skillcorner | **Category:** concepts | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31 | **Match:** partial
 
 ## Physical speed bands
 
@@ -1663,7 +1686,7 @@ Physical metrics bucket movement by intensity: **running**, **HSR** (High Speed 
 ---
 
 ## [3] Base metrics
-**Provider:** skillcorner | **Category:** physical-data | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31
+**Provider:** skillcorner | **Category:** physical-data | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31 | **Match:** partial
 
 ## Base metrics
 
@@ -1688,7 +1711,7 @@ Physical metrics bucket movement by intensity: **running**, **HSR** (High Speed 
 ---
 
 ## [4] Player workload table recipe
-**Provider:** skillcorner | **Category:** physical-data | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31
+**Provider:** skillcorner | **Category:** physical-data | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31 | **Match:** partial
 
 ## Player workload table recipe
 
@@ -1728,7 +1751,7 @@ minutes basis, units, and QC flags in the exported data.
 ---
 
 ## [5] Physical metrics
-**Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03
+**Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03 | **Match:** partial
 
 ## Physical metrics
 
@@ -1831,7 +1854,7 @@ charting-shot-placement for the full zone list.
 
 | ID | Name | Notes |
 |----|------|-------|
-| 1 | longBall | Pass longer than 32 metres |
+| 1 | longBall | Intended long ball, including launches. The definition is about intent, not a fixed length: in Premier League 2025/26 data almost every pass of 32 metres or more has Q1, and some shorter passes have it too |
 | 2 | cross | Cross (Q2). Corners commonly carry Q2 + Q6; free-kick crosses commonly carry Q2 + Q5; open-play crosses are Q2 without Q5/Q6. |
 | 3 | headPass | Headed pass (Q3). Distinct from Q15, the headed shot qualifier. |
 | 4 | throughBall | Through ball (Q4). Do not confuse with Q5 free-kick delivery. |
@@ -1841,7 +1864,7 @@ charting-shot-placement for the full zone list.
 | 124 | goalKick | Goal kick pass. For goal-kick distribution charts, combine with pass end coordinates Q140/Q141. |
 | 279 | kickOff | Kick-off pass. Value `S` is the kick-off that starts a period; `G` is the kick-off after a goal. |
 | 7 | playersCaughtOffside | On an offside pass (typeId 2). The value is the ID of the player caught offside. It is not a goal-kick flag; goal kicks are Q124. |
-| 154 | intentionalAssist | Pass that creates a scoring chance, for example a cross into the box or a through ball |
+| 154 | intentionalAssist | The assist was intentional: the passer meant the pass, with no deflection. It appears on the assisting pass and on the shot. For the pass that set up a shot use Q210; for an assisted shot use Q29 |
 | 210 | assist | The pass set up a shot, a goal or a missed chance |
 | 196 | switchOfPlay | Pass crossing centre zone, y-distance > 60 |
 | 212 | length | Estimated distance in metres that the ball travelled on the pass or clearance |
@@ -1868,8 +1891,8 @@ building late-game, close-game, or "mattered" filters.
 | `mattered` | shot taken while the goal difference was within one and the final margin was within one | Narrative filter for chances that could plausibly change the result |
 
 Use the goal-timeline reconstruction in [charting-game-state.md](charting-game-state.md):
-drop disallowed goals with qualifier `8`, credit own goals with qualifier `28` to
-the opposing team, and sort by period-aware clock or `expandedMinute`. Count only
+count typeId `16` goals (a goal that VAR rules out becomes typeId `84` and is not
+counted), credit own goals with qualifier `28` to the opposing team, and sort by period-aware clock or `expandedMinute`. Count only
 goals before the shot; a goal event at the same clock should not retroactively
 change the shot's pre-shot state unless the provider explicitly links them.
 
@@ -1901,16 +1924,16 @@ Indexed providers:
 **socceraction** (34 chunks): spadl (12), vaep-xt (22) | aliases: soccer-action
 **soccerdata** (40 chunks): data-sources (9), overview (5), usage (26) | aliases: soccer-data, sofascore, sofa-score
 **soccerdonna** (5 chunks): data-provenance (2), identity-surfaces (3) | aliases: soccer-donna
-**sportmonks** (567 chunks): api-access (27), api-changes (12), authentication (3), best-practices (8), changelog (38), changelog-beta (29), charting-season-stories (7), code-libraries (2), data-corrections (5), data-model (22), data-provenance (2), demo-response-files (8), differences-between-api-2-and-api-3 (2), endpoints (1), error-codes (34), event-types (22), filtering (2), filtering-and-complexity-exceptions (1), fixtures (3), get-all-fixtures (8), get-all-leagues (8), get-all-leagues-by-team-id (8), get-all-livescores (7), get-all-seasons (8), get-all-states (8), get-all-types (5), get-brackets-by-season-id (13), get-current-leagues-by-team-id (6), get-fixture-by-id (7), get-fixtures-by-date (8), get-fixtures-by-date-range (8), get-fixtures-by-date-range-for-team (7), get-fixtures-by-head-to-head (7), get-fixtures-by-multiple-ids (7), get-fixtures-by-search-by-name (8), get-inplay-livescores (6), get-latest-updated-fixtures (11), get-latest-updated-livescores (11), get-league-by-id (7), get-leagues-by-country-id (7), get-leagues-by-fixture-date (8), get-leagues-by-live (7), get-leagues-search-by-name (8), get-past-fixtures-by-tv-station-id (8), get-seasons-by-id (7), get-seasons-by-search-by-name (8), get-seasons-by-team-id (7), get-state-by-id (7), get-type-by-entity (1), get-type-by-id (5), get-upcoming-fixtures-by-market-id (8), get-upcoming-fixtures-by-tv-station-id (8), getting-started (6), identity-surfaces (4), include-exceptions (1), includes (4), leagues (13), livescores (1), making-your-first-request (9), meta-description (1), nested-includes (3), new-endpoints-and-data-features (4), ordering-and-sorting (3), other-exceptions (1), overview (1), rate-limit (2), request-options (1), seasons (3), selecting-and-filtering (1), selecting-fields (3), states (4), statistics (1), syntax (4), syntax-and-filters (6), translations-beta (5), types (1), what-can-you-do-with-sportmonks-data (10) | aliases: sport-monks
+**sportmonks** (568 chunks): api-access (27), api-changes (12), authentication (3), best-practices (8), changelog (38), changelog-beta (29), charting-season-stories (7), code-libraries (2), data-corrections (5), data-model (22), data-provenance (2), demo-response-files (8), differences-between-api-2-and-api-3 (2), endpoints (1), error-codes (34), event-types (23), filtering (2), filtering-and-complexity-exceptions (1), fixtures (3), get-all-fixtures (8), get-all-leagues (8), get-all-leagues-by-team-id (8), get-all-livescores (7), get-all-seasons (8), get-all-states (8), get-all-types (5), get-brackets-by-season-id (13), get-current-leagues-by-team-id (6), get-fixture-by-id (7), get-fixtures-by-date (8), get-fixtures-by-date-range (8), get-fixtures-by-date-range-for-team (7), get-fixtures-by-head-to-head (7), get-fixtures-by-multiple-ids (7), get-fixtures-by-search-by-name (8), get-inplay-livescores (6), get-latest-updated-fixtures (11), get-latest-updated-livescores (11), get-league-by-id (7), get-leagues-by-country-id (7), get-leagues-by-fixture-date (8), get-leagues-by-live (7), get-leagues-search-by-name (8), get-past-fixtures-by-tv-station-id (8), get-seasons-by-id (7), get-seasons-by-search-by-name (8), get-seasons-by-team-id (7), get-state-by-id (7), get-type-by-entity (1), get-type-by-id (5), get-upcoming-fixtures-by-market-id (8), get-upcoming-fixtures-by-tv-station-id (8), getting-started (6), identity-surfaces (4), include-exceptions (1), includes (4), leagues (13), livescores (1), making-your-first-request (9), meta-description (1), nested-includes (3), new-endpoints-and-data-features (4), ordering-and-sorting (3), other-exceptions (1), overview (1), rate-limit (2), request-options (1), seasons (3), selecting-and-filtering (1), selecting-fields (3), states (4), statistics (1), syntax (4), syntax-and-filters (6), translations-beta (5), types (1), what-can-you-do-with-sportmonks-data (10) | aliases: sport-monks
 **sportradar** (481 chunks): api-access (6), api-endpoints (6), charting-and-stories (5), data-model (8), data-provenance (2), integration-notes (5), monitoring-data-changes (13), soccer-api-vs-soccer-extended-api (7), soccer-extended-competition-info (2), soccer-extended-competition-seasons (2), soccer-extended-competitions (3), soccer-extended-competitor-mappings (2), soccer-extended-competitor-merge-mappings (2), soccer-extended-competitor-profile (7), soccer-extended-competitor-schedules (16), soccer-extended-competitor-summaries (5), soccer-extended-competitor-vs-competitor (2), soccer-extended-daily-schedules (2), soccer-extended-daily-summaries (2), soccer-extended-faq (71), soccer-extended-fifa-rankings (3), soccer-extended-league-timeline (7), soccer-extended-live-schedules (2), soccer-extended-live-summaries (2), soccer-extended-live-timelines (3), soccer-extended-live-timelines-delta (2), soccer-extended-overview (11), soccer-extended-player-mappings (2), soccer-extended-player-merge-mappings (2), soccer-extended-player-profile (4), soccer-extended-player-schedules (2), soccer-extended-player-summaries (2), soccer-extended-push-events (12), soccer-extended-push-feeds (5), soccer-extended-push-statistics (10), soccer-extended-season-competitors (2), soccer-extended-season-form-standings (4), soccer-extended-season-info (9), soccer-extended-season-leaders (4), soccer-extended-season-lineups (5), soccer-extended-season-links (3), soccer-extended-season-missing-players (4), soccer-extended-season-overunder-statistics (3), soccer-extended-season-players (2), soccer-extended-season-schedule (3), soccer-extended-season-standings (4), soccer-extended-season-summaries (2), soccer-extended-season-transfers (4), soccer-extended-season-venues (2), soccer-extended-seasonal-competitor-extended-stati (6), soccer-extended-seasonal-competitor-players (3), soccer-extended-seasonal-competitor-statistics (5), soccer-extended-seasons (2), soccer-extended-seasons-disabled (2), soccer-extended-sport-event-extended-summary (5), soccer-extended-sport-event-extended-timeline (5), soccer-extended-sport-event-fun-facts (2), soccer-extended-sport-event-insights (2), soccer-extended-sport-event-lineups (2), soccer-extended-sport-event-momentum (3), soccer-extended-sport-event-summary (2), soccer-extended-sport-event-timeline (3), soccer-extended-sport-events-created (2), soccer-extended-sport-events-removed (2), soccer-extended-sport-events-updated (2), soccer-ig-api-basics (16), soccer-ig-data-coverage-tiers (7), soccer-ig-fixtures (9), soccer-ig-historical-data (6), soccer-ig-id-handling (18), soccer-ig-live-match-retrieval (12), soccer-ig-match-status-workflow (13), soccer-ig-overview (1), soccer-ig-push (13), soccer-ig-rosters-lineups-transfers (9), soccer-ig-scenarios (1), soccer-ig-seasonal-stats (7), soccer-ig-tracking-standings (16), soccer-ig-tracking-tournaments (11), soccer-ig-update-frequencies (6) | aliases: sport-radar, sportradar-api, soccer-extended, sportradar-soccer
-**statsbomb** (237 chunks): api-access (38), api-endpoints (8), charting-lineups (6), coordinate-system (13), data-model (27), data-provenance (2), event-types (48), identity-surfaces (5), iq-metrics-glossary (14), player-mapping (6), player-match-stats (13), player-season-stats (12), team-match-stats (11), team-season-stats (11), xg-model (23) | aliases: stats-bomb, statsbomb-open-data, statsbomb-open
+**statsbomb** (244 chunks): api-access (38), api-endpoints (8), charting-lineups (6), coordinate-system (13), data-model (27), data-provenance (2), event-types (55), identity-surfaces (5), iq-metrics-glossary (14), player-mapping (6), player-match-stats (13), player-season-stats (12), team-match-stats (11), team-season-stats (11), xg-model (23) | aliases: stats-bomb, statsbomb-open-data, statsbomb-open
 **thesportsdb** (20 chunks): api-access (6), api-endpoints (4), data-provenance (2), identity-surfaces (4), livescore (4) | aliases: tsdb, the-sports-db, the-sportsdb, sportsdb
 **transfermarkt** (5 chunks): data-provenance (2), identity-surfaces (3)
 **transferroom** (45 chunks): api-access (8), api-endpoints (12), charting-availability (5), data-model (9), data-provenance (2), identity-surfaces (9) | aliases: transfer-room
 **unravelsports** (202 chunks): additional-citations (5), additional-license (6), american-football-dataset (2), american-football-graphs (1), api-american-football (1), api-classifiers (8), api-soccer (1), api-utils (1), generated-unravel-utils-add-dummy-label-column (1), generated-unravel-utils-add-graph-id-column (1), generated-unravel-utils-dummy-graph-ids (1), generated-unravel-utils-dummy-labels (1), getting-started-concepts (17), getting-started-installation (11), getting-started-quickstart (25), index (5), soccer-dataset (4), soccer-graphs (3), soccer-models (2), tutorials-american-football (15), tutorials-formation-detection (30), tutorials-pressing-intensity (21), tutorials-soccer-gnn (30), utils-features (2), utils-helpers (5), utils-objects (3) | aliases: unravel, unravel-sports, bigdatabowl, big-data-bowl
 **wyscout** (165 chunks): api-access (11), api-endpoints (13), charting-analysis-metrics (7), coordinate-system (6), data-model (17), data-provenance (2), event-types (6), glossary-events (79), glossary-metrics-concepts (20), identity-surfaces (4) | aliases: hudl, hudl-wyscout
 
-Data: built 2026-09-29T07:27:10.000Z from commit 2d483df (bundled).
+Data: built 2026-09-30T17:49:29.000Z from commit 4890862 (bundled).
 ````
 
 ### p01 — resolve_provider_id {"query": "Catapult"} — error
@@ -1956,8 +1979,8 @@ Resolved "Opta" to provider ID: **opta**
 ````text
 Resolved "StatsBomb" to provider ID: **statsbomb**
 **Display name:** StatsBomb
-**Indexed:** yes (237 chunks)
-**Categories:** api-access (38), api-endpoints (8), charting-lineups (6), coordinate-system (13), data-model (27), data-provenance (2), event-types (48), identity-surfaces (5), iq-metrics-glossary (14), player-mapping (6), player-match-stats (13), player-season-stats (12), team-match-stats (11), team-season-stats (11), xg-model (23)
+**Indexed:** yes (244 chunks)
+**Categories:** api-access (38), api-endpoints (8), charting-lineups (6), coordinate-system (13), data-model (27), data-provenance (2), event-types (55), identity-surfaces (5), iq-metrics-glossary (14), player-mapping (6), player-match-stats (13), player-season-stats (12), team-match-stats (11), team-season-stats (11), xg-model (23)
 **Aliases:** stats-bomb, statsbomb-open-data, statsbomb-open
 **Access level:** public
 **Licence/status:** Public open-data repository and public documentation; verify upstream licence before redistributing raw data.

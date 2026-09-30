@@ -119,8 +119,10 @@ jobs:
             exit 1
           fi
 
-          # Install both packages together to prevent npm pruning football-docs
-          npm install --no-save football-docs better-sqlite3 2>&1
+          # Install the football-docs version pinned in .mcp.json (plus better-sqlite3 to inspect its index)
+          pinned=$(node -e "const a=require('./.mcp.json').mcpServers['football-docs'].args; const s=a.find(x=>x.startsWith('football-docs')); console.log(s)")
+          echo "Pinned: $pinned"
+          npm install --no-save "$pinned" better-sqlite3 2>&1
 
           # Verify the binary exists and the DB is present
           if [ ! -f node_modules/.bin/football-docs ]; then

@@ -2,7 +2,7 @@
   "tools": [
     {
       "name": "search_docs",
-      "description": "Search football data provider documentation. Use for finding event types, qualifier IDs, API endpoints, coordinate systems, data models, and cross-provider mappings. Returns the most relevant documentation chunks.",
+      "description": "Search football data provider documentation. Use for finding event types, qualifier IDs, API endpoints, coordinate systems, data models, and cross-provider mappings. Returns the most relevant documentation chunks. Results that do not contain every query term are marked \"partial\", and the reply names any query term that no indexed doc mentions: if the question is about that term, it is not indexed.",
       "inputSchema": {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "type": "object",

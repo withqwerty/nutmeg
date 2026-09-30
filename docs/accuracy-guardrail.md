@@ -31,9 +31,11 @@ Football data providers change their APIs, schemas, event types, qualifier IDs, 
 - Use a partial result only if it answers the question on its own terms; otherwise treat the topic as not indexed
 - Older football-docs versions do not mark partial matches. Read each result's **Provider** line and content: if no result is from the provider or about the topic the user asked about, treat the topic as not indexed. Use `resolve_provider_id` to check whether a provider is covered at all.
 
-**When the football-docs tools fail:**
-- If a football-docs tool returns an error or does not load (for example a `better-sqlite3` or `NODE_MODULE_VERSION` error), tell the user that the docs server did not start and point them to the football-docs README for the fix.
-- Do not answer provider-specific questions from training knowledge while the server is down. Say what you would have looked up.
+**When the football-docs tools are missing or fail:**
+- If no football-docs tool is available (for example a skills-only install), tell the user that provider facts cannot be checked, and give the install line: `claude mcp add football-docs -- npx -y football-docs@0.15.0` (or the equivalent MCP setting in their agent). It needs Node.js 22.13 or newer.
+- If a football-docs tool returns an error or does not start, say so and point to the football-docs README for the fix.
+- By default, do not answer provider-specific questions from training knowledge. Say what you would have looked up.
+- If the user asks you to go on without the docs, you may answer, but label every provider fact "unverified (from memory)" and suggest checking it against the provider's documentation.
 
 **When you state a provider fact:**
 - Say where it came from: the provider and doc title from the result's **Source** line (or its URL), for example "Opta qualifiers (football-docs)".

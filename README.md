@@ -42,6 +42,14 @@ Works with Claude Code, Cursor, Codex, Windsurf, and 40+ other agents via the [A
 npx skills add withqwerty/nutmeg
 ```
 
+Nutmeg looks up provider facts in the football-docs MCP server, which this install does not include. Add it to your agent as well (Node.js 22.13 or newer):
+
+```bash
+claude mcp add football-docs -- npx -y football-docs@0.15.0
+```
+
+For other agents, add the same command (`npx -y football-docs@0.15.0`) as an MCP server in their settings. Without it, nutmeg says it cannot check provider facts, and labels anything it answers from memory as unverified.
+
 This installs the 10 skills but not the agents or MCP docs server. For the full experience (searchable provider docs, pipeline builder agent, data reviewer agent), use the plugin install above.
 
 ## Setup
@@ -81,7 +89,7 @@ Think Context7 for football data. Provider-specific facts, including identity
 surfaces and ID-scheme quirks, should come from this index rather than from
 Nutmeg's own prompts.
 
-The server is published as the [`football-docs`](https://www.npmjs.com/package/football-docs) npm package and starts automatically when nutmeg is loaded (via `npx -y football-docs`). No local build step is required. It needs Node.js 22.13 or newer.
+The server is published as the [`football-docs`](https://www.npmjs.com/package/football-docs) npm package and starts automatically when nutmeg is loaded (via `npx -y football-docs@0.15.0`; nutmeg pins the version it was tested with). No local build step is required. It needs Node.js 22.13 or newer.
 
 ### Adding provider docs
 
