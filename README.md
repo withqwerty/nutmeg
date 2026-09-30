@@ -57,7 +57,7 @@ Most users only need two commands — `/nutmeg` routes everything else automatic
 | Skill | What it does |
 |-------|-------------|
 | `/nutmeg` | **Start here.** Describe what you want — it handles setup, routing, and dispatch |
-| `/nutmeg-learn` | Concepts, resources, provider docs, learning paths |
+| `/nutmeg:learn` | Concepts, resources, provider docs, learning paths |
 
 ### Sub-skills (auto-dispatched or direct)
 
@@ -65,14 +65,14 @@ These are invoked automatically by `/nutmeg` based on what you're doing. Power u
 
 | Skill | What it does |
 |-------|-------------|
-| `/nutmeg-acquire` | Fetch, scrape, or download data + manage API keys |
-| `/nutmeg-wrangle` | Transform, filter, reshape data |
-| `/nutmeg-compute` | Calculate derived metrics (xG, PPDA, passing networks) |
-| `/nutmeg-analyse` | Explore and interpret football data |
-| `/nutmeg-brainstorm` | Research-backed visualisation ideation and chart design |
-| `/nutmeg-store` | Choose storage format and publishing method |
-| `/nutmeg-review` | Review data code and charts for correctness and conventions |
-| `/nutmeg-heal` | Fix broken scrapers, submit upstream issues |
+| `/nutmeg:acquire` | Fetch, scrape, or download data + manage API keys |
+| `/nutmeg:wrangle` | Transform, filter, reshape data |
+| `/nutmeg:compute` | Calculate derived metrics (xG, PPDA, passing networks) |
+| `/nutmeg:analyse` | Explore and interpret football data |
+| `/nutmeg:brainstorm` | Research-backed visualisation ideation and chart design |
+| `/nutmeg:store` | Choose storage format and publishing method |
+| `/nutmeg:review` | Review data code and charts for correctness and conventions |
+| `/nutmeg:heal` | Fix broken scrapers, submit upstream issues |
 
 ## Football Docs MCP Server
 

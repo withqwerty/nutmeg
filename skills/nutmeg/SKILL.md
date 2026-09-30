@@ -23,17 +23,17 @@ Read what the user is asking. Classify it into one of these intents:
 
 | Intent | Signal | Action |
 |--------|--------|--------|
-| **Get data** | "scrape", "fetch", "download", "get me data", names a provider or competition | Invoke `/nutmeg-acquire` |
-| **Fix broken pipeline** | "error", "broken", "403", "scraper stopped working", "rate limited" | Invoke `/nutmeg-heal` |
-| **Transform data** | "clean", "filter", "join", "merge", "reshape", "convert", "coordinate" | Invoke `/nutmeg-wrangle` |
-| **Compute metrics** | "xG", "PPDA", "passing network", "expected threat", "pressing", "per-90" | Invoke `/nutmeg-compute` |
-| **Analyse / explore** | "compare", "analyse", "which team", "who is the best", "pattern", "trend" | Invoke `/nutmeg-analyse` |
-| **Visualise** | "chart", "plot", "visualise", "dashboard", "shot map", "radar", "heatmap" | Invoke `/nutmeg-brainstorm` |
-| **Review code/chart** | "review", "check my code", "is this correct", "before I publish" | Invoke `/nutmeg-review` |
-| **Store / publish** | "save", "database", "publish", "deploy", "Streamlit", "share" | Invoke `/nutmeg-store` |
-| **Learn / explain** | "what is xG", "explain", "teach me", "resources", "how does X work" | Invoke `/nutmeg-learn` |
-| **Manage credentials** | "API key", "authentication", "set up access" | Invoke `/nutmeg-acquire` (credentials are part of acquisition) |
-| **Provider docs** | "qualifier ID", "coordinate system", "what fields does X have" | Invoke `/nutmeg-learn` (provider docs are part of learning) |
+| **Get data** | "scrape", "fetch", "download", "get me data", names a provider or competition | Invoke `/nutmeg:acquire` |
+| **Fix broken pipeline** | "error", "broken", "403", "scraper stopped working", "rate limited" | Invoke `/nutmeg:heal` |
+| **Transform data** | "clean", "filter", "join", "merge", "reshape", "convert", "coordinate" | Invoke `/nutmeg:wrangle` |
+| **Compute metrics** | "xG", "PPDA", "passing network", "expected threat", "pressing", "per-90" | Invoke `/nutmeg:compute` |
+| **Analyse / explore** | "compare", "analyse", "which team", "who is the best", "pattern", "trend" | Invoke `/nutmeg:analyse` |
+| **Visualise** | "chart", "plot", "visualise", "dashboard", "shot map", "radar", "heatmap" | Invoke `/nutmeg:brainstorm` |
+| **Review code/chart** | "review", "check my code", "is this correct", "before I publish" | Invoke `/nutmeg:review` |
+| **Store / publish** | "save", "database", "publish", "deploy", "Streamlit", "share" | Invoke `/nutmeg:store` |
+| **Learn / explain** | "what is xG", "explain", "teach me", "resources", "how does X work" | Invoke `/nutmeg:learn` |
+| **Manage credentials** | "API key", "authentication", "set up access" | Invoke `/nutmeg:acquire` (credentials are part of acquisition) |
+| **Provider docs** | "qualifier ID", "coordinate system", "what fields does X have" | Invoke `/nutmeg:learn` (provider docs are part of learning) |
 | **Entity resolution / ID matching** | "same player", "match IDs", "provider bridge", "map Transfermarkt to Opta", "candidate match", "identity surface" | Read `${CLAUDE_PLUGIN_ROOT}/docs/entity-resolution-routing.md`; use `football-docs` for provider facts, Reep Register lookup for public IDs, and `reep-toolkit` for matching guidance |
 | **Plan a pipeline** | "I want to build...", "how do I approach...", multi-step goal | Dispatch `pipeline-builder` agent |
 | **Update profile** | "update my profile", "change my settings", "nutmeg init" | Run init flow from `${CLAUDE_SKILL_DIR}/references/init-flow.md` |
@@ -44,7 +44,7 @@ Read what the user is asking. Classify it into one of these intents:
 
 ## Step 3: Dispatch or handle
 
-When dispatching to a sub-skill, invoke it by name (e.g. `/nutmeg-acquire`). Pass along:
+When dispatching to a sub-skill, invoke it by name (e.g. `/nutmeg:acquire`). Pass along:
 - The user's original request as context
 - Their profile settings (already loaded)
 
@@ -71,5 +71,5 @@ The user should discover capabilities naturally:
 
 1. **First interaction:** They describe what they want. You route it.
 2. **During work:** When you dispatch a sub-skill, briefly mention it ("I'll use the data acquisition workflow for this...") so they learn the vocabulary.
-3. **Power users:** If they directly invoke `/nutmeg-acquire` etc., respect that — don't re-route through here.
-4. **Teaching moments:** When the user hits a concept they don't know (xG, PPDA, coordinate systems), offer a brief inline explanation and mention `/nutmeg-learn` has deeper resources.
+3. **Power users:** If they directly invoke `/nutmeg:acquire` etc., respect that — don't re-route through here.
+4. **Teaching moments:** When the user hits a concept they don't know (xG, PPDA, coordinate systems), offer a brief inline explanation and mention `/nutmeg:learn` has deeper resources.

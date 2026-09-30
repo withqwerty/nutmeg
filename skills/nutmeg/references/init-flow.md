@@ -89,4 +89,4 @@ Based on their answers, include relevant warnings:
 Adapt to their level:
 - **New:** "Just describe what you want to explore — I'll handle the rest. Try: 'show me shot locations from the 2022 World Cup final'"
 - **Familiar:** "Ask me anything. Try: 'get PL xG data from Understat and compare the top 6'"
-- **Experienced/Expert:** "All sub-skills are available directly if you prefer: `/nutmeg-acquire`, `/nutmeg-analyse`, etc. Or just describe what you need."
+- **Experienced/Expert:** "All sub-skills are available directly if you prefer: `/nutmeg:acquire`, `/nutmeg:analyse`, etc. Or just describe what you need."

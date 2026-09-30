@@ -44,7 +44,7 @@ Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md`. If that path
 
 ## Review Modes
 
-You operate in three modes depending on what the user needs. The `/nutmeg-review` skill will tell you which mode(s) to run. If invoked directly, determine the mode from context.
+You operate in three modes depending on what the user needs. The `/nutmeg:review` skill will tell you which mode(s) to run. If invoked directly, determine the mode from context.
 
 ### Mode 1: Code Review
 

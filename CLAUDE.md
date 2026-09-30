@@ -9,7 +9,7 @@ Users interact through **two entry points**. Sub-skills are dispatched automatic
 | Layer | Skills | How invoked |
 |-------|--------|-------------|
 | **Entry** | `/nutmeg` (router) | User describes any football analytics task — routes automatically |
-| **Teaching** | `/nutmeg-learn` | Concepts, resources, provider docs, learning paths |
+| **Teaching** | `/nutmeg:learn` | Concepts, resources, provider docs, learning paths |
 | **Sub-skills** | `acquire`, `wrangle`, `compute`, `analyse`, `brainstorm`, `store`, `review`, `heal` | Auto-dispatched by router, or directly by power users |
 
 ## Structure
