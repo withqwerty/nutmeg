@@ -81,14 +81,14 @@ Think Context7 for football data. Provider-specific facts, including identity
 surfaces and ID-scheme quirks, should come from this index rather than from
 Nutmeg's own prompts.
 
-The server is published as the [`football-docs`](https://www.npmjs.com/package/football-docs) npm package and starts automatically when nutmeg is loaded (via `npx -y football-docs`). No local build step is required.
+The server is published as the [`football-docs`](https://www.npmjs.com/package/football-docs) npm package and starts automatically when nutmeg is loaded (via `npx -y football-docs`). No local build step is required. It needs Node.js 22.13 or newer.
 
 ### Adding provider docs
 
 Provider docs and the search index live in the [football-docs](https://github.com/withqwerty/football-docs) repository. Drop markdown files in `docs/{provider}/` there and run `pnpm ingest` to rebuild `data/docs.db`:
 
 ```
-docs/providers/
+docs/
   opta/
     event-types.md
     qualifiers.md

@@ -80,7 +80,7 @@ Read and follow `docs/accuracy-guardrail.md`. Always use `search_docs` for provi
 ### 6. xG usage
 
 - Is xG coming from the provider or a custom model? State which.
-- If using Opta: is it from qualifier 321 (matchexpectedgoals endpoint) or qualifier 213 (not populated in theanalyst.com feed)?
+- If using Opta: is it qualifier 321 (xG) or 322 (xGOT) from the matchexpectedgoals endpoint? The match event feed carries no xG. Qualifier 213 is the pass or clearance angle, not xG.
 - Is xG being summed correctly? (per-shot, not per-match)
 
 ### 7. Team name matching

@@ -5,7 +5,7 @@
 Football data providers change their APIs, schemas, event types, qualifier IDs, coordinate systems, rate limits, and endpoints frequently. Your training data may be outdated.
 
 **Always use `search_docs` for:**
-- Qualifier IDs and type IDs (e.g., Opta qualifier 76, StatsBomb type 30)
+- Qualifier IDs and type IDs (e.g., Opta qualifier 214, StatsBomb type 30)
 - API endpoint URLs and request/response schemas
 - Provider ID grains, identity surfaces, URL handles, and bridge quirks
 - Field names, data types, and value ranges
@@ -20,10 +20,15 @@ Football data providers change their APIs, schemas, event types, qualifier IDs, 
 - Cite a specific version number or release date from memory
 - State a rate limit or pricing tier without verification
 
-**When search_docs returns no results:**
+**When search_docs returns no results, or says a term is not indexed:**
 - Tell the user the information is not in the docs index
 - Suggest they check the provider's official documentation directly
 - Do NOT fill the gap with training knowledge — say "I don't have this indexed"
+
+**When search_docs marks results as partial:**
+- A result marked `**Match:** partial` does not contain every term of the query
+- If the reply says "No indexed doc mentions ..." for a term the question is about, that topic is not indexed
+- Use a partial result only if it answers the question on its own terms; otherwise treat the topic as not indexed
 
 **When writing code that uses provider data:**
 - Look up the exact field names and types via `search_docs` before writing access patterns
