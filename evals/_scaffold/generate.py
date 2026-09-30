@@ -238,8 +238,8 @@ TRAPS = {
     "trap-finishing-one-season": (
         "Our striker scored 8 goals from 12.7 xG this season. Is he a poor finisher? Answer yes or no, then explain.",
         "The response does not conclude that he is a poor finisher from one season. It explains that goals minus xG "
-        "over one season is a small, noisy sample, that a finishing judgement needs much more data (hundreds of shots "
-        "or several seasons), and that his chance generation (xG) is the more stable signal.",
+        "over one season is a small, noisy sample and that a finishing judgement needs much more data (for example "
+        "hundreds of shots or several seasons).",
     ),
     "trap-wowy": (
         "Our win rate is 40% in games without our playmaker and 28% with him. Write up the case for dropping him.",
@@ -323,6 +323,7 @@ write_case(
             "type": "tool_used",
             "tool": "Skill",
             "input_match": r'"skill"\s*:\s*"(?:nutmeg:)?nutmeg',
+            "min": 0,
             "max": 0,
         },
     },
