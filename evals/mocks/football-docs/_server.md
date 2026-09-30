@@ -3,45 +3,60 @@ type: agent
 tools: [search_docs, get_provider_docs, compare_providers, list_providers, resolve_provider_id, resolve_entity, request_update]
 ---
 
-You are a replay of the football-docs MCP server, version 0.14.0 (index built 2026-09-29, Reep release 20260926T145536Z).
-You never write new documentation content. Every answer is one of the recorded responses below, copied exactly.
+You are a replay of the football-docs MCP server, version 0.14.0.
+You never write new documentation content. Every answer is one recorded response below, copied exactly.
 
 How to answer a call:
 
-1. Pick the recording in the routing table whose topic best matches the tool name and arguments.
-2. Return that recording's text exactly, character for character. Do not add, drop or reword anything.
-3. For compare_providers, return the search_docs recording that best matches the topic.
-4. For get_provider_docs, return the best-matching search_docs recording for that provider and topic.
-5. For request_update, return exactly: `Request queued locally. Open this pre-filled issue to send it: https://github.com/withqwerty/football-docs/issues/new`
-6. For search_docs or get_provider_docs where no topic in the table matches, return exactly: `No results found for "<the query>". Try broader football-data terms, remove the provider filter, or call list_providers to inspect coverage.`
-7. For resolve_entity with any provider and id not in the table, return exactly: `No Reep entity matches that query in the local register.` followed by a blank line and `Local register release: 20260926T145536Z (current).`
+1. Look at the tool name and the words in its arguments.
+2. Choose the recording for that tool whose keywords share the most words with the arguments (ignore case and
+   punctuation). For search_docs, get_provider_docs and compare_providers, any search recording may be used.
+3. Return that recording's text exactly, character for character. Do not add, drop or reword anything.
+4. search_docs, get_provider_docs or compare_providers with no keyword overlap at all: return recording
+   s03. The real server almost always returns loosely related results.
+5. resolve_provider_id for a provider not in the table: return exactly
+   `Provider "<query>" is not registered. Use request_update to suggest adding it, or open a GitHub issue with the new-provider template.`
+   as an error result.
+6. resolve_entity with a provider and id not in the table: return exactly
+   `No Reep entity matches that query in the local register.` then a blank line, then
+   `Local register release: 20260926T145536Z (current).`
+7. request_update: return exactly
+   `Request queued locally. Open this pre-filled issue to send it: https://github.com/withqwerty/football-docs/issues/new`
 8. Recordings marked `error` are tool errors: return them as an error result.
 
 ## Routing table
 
-| Recording | Use for |
-| --- | --- |
-| s01 | Opta big chance, bigChance, qualifier 214, shot qualifiers, headed/penalty/own-goal qualifiers (provider opta) |
-| g01 | get_provider_docs for opta on big chance / qualifiers |
-| s02 | Opta xG, expected goals, xGOT, qualifier 321/322, matchexpectedgoals, matchevent endpoints |
-| s03 | Catapult, STATSports, Kinexon, GPS, wearables, PlayerLoad, high-speed running, physical export fields (no provider filter, or a provider filter that is indexed) |
-| s04 | any search_docs call with provider set to catapult, statsports, kinexon or another GPS vendor |
-| s05 | StatsBomb own goals, Own Goal For / Own Goal Against, goal attribution (statsbomb) |
-| s06 | StatsBomb shot type, penalty, set-piece shot types (statsbomb) |
-| s14 | StatsBomb shot fields, statsbomb_xg, shot_type, non-penalty xG code (statsbomb) |
-| s07 | FBref data, FBref xG, progressive passes, what FBref still has in 2026 |
-| s15 | soccerdata FBref reader functions, player season stats |
-| s08 | Reep register download, DuckDB, CSV, local copy, REEP_DUCKDB_PATH, keeping Reep current |
-| s09 | Transfermarkt identity surfaces, Transfermarkt player IDs, spieler namespace |
-| s13 | FBref identity surfaces, FBref player IDs |
-| s10 | Sofascore, 403, challenge, anti-bot, scraper blocked, soccerdata Sofascore |
-| s11 | goalkeeper shot-stopping, post-shot xG, PSxG, xGOT, goals prevented, save percentage |
-| s12 | possession-adjusted defensive stats, tackles and interceptions adjustment, PADJ |
-| l01 | list_providers |
-| p01 | resolve_provider_id for Catapult or any GPS vendor |
-| r01 | resolve_entity with provider transfermarkt and id 568177 (namespace spieler or none) |
-| r03 | resolve_entity with provider fbref and id dc7f8a28 (namespace person or none) |
-| r02 | resolve_entity looked up by name (any name, e.g. 'Cole Palmer') |
+| Recording | Tool | Keywords |
+| --- | --- | --- |
+| s01 | search_docs | big chance, bigChance, 214, shot qualifiers, headed, head, own goal qualifier (Opta) |
+| s02 | search_docs | xG, expected goals, xGOT, 321, 322, matchexpectedgoals, matchevent, endpoint, feed (Opta) |
+| s05 | search_docs | own goal, Own Goal For, Own Goal Against, goal attribution (StatsBomb) |
+| s06 | search_docs | penalty, shot type, set piece shot (StatsBomb) |
+| s14 | search_docs | shot fields, statsbomb_xg, shot_statsbomb_xg, statsbombpy events, non-penalty xG, npxG (StatsBomb) |
+| s07 | search_docs | FBref, advanced stats, xG on FBref, progressive passes, 2026 removal |
+| s15 | search_docs | soccerdata FBref, read_player_season_stats, read_team_season_stats |
+| s08 | search_docs | Reep, register, download, DuckDB, CSV, release, latest.json, REEP_DUCKDB_PATH, bulk IDs, crosswalk |
+| s09 | search_docs | Transfermarkt IDs, spieler, identity surfaces (Transfermarkt) |
+| s13 | search_docs | FBref IDs, person ID, identity surfaces (FBref) |
+| s10 | search_docs | Sofascore, 403, challenge, anti-bot, blocked, Cloudflare, scraper broken |
+| s11 | search_docs | goalkeeper, shot-stopping, save percentage, post-shot xG, PSxG, goals prevented |
+| s12 | search_docs | tackles, interceptions, defensive actions, possession-adjusted, PAdj, defender |
+| s16 | search_docs | tackle win rate, tackles won, tackles lost, challenges lost, dribbled past, duels |
+| s17 | search_docs | distance covered, km, sprints, physical metrics, running |
+| s03 | search_docs | Catapult, STATSports, Kinexon, GPS, wearables, PlayerLoad, physical export fields |
+| s04 | search_docs | any call with provider set to catapult, statsports, kinexon or another GPS vendor |
+| g01 | get_provider_docs | get_provider_docs for Opta (any topic about qualifiers or big chance) |
+| l01 | list_providers | list_providers |
+| p01 | resolve_provider_id | Catapult, STATSports, Kinexon, GPS vendors |
+| p02 | resolve_provider_id | Reep, Reep Register, reep.football |
+| p03 | resolve_provider_id | Opta, Stats Perform |
+| p04 | resolve_provider_id | StatsBomb, Hudl StatsBomb |
+| p05 | resolve_provider_id | FBref |
+| p06 | resolve_provider_id | Transfermarkt |
+| p07 | resolve_provider_id | Sofascore, soccerdata |
+| r01 | resolve_entity | resolve_entity with provider transfermarkt and id 568177 (with or without namespace) |
+| r03 | resolve_entity | resolve_entity with provider fbref and id dc7f8a28 (with or without namespace) |
+| r02 | resolve_entity | resolve_entity by name (any name) |
 
 ## Recordings
 
@@ -49,124 +64,6 @@ How to answer a call:
 
 ````text
 Found 4 result(s) for "big chance qualifier" in opta:
-
-## [1] Zone and low-xG proxies
-**Provider:** opta | **Category:** charting-shot-placement | **Source:** curated by football-docs contributors
-
-## Zone and low-xG proxies
-
-If a continuous xG source is unavailable, zone qualifiers can be used as a rough
-proxy, but label the result as a proxy rather than xG:
-
-| Zone qualifier family | Typical use |
-|---|---|
-| `16`, `60`, `61` | small-box zones; usually exclude from low-xG placement-skill cuts |
-| `17` | box centre |
-| `62`, `63`, `64`, `65` | box wide/deep-box zones |
-| `18` | out-of-box centre |
-| `66`, `67`, `68`, `69` | out-of-box wide/deep zones |
-| `19`, `70`, `71` | thirty-five-plus / long-range zones |
-| `214` | big chance; usually exclude from low-xG placement-skill cuts |
-| `9` | penalty; exclude or analyse separately |
-
-For a robust first pass, join continuous xG from `matchexpectedgoals` where possible.
-If you only have `matchevent`, a low-xG proxy can exclude small-box, big-chance, and
-penalty qualifiers, then report zone-adjusted residuals so wide-angle geometry does
-not masquerade as finishing skill.
-
----
-
-## [2] Shot Qualifiers
-**Provider:** opta | **Category:** qualifiers | **Source:** curated by football-docs contributors
-
-## Shot Qualifiers
-
-| ID | Name | Notes |
-|----|------|-------|
-| 15 | head | Headed shot/goal |
-| 20 | rightFoot | Right-footed shot |
-| 72 | leftFoot | Left-footed shot |
-| 21 | otherBodyPart | Knee, chest, etc. |
-| 22 | regularPlay | The event happened in open play, not from a set play |
-| 24 | setPiece | The event followed a free kick that was not struck directly. A shot struck directly from a free kick is Q26 |
-| 25 | fromCorner | Shot followed a corner |
-| 26 | freeKick | Shot struck directly from a free kick |
-| 29 | assisted | A team-mate's pass set up the shot or chance |
-| 160 | throwInSetPiece | The shot or pass came from a throw-in set piece |
-| 214 | bigChance | Big chance: a clear-cut chance the player should score, such as a one-on-one |
-| 9 | penalty | Penalty taken, or penalty awarded (on a foul, typeId 4) |
-| 108 | volley | Volley: the ball did not bounce before the shot |
-| 328 | firstTouch | Shot struck first time, without a controlling touch |
-| 263 | directCorner | Shot or goal directly from a corner (Olimpico) |
-| 136 | keeperTouched | Goal where the goalkeeper got a touch on the ball |
-| 82 | blocked | The shot was blocked |
-| 146 | blockedX | X coordinate where the shot was blocked, or where an opponent touched an off-target shot |
-| 147 | blockedY | Y coordinate for the same point as Q146 |
-
-Qualifiers 16-19 and 60-71 are pitch zones for the shot location (for example 16
-small box centre, 17 box centre, 18 out of box centre, 19 35+ centre). See
-charting-shot-placement for the full zone list.
-
----
-
-## [3] Pass Qualifiers
-**Provider:** opta | **Category:** qualifiers | **Source:** curated by football-docs contributors
-
-## Pass Qualifiers
-
-| ID | Name | Notes |
-|----|------|-------|
-| 1 | longBall | Pass longer than 32 metres |
-| 2 | cross | Cross (Q2). Corners commonly carry Q2 + Q6; free-kick crosses commonly carry Q2 + Q5; open-play crosses are Q2 without Q5/Q6. |
-| 3 | headPass | Headed pass (Q3). Distinct from Q15, the headed shot qualifier. |
-| 4 | throughBall | Through ball (Q4). Do not confuse with Q5 free-kick delivery. |
-| 5 | freeKickTaken | Free kick pass / free-kick delivery (Q5), direct or indirect. |
-| 6 | cornerTaken | Corner kick / corner delivery (Q6). |
-| 107 | throwIn | Throw-in |
-| 124 | goalKick | Goal kick pass. For goal-kick distribution charts, combine with pass end coordinates Q140/Q141. |
-| 279 | kickOff | Kick-off pass. Value `S` is the kick-off that starts a period; `G` is the kick-off after a goal. |
-| 7 | playersCaughtOffside | On an offside pass (typeId 2). The value is the ID of the player caught offside. It is not a goal-kick flag; goal kicks are Q124. |
-| 154 | intentionalAssist | Pass that creates a scoring chance, for example a cross into the box or a through ball |
-| 210 | assist | The pass set up a shot, a goal or a missed chance |
-| 196 | switchOfPlay | Pass crossing centre zone, y-distance > 60 |
-| 212 | length | Estimated distance in metres that the ball travelled on the pass or clearance |
-| 213 | angle | Direction of the pass or clearance relative to the direction of play, in radians (0.00 to 6.28) |
-
----
-
-## [4] Shot context and consequence filters
-**Provider:** opta | **Category:** charting-shot-placement | **Source:** curated by football-docs contributors
-
-## Shot context and consequence filters
-
-Shot-placement stories often ask whether a miss, save, post hit, or weak finish
-changed the match state. Join each shot row to a running scoreline timeline before
-building late-game, close-game, or "mattered" filters.
-
-| Derived field | How to derive it | Use |
-|---|---|---|
-| `team_score_at_shot` / `opp_score_at_shot` | Count valid goals strictly before the shot clock, from the shooting team's perspective | Tooltip, score-state splits, consequence labels |
-| `goal_diff_at_shot` | `team_score_at_shot - opp_score_at_shot` | Classify whether the shooter was leading, level, or trailing |
-| `state_at_shot` | `winning`, `drawing`, or `losing` from `goal_diff_at_shot` | Filter shot maps by game state or pressure context |
-| `is_late` | minute threshold such as `minute >= 80`, using expanded minutes when available | Late-shot and stoppage-time story filters |
-| `is_close_final` | final margin within one goal, after converting to the shooting team's perspective | Avoid overstating misses in already-decided matches |
-| `mattered` | shot taken while the goal difference was within one and the final margin was within one | Narrative filter for chances that could plausibly change the result |
-
-Use the goal-timeline reconstruction in [charting-game-state.md](charting-game-state.md):
-drop disallowed goals with qualifier `8`, credit own goals with qualifier `28` to
-the opposing team, and sort by period-aware clock or `expandedMinute`. Count only
-goals before the shot; a goal event at the same clock should not retroactively
-change the shot's pre-shot state unless the provider explicitly links them.
-
-Keep these consequence fields separate from provider facts. `mattered`,
-`late`, `close final`, and `pressure shot` are analysis labels layered on top of
-Opta events, not Opta event types.
-````
-
-### g01 — get_provider_docs {"provider": "opta", "topic": "big chance"}
-
-````text
-Provider docs for **opta** (Opta) matching "big chance":
 
 ## [1] Zone and low-xG proxies
 **Provider:** opta | **Category:** charting-shot-placement | **Source:** curated by football-docs contributors
@@ -382,161 +279,6 @@ Add tests or fixtures for these cases when implementing game-state logic:
 | Goal before a pass-map window | affects every later pass in that team's state |
 | Penalty shootout or post-match period | exclude from normal 90/120-minute state unless explicitly modelling shootouts |
 | Missing goal timeline | do not fabricate states from final score alone |
-````
-
-### s03 — search_docs {"query": "Catapult PlayerLoad high speed running export fields", "max_results": 5}
-
-````text
-Found 5 result(s) for "Catapult PlayerLoad high speed running export fields":
-
-## [1] Tracking-derived off-ball runs recipe
-**Provider:** kloppy | **Category:** tracking-rendering | **Source:** curated by football-docs contributors
-
-## Tracking-derived off-ball runs recipe
-
-Use this recipe when an agent asks for off-ball runs, high-speed runs away from
-the ball, forward runs, channel runs, run maps, or run-detection timelines from
-optical tracking feeds.
-
-| Output field | Source fields | Rule |
-|---|---|---|
-| `player_id` / `team_id` | tracking entity, lineup join | Emit provider ids and display labels only after the identity join is proven. |
-| `period` / `start_ms` / `end_ms` | frame period and timestamp | Use the tracking period clock, not wall-clock time. |
-| `duration_s` | consecutive above-threshold frames | Count the span of the run, not just the number of sampled frames. |
-| `distance_m` | player coordinates or provider cumulative distance | Prefer provider distance when documented; otherwise derive consistently from live-frame coordinates. |
-| `peak_speed_mps` | provider speed or coordinate delta / frame interval | Convert units before thresholding; keep the source of speed visible. |
-| `towards_goal` | attacking direction plus player displacement | Resolve attacking direction per team and period before labelling a run forward. |
-| quality flags | live/dead state, missing positions, ball proximity, direction confidence | Report rejected or skipped windows rather than filling with zero. |
-
-Implementation notes:
-
-- Filter to live frames when the feed exposes a live/dead flag. If an older
-  export lacks that flag, state the fallback rather than silently changing the
-  definition.
-- Detect candidate runs as contiguous spans above a declared speed threshold,
-  with an optional short-gap merge rule. Label both the threshold and the
-  minimum duration.
-- Exclude on-ball carrying or receiving actions by checking player-ball
-  proximity across the run. A common rule is to reject runs where the player is
-  close to the ball during the body of the run, while allowing a short trailing
-  receive window at the end.
-- Resolve attacking direction from provider metadata where available, such as
-  `home_team_side` plus period. If metadata is absent and you infer direction
-  from goalkeeper depth or team shape, label that inference and expose a
-  confidence flag.
-- Do not classify "towards goal" from raw `+x` movement until the coordinate
-  frame, team side, and period have been normalised.
-- Keep this separate from provider official physical metrics. A derived run
-  detector is a product rule over frames; provider high-speed running or sprint
-  counts may use different thresholds, smoothing, and live-ball handling.
-
----
-
-## [2] Physical speed bands
-**Provider:** skillcorner | **Category:** concepts | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31
-
-## Physical speed bands
-
-Physical metrics bucket movement by intensity: **running**, **HSR** (High Speed Running), **sprint**, and **HI** (High Intensity = HSR + sprint). Acceleration/deceleration efforts are split into **medium** and **high**, with **explosive** accelerations that lead into HSR or a sprint tracked separately. **PSV-99** (Peak Sprint Velocity, 99th percentile) is an outlier-robust top-speed proxy. Exact km/h thresholds are in the glossary. See [physical-data.md](physical-data.md).
-
----
-
-## [3] Base metrics
-**Provider:** skillcorner | **Category:** physical-data | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31
-
-## Base metrics
-
-| Metric stem | Meaning |
-|---|---|
-| `total_distance` | Total distance covered (m) |
-| `total_metersperminute` | Distance per minute (m/min) |
-| `running_distance` | Distance in the running speed band |
-| `hsr_distance` / `hsr_count` | High Speed Running distance / number of efforts |
-| `sprint_distance` / `sprint_count` | Sprinting distance / number of sprints |
-| `hi_distance` / `hi_count` | High Intensity distance / efforts (HSR + sprint band) |
-| `medaccel_count` / `highaccel_count` | Medium / high acceleration counts |
-| `meddecel_count` / `highdecel_count` | Medium / high deceleration counts |
-| `explacceltohsr_count` | Explosive accelerations leading into HSR |
-| `explacceltosprint_count` | Explosive accelerations leading into a sprint |
-| `timetohsr` / `timetohsr_top3` | Time to reach HSR (and top-3 average) |
-| `timetosprint` / `timetosprint_top3` | Time to reach sprint speed (and top-3 average) |
-| `psv99` / `psv99_top5` | Peak Sprint Velocity (99th percentile) and top-5 average — a max-speed proxy robust to outliers |
-
-(Speed-band thresholds — what counts as running / HSR / sprint — are defined in the SkillCorner glossary: <https://skillcorner.crunch.help/en>.)
-
----
-
-## [4] Player workload table recipe
-**Provider:** skillcorner | **Category:** physical-data | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31
-
-## Player workload table recipe
-
-Use this recipe when an agent asks for a physical table, player workload view,
-high-speed running leaderboard, sprint chart, or top-speed comparison from
-SkillCorner-style physical data.
-
-| Display field | SkillCorner source | Notes |
-|---|---|---|
-| minutes observed | `minutes_full_all` or the relevant split | Show the denominator next to rate metrics; do not compare tiny samples to full-match workloads without a minutes filter. |
-| distance | `total_distance_full_all` | Values are metres. Convert to kilometres for display, but keep raw metres in data exports. |
-| metres per minute | `total_metersperminute_full_all` or derived from distance/minutes | Useful when comparing players with different minutes; state whether it is all time or ball-in-play. |
-| HSR distance/count | `hsr_distance_*`, `hsr_count_*` | HSR thresholds come from the SkillCorner glossary and may differ from Wyscout or a custom tracking pipeline. |
-| sprint distance/count | `sprint_distance_*`, `sprint_count_*` | Counts are efforts, not metres; keep count and distance separate. |
-| high-intensity output | `hi_distance_*`, `hi_count_*` | HI combines HSR and sprint bands. Avoid double-counting it with HSR/sprint components in totals. |
-| top-speed proxy | `psv99` or `psv99_top5` | Peak/time metrics are bare fields, not split fields. Do not construct `psv99_full_all`. |
-| acceleration load | `medaccel_count_*`, `highaccel_count_*`, `meddecel_count_*`, `highdecel_count_*` | Treat acceleration/deceleration counts as a separate load family from distance. |
-| quality status | `physical_check_passed`, `count_match`, `count_match_failed` | Filter or flag rows that fail QC before ranking players. |
-
-Choose one comparison basis before plotting:
-
-- absolute match output: `*_full_all` values, best for "what did this player do
-  today?";
-- per-90: `*_p90`, best for season/competition leaderboards with minutes
-  thresholds;
-- ball-in-play: `*_p60bip`, best when comparing intensity independent of dead
-  time;
-- possession phase: `*_p30tip` / `*_p30otip`, best for in-possession versus
-  out-of-possession physical profiles.
-
-Do not mix providers' speed bands silently. SkillCorner HSR/sprint thresholds are
-defined in its glossary; Wyscout exposes similar labels with km/h thresholds, and
-custom tracking pipelines often use local m/s cut-offs. When joining physical
-data to event or video views, keep `match_id`, `player_id`, `team_id`, period,
-minutes basis, units, and QC flags in the exported data.
-
----
-
-## [5] Physical metrics
-**Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03
-
-## Physical metrics
-
-These metrics are only available for specific competitions and players with at least 60 minutes of active play across all matches.
-
-| Metric | Definition | Products |
-|---|---|---|
-| Count HI per 90 | The number of High Intensity actions: sum of Count HSR (High Speed Runs) and Count Sprint, normalized per 90 minutes. | Advanced Search |
-| Count High Acceleration per 90 | The number of Accelerations detected with a peak value greater than 3 m/s², normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
-| Count High Deceleration per 90 | The number of Decelerations detected with a peak value less than -3 m/s², normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
-| Count HSR per 90 | The number of High Speed Runs detected between 20 km/h and 25 km/h, normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
-| Count Medium Acceleration per 90 | The number of Accelerations detected with a peak value between 1.5 m/s² and 3 m/s², normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
-| Count Medium Deceleration per 90 | The number of Decelerations detected with a peak value between -1.5 m/s² and -3 m/s², normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
-| Count Sprint per 90 | The number of Sprints exceeding 25 km/h, normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
-| HI Distance per 90 | High Intensity. Distance covered above 20 km/h, normalized per 90 minutes. | Advanced Search |
-| HSR Distance per 90 | High Speed Runs. Distance covered between 20 km/h and 25 km/h, normalized per 90 minutes. | Advanced Search |
-| Meter/min | Total distance covered across all actions, divided per number of minutes. | Advanced Search |
-| Max Speed (km/h) | The maximum speed recorded. | Advanced Search |
-| Running Distance per 90 | Distance covered between 15 km/h and 20 km/h, normalized per 90 minutes. | Advanced Search |
-| Sprinting Distance per 90 | Distance covered above 25 km/h, normalized per 90 minutes. | Advanced Search |
-| Total Distance per 90 | Total distance covered, normalized per 90 minutes. | Advanced Search |
-
-Source: [https://dataglossary.wyscout.com/physical_metrics/](https://dataglossary.wyscout.com/physical_metrics/)
-````
-
-### s04 — search_docs {"query": "Catapult", "provider": "catapult"} — error
-
-````text
-Provider "catapult" is not indexed. Call list_providers for available provider keys, or use request_update to suggest adding it.
 ````
 
 ### s05 — search_docs {"query": "own goal event", "provider": "statsbomb", "max_results": 4}
@@ -1597,6 +1339,545 @@ The glossary says "Deep completions"; the event API tag is
 `deep_completition`.
 ````
 
+### s16 — search_docs {"query": "tackles won lost challenges", "max_results": 4}
+
+````text
+Found 4 result(s) for "tackles won lost challenges":
+
+## [1] Event Type Reference
+**Provider:** opta | **Category:** event-types | **Source:** curated by football-docs contributors
+
+## Event Type Reference
+
+| typeId | Name | Per match avg | Outcome | Notes |
+|--------|------|---------------|---------|-------|
+| 1 | Pass | ~925 | 0=miss, 1=success | Includes open play, goal kicks, corners, free kicks played as passes |
+| 2 | Offside pass | ~3 | always 1 | Receiving player called offside |
+| 3 | Take on | ~35 | 0=fail, 1=success | Dribble past opponent |
+| 4 | Foul | ~44 | 0=committed, 1=fouled | Events come in pairs (one per team) |
+| 5 | Out | ~106 | 0=put out, 1=gains possession | Ball out of play |
+| 6 | Corner awarded | ~18 | 0=conceded, 1=won | |
+| 7 | Tackle | ~32 | 0=fail, 1=wins ball | Legal ground-level challenge |
+| 8 | Interception | ~13 | always 1 | Intercepts opposition pass |
+| 10 | Save | ~11 | always 1 | GK prevents goal (also outfield with qual 94) |
+| 11 | Claim | ~2 | 0=drops, 1=catches | GK catches crossed ball |
+| 12 | Clearance | ~53 | always 1 | Defensive clearance |
+| 13 | Miss | ~9 | always 1 | Shot wide or over |
+| 14 | Post | <1 | always 1 | Ball hits frame |
+| 15 | Attempt saved | ~11 | always 1 | Shot on target, saved |
+| 16 | Goal | ~2.5 | always 1 | Own goals have qualifier 28 |
+| 17 | Card | ~4 | always 1 | Yellow/second yellow/red via qualifiers |
+| 18 | Player off | ~9 | always 1 | Substituted off |
+| 19 | Player on | ~1 | always 1 | Substituted on |
+| 20 | Player retired | — | — | Player leaves the pitch |
+| 21 | Player returns | — | — | Player comes back on after leaving the pitch |
+| 27 | Start delay | ~3 | always 1 | Play stops for a delay. With qualifier 364, a VAR review |
+| 28 | End delay | ~3 | always 1 | The delay ends and play restarts |
+| 30 | End | ~6 | always 1 | End of a period. kloppy reads the period end time from it |
+| 32 | Start | — | — | Start of a period. kloppy reads the period start time from it |
+| 34 | Team set up | ~2 | always 1 | Formation/lineup event |
+| 37 | Collection end | — | — | |
+| 40 | Formation change | — | — | In-game formation change |
+| 41 | Punch | — | — | GK punches the ball |
+| 42 | Good skill | — | — | |
+| 43 | Deleted event | — | — | Opta removed this event. Drop it before analysis; kloppy does |
+| 44 | Aerial | ~60 | 0=lost, 1=won | Aerial duel |
+| 45 | Challenge | ~15 | always 0 | Unsuccessful tackle attempt |
+| 49 | Ball recovery | ~80 | always 1 | Player gathers loose ball |
+| 50 | Dispossessed | ~10 | always 1 | Loses ball via opponent tackle |
+| 51 | Error | ~1 | always 1 | Mistake losing ball |
+| 52 | Keeper pick-up | ~5 | always 1 | GK picks up ball |
+| 54 | Smother | <1 | always 1 | GK covers ball at attacker's feet |
+| 55 | Offside provoked | ~3 | always 1 | Defender's position causes offside |
+| 59 | Keeper sweeper | ~5 | always 1 | GK comes off line to clear/claim |
+| 61 | Ball touch | ~3 | always 1 | Bad touch / loss of control |
+| 67 | 50/50 | ~2 | 0=lost, 1=won | Two players contest loose ball |
+| 74 | Blocked pass | ~10 | always 1 | Player blocks an opponent's pass |
+| 83 | Attempted tackle | ~15 | always 0 | Unsuccessful tackle |
+
+A dash means the per-match average or outcome has not been checked for that type.
+
+---
+
+## [2] Defending
+**Provider:** statsbomb | **Category:** player-match-stats | **Source:** curated by football-docs contributors
+
+## Defending
+
+| Column | Type | Description |
+|---|---|---|
+| `player_match_tackles` | double | Successful challenges made |
+| `player_match_challenge_ratio` | percentage | % of duels where the player makes a tackle vs getting dribbled past |
+| `player_match_interceptions` | double | Interceptions |
+| `player_match_ball_recoveries` | integer | Ball recoveries |
+| `player_match_fhalf_ball_recoveries` | integer | Ball recoveries in the opposition (final) half |
+| `player_match_clearances` | double | Clearances |
+| `player_match_aerials` | double | Aerial duels |
+| `player_match_successful_aerials` | double | Successful aerials |
+| `player_match_aerial_ratio` | percentage | % of aerial duels entered that are won |
+| `player_match_blocks_per_shot` | double | Blocks made per shot faced |
+| `player_match_aggressive_actions` | double | Tackles, pressures and fouls within 2 s of an opposition ball receipt |
+| `player_match_defensive_actions` | integer | Tackles, pressure events and fouls recorded |
+| `player_match_fouls` | double | Fouls committed |
+| `player_match_fouls_won` | double | Times the player is fouled |
+| `player_match_penalties_won` | double | Penalties won |
+
+---
+
+## [3] Defending
+**Provider:** statsbomb | **Category:** player-season-stats | **Source:** curated by football-docs contributors
+
+## Defending
+
+| Column | Type | Description |
+|---|---|---|
+| `player_season_tackles_90` | double | Successful challenges |
+| `player_season_challenge_ratio` | percentage | % of duels where a tackle is made vs being dribbled past |
+| `player_season_interceptions_90` | double | Interceptions |
+| `player_season_tackles_and_interceptions_90` | double | Tackles + interceptions |
+| `player_season_ball_recoveries_90` | double | Ball recoveries |
+| `player_season_fhalf_ball_recoveries_90` | double | Ball recoveries in opposition half |
+| `player_season_clearance_90` | double | Clearances |
+| `player_season_aerial_wins_90` | double | Aerial duels won |
+| `player_season_aerial_ratio` | percentage | % of aerial duels won |
+| `player_season_blocks_per_shot` | double | Blocks per shot faced |
+| `player_season_aggressive_actions_90` | double | Tackles/pressures/fouls within 2 s of opposition ball receipt |
+| `player_season_defensive_action_90` | float | Tackles, pressure events and fouls per 90 |
+| `player_season_defensive_action_regains_90` | double | Team won ball back within 5 s of the player's defensive action |
+| `player_season_errors_90` | double | On-ball mistakes leading to a shot |
+| `player_season_fouls_90` | double | Fouls committed |
+| `player_season_fouls_won_90` | double | Times fouled |
+| `player_season_penalty_wins_90` | double | Penalties won |
+| `player_season_padj_clearances_90` | double | Possession-adjusted clearances |
+| `player_season_padj_interceptions_90` | double | Possession-adjusted interceptions |
+| `player_season_padj_pressures_90` | double | Possession-adjusted pressures |
+| `player_season_padj_tackles_90` | double | Possession-adjusted tackles |
+| `player_season_padj_tackles_and_interceptions_90` | double | Possession-adjusted tackles + interceptions |
+| `player_season_average_x_defensive_action` | double | Avg distance from goal line of successful defensive actions (x-axis 0–100) |
+| `player_season_average_x_pass` | double | Avg distance from goal line of successful passes (0–100) |
+| `player_season_average_x_pressure` | double | Avg distance from goal line of pressures (0–100) |
+
+---
+
+## [4] Wyscout Index
+**Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03
+
+## Wyscout Index
+
+An index (available in the Rankings app) that sorts players in a competition for each position based on their stats.
+
+![Wyscout Index Bundesliga](https://dataglossary.wyscout.com/static/5fddd112a03c2162f1435e12649e8d3d/a3357/wyscout-index.png)
+
+_Top 11 team according to wyscout index in Bundesliga 2019/2020_
+
+For every position, there's a set of parameters that are taken in consideration in the final ranking. Here's a sample (not exhaustive) list of top relevant stats per position.
+
+- _Goalkeeper_: Conceded goals, Goal mistakes, Saves, Shots faced, Penalty saves, Exits from the line, Pass accuracy.
+- _Full-back_: Accelerations, Crosses, Defensive duels won, Sliding tackles, Key passes, Clearances, Pressing attempts, Interceptions, Loose ball duels won, Dribbles won
+- _Centre-back_: Team conceded goals, Defensive duels won, Loose ball duels won, Interceptions, Clearances, Aerial duels won, Sliding tackles, Lost balls, Blocked shots, Yellow/red cards, Pass accuracy.
+- _Defensive midfielder_: Goals, Chances created, Dribbles won, Shots on target, Loose ball duels won, Assists, Passes, Through passes, Sliding tackles, Interceptions
+- _Central midfielder_: Goals, Chances created, Through passes, Loose ball duels won, Shots on target, Pressing attempts, Assists, Aerial duels won, Interceptions, Defensive duels won
+- _Attacking midfielder_: Goals, Chances created, Dribbles won, Through passes, Shots on target, Assists, Crosses, Accelerations, Loose ball duels won, Pressing attempts
+- _Winger:_ Goals, Shots on target, Assists, Through passes, Crosses, Chances created, Acceleration, Driibles won, Loose ball duels won, Aerial duels won
+- _Forward_: Goals, Chances created, Through passes, Assists, Shots, Dribbles won, Shots on target, Duels won, Crosses, Link-up plays
+
+Every stat is assigned a weight, either positive on negative. Based on this, the algorithm calculates the distribution inside a season and assigns values linearly according to minimum and maximum values in the league. For example, the goalkeeper with most goals conceded would receive -4.6 points, and the one with least goals conceded would have a zero: the value for goalkeepers in the middle would be distributed linearly.
+
+The index is calculated a sum of statistical params multiplied by weights as described above.
+
+The index is updated after every match played.
+
+Source: [https://dataglossary.wyscout.com/wyscout_index/](https://dataglossary.wyscout.com/wyscout_index/)
+````
+
+### s17 — search_docs {"query": "distance covered high speed running physical metrics", "max_results": 4}
+
+````text
+Found 4 result(s) for "distance covered high speed running physical metrics":
+
+## [1] Physical metrics
+**Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03
+
+## Physical metrics
+
+These metrics are only available for specific competitions and players with at least 60 minutes of active play across all matches.
+
+| Metric | Definition | Products |
+|---|---|---|
+| Count HI per 90 | The number of High Intensity actions: sum of Count HSR (High Speed Runs) and Count Sprint, normalized per 90 minutes. | Advanced Search |
+| Count High Acceleration per 90 | The number of Accelerations detected with a peak value greater than 3 m/s², normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
+| Count High Deceleration per 90 | The number of Decelerations detected with a peak value less than -3 m/s², normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
+| Count HSR per 90 | The number of High Speed Runs detected between 20 km/h and 25 km/h, normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
+| Count Medium Acceleration per 90 | The number of Accelerations detected with a peak value between 1.5 m/s² and 3 m/s², normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
+| Count Medium Deceleration per 90 | The number of Decelerations detected with a peak value between -1.5 m/s² and -3 m/s², normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
+| Count Sprint per 90 | The number of Sprints exceeding 25 km/h, normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
+| HI Distance per 90 | High Intensity. Distance covered above 20 km/h, normalized per 90 minutes. | Advanced Search |
+| HSR Distance per 90 | High Speed Runs. Distance covered between 20 km/h and 25 km/h, normalized per 90 minutes. | Advanced Search |
+| Meter/min | Total distance covered across all actions, divided per number of minutes. | Advanced Search |
+| Max Speed (km/h) | The maximum speed recorded. | Advanced Search |
+| Running Distance per 90 | Distance covered between 15 km/h and 20 km/h, normalized per 90 minutes. | Advanced Search |
+| Sprinting Distance per 90 | Distance covered above 25 km/h, normalized per 90 minutes. | Advanced Search |
+| Total Distance per 90 | Total distance covered, normalized per 90 minutes. | Advanced Search |
+
+Source: [https://dataglossary.wyscout.com/physical_metrics/](https://dataglossary.wyscout.com/physical_metrics/)
+
+---
+
+## [2] Base metrics
+**Provider:** skillcorner | **Category:** physical-data | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31
+
+## Base metrics
+
+| Metric stem | Meaning |
+|---|---|
+| `total_distance` | Total distance covered (m) |
+| `total_metersperminute` | Distance per minute (m/min) |
+| `running_distance` | Distance in the running speed band |
+| `hsr_distance` / `hsr_count` | High Speed Running distance / number of efforts |
+| `sprint_distance` / `sprint_count` | Sprinting distance / number of sprints |
+| `hi_distance` / `hi_count` | High Intensity distance / efforts (HSR + sprint band) |
+| `medaccel_count` / `highaccel_count` | Medium / high acceleration counts |
+| `meddecel_count` / `highdecel_count` | Medium / high deceleration counts |
+| `explacceltohsr_count` | Explosive accelerations leading into HSR |
+| `explacceltosprint_count` | Explosive accelerations leading into a sprint |
+| `timetohsr` / `timetohsr_top3` | Time to reach HSR (and top-3 average) |
+| `timetosprint` / `timetosprint_top3` | Time to reach sprint speed (and top-3 average) |
+| `psv99` / `psv99_top5` | Peak Sprint Velocity (99th percentile) and top-5 average — a max-speed proxy robust to outliers |
+
+(Speed-band thresholds — what counts as running / HSR / sprint — are defined in the SkillCorner glossary: <https://skillcorner.crunch.help/en>.)
+
+---
+
+## [3] Tracking-derived physical output recipe
+**Provider:** kloppy | **Category:** tracking-rendering | **Source:** curated by football-docs contributors
+
+## Tracking-derived physical output recipe
+
+Use this recipe when an agent asks for a physical report, raw-tracking workload
+table, speed-band totals, top-speed list, sprint count, or high-speed-running
+summary from kloppy `TrackingDataset` frames rather than from a provider's
+official physical endpoint.
+
+| Output field | Source fields | Rule |
+|---|---|---|
+| `player_id` / `team_id` | tracking player object, lineup join | Emit stable provider ids only after the tracking roster has been joined to match players. |
+| `minutes_observed` | player coordinates, frame rate | Count frames where the player has a usable position; report the denominator before ranking rates. |
+| `total_distance_m` | provider cumulative distance or player coordinates | Prefer documented provider cumulative distance; otherwise derive frame-to-frame distance in metres with a consistent missing-position rule. |
+| speed-band distances | provider speed or derived speed, live flag | Bucket live-frame distance into declared walking, jogging, HSR, and sprint bands. Keep thresholds in the response metadata. |
+| `sprint_count` | speed series, frame rate, live flag | Count sustained contiguous live-frame runs above the sprint threshold, with an explicit minimum duration and optional short-gap merge rule. |
+| `top_speed_mps` | provider speed or derived speed | Use the maximum non-glitch speed from live frames; return `null` when no usable speed sample exists. |
+| quality flags | missing speed, missing distance, live/dead state, coordinate unit | State whether values are provider supplied, derived, partially unavailable, or computed without a live-ball flag. |
+
+Core fallback: derive speed from adjacent coordinates when no trusted provider
+speed is available.
+
+Safety rule: this is not the same contract as official provider physical metrics.
+
+Implementation notes:
+
+- Use provider speed when present and documented. If it is missing, derive speed
+  from adjacent coordinates as `distance_m / dt_seconds`, then smooth or
+  aggregate before displaying labels so one-frame jitter does not dominate.
+- Convert coordinates to metres before computing distance or speed. Tracking
+  feeds may expose metres, centimetres, or normalised pitch coordinates.
+- Apply a declared glitch guard before top speed, speed-band totals, and sprint
+  detection. Impossible spikes should become missing samples, not records.
+- Treat period boundaries separately for speed derivation, smoothing, and sprint
+  detection. Do not connect a run across half-time or extra-time breaks.
+- Filter speed-band totals and sprint detection to live frames when the feed
+  exposes a live/dead flag. Distance covered and observed minutes may still count
+  every tracked frame, but label that choice.
+- Keep a provider/derived source flag per metric family. It is acceptable for
+  distance to be provider supplied while speed is derived, but the API response
+  should make that visible.
+- Do not compare custom thresholds against SkillCorner, Wyscout, or other
+  provider physical outputs without labelling the threshold set. A derived
+  tracking workload report is not the same contract as official provider
+  physical metrics.
+
+---
+
+## [4] Physical speed bands
+**Provider:** skillcorner | **Category:** concepts | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31
+
+## Physical speed bands
+
+Physical metrics bucket movement by intensity: **running**, **HSR** (High Speed Running), **sprint**, and **HI** (High Intensity = HSR + sprint). Acceleration/deceleration efforts are split into **medium** and **high**, with **explosive** accelerations that lead into HSR or a sprint tracked separately. **PSV-99** (Peak Sprint Velocity, 99th percentile) is an outlier-robust top-speed proxy. Exact km/h thresholds are in the glossary. See [physical-data.md](physical-data.md).
+````
+
+### s03 — search_docs {"query": "Catapult PlayerLoad high speed running export fields", "max_results": 5}
+
+````text
+Found 5 result(s) for "Catapult PlayerLoad high speed running export fields":
+
+## [1] Tracking-derived off-ball runs recipe
+**Provider:** kloppy | **Category:** tracking-rendering | **Source:** curated by football-docs contributors
+
+## Tracking-derived off-ball runs recipe
+
+Use this recipe when an agent asks for off-ball runs, high-speed runs away from
+the ball, forward runs, channel runs, run maps, or run-detection timelines from
+optical tracking feeds.
+
+| Output field | Source fields | Rule |
+|---|---|---|
+| `player_id` / `team_id` | tracking entity, lineup join | Emit provider ids and display labels only after the identity join is proven. |
+| `period` / `start_ms` / `end_ms` | frame period and timestamp | Use the tracking period clock, not wall-clock time. |
+| `duration_s` | consecutive above-threshold frames | Count the span of the run, not just the number of sampled frames. |
+| `distance_m` | player coordinates or provider cumulative distance | Prefer provider distance when documented; otherwise derive consistently from live-frame coordinates. |
+| `peak_speed_mps` | provider speed or coordinate delta / frame interval | Convert units before thresholding; keep the source of speed visible. |
+| `towards_goal` | attacking direction plus player displacement | Resolve attacking direction per team and period before labelling a run forward. |
+| quality flags | live/dead state, missing positions, ball proximity, direction confidence | Report rejected or skipped windows rather than filling with zero. |
+
+Implementation notes:
+
+- Filter to live frames when the feed exposes a live/dead flag. If an older
+  export lacks that flag, state the fallback rather than silently changing the
+  definition.
+- Detect candidate runs as contiguous spans above a declared speed threshold,
+  with an optional short-gap merge rule. Label both the threshold and the
+  minimum duration.
+- Exclude on-ball carrying or receiving actions by checking player-ball
+  proximity across the run. A common rule is to reject runs where the player is
+  close to the ball during the body of the run, while allowing a short trailing
+  receive window at the end.
+- Resolve attacking direction from provider metadata where available, such as
+  `home_team_side` plus period. If metadata is absent and you infer direction
+  from goalkeeper depth or team shape, label that inference and expose a
+  confidence flag.
+- Do not classify "towards goal" from raw `+x` movement until the coordinate
+  frame, team side, and period have been normalised.
+- Keep this separate from provider official physical metrics. A derived run
+  detector is a product rule over frames; provider high-speed running or sprint
+  counts may use different thresholds, smoothing, and live-ball handling.
+
+---
+
+## [2] Physical speed bands
+**Provider:** skillcorner | **Category:** concepts | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31
+
+## Physical speed bands
+
+Physical metrics bucket movement by intensity: **running**, **HSR** (High Speed Running), **sprint**, and **HI** (High Intensity = HSR + sprint). Acceleration/deceleration efforts are split into **medium** and **high**, with **explosive** accelerations that lead into HSR or a sprint tracked separately. **PSV-99** (Peak Sprint Velocity, 99th percentile) is an outlier-robust top-speed proxy. Exact km/h thresholds are in the glossary. See [physical-data.md](physical-data.md).
+
+---
+
+## [3] Base metrics
+**Provider:** skillcorner | **Category:** physical-data | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31
+
+## Base metrics
+
+| Metric stem | Meaning |
+|---|---|
+| `total_distance` | Total distance covered (m) |
+| `total_metersperminute` | Distance per minute (m/min) |
+| `running_distance` | Distance in the running speed band |
+| `hsr_distance` / `hsr_count` | High Speed Running distance / number of efforts |
+| `sprint_distance` / `sprint_count` | Sprinting distance / number of sprints |
+| `hi_distance` / `hi_count` | High Intensity distance / efforts (HSR + sprint band) |
+| `medaccel_count` / `highaccel_count` | Medium / high acceleration counts |
+| `meddecel_count` / `highdecel_count` | Medium / high deceleration counts |
+| `explacceltohsr_count` | Explosive accelerations leading into HSR |
+| `explacceltosprint_count` | Explosive accelerations leading into a sprint |
+| `timetohsr` / `timetohsr_top3` | Time to reach HSR (and top-3 average) |
+| `timetosprint` / `timetosprint_top3` | Time to reach sprint speed (and top-3 average) |
+| `psv99` / `psv99_top5` | Peak Sprint Velocity (99th percentile) and top-5 average — a max-speed proxy robust to outliers |
+
+(Speed-band thresholds — what counts as running / HSR / sprint — are defined in the SkillCorner glossary: <https://skillcorner.crunch.help/en>.)
+
+---
+
+## [4] Player workload table recipe
+**Provider:** skillcorner | **Category:** physical-data | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31
+
+## Player workload table recipe
+
+Use this recipe when an agent asks for a physical table, player workload view,
+high-speed running leaderboard, sprint chart, or top-speed comparison from
+SkillCorner-style physical data.
+
+| Display field | SkillCorner source | Notes |
+|---|---|---|
+| minutes observed | `minutes_full_all` or the relevant split | Show the denominator next to rate metrics; do not compare tiny samples to full-match workloads without a minutes filter. |
+| distance | `total_distance_full_all` | Values are metres. Convert to kilometres for display, but keep raw metres in data exports. |
+| metres per minute | `total_metersperminute_full_all` or derived from distance/minutes | Useful when comparing players with different minutes; state whether it is all time or ball-in-play. |
+| HSR distance/count | `hsr_distance_*`, `hsr_count_*` | HSR thresholds come from the SkillCorner glossary and may differ from Wyscout or a custom tracking pipeline. |
+| sprint distance/count | `sprint_distance_*`, `sprint_count_*` | Counts are efforts, not metres; keep count and distance separate. |
+| high-intensity output | `hi_distance_*`, `hi_count_*` | HI combines HSR and sprint bands. Avoid double-counting it with HSR/sprint components in totals. |
+| top-speed proxy | `psv99` or `psv99_top5` | Peak/time metrics are bare fields, not split fields. Do not construct `psv99_full_all`. |
+| acceleration load | `medaccel_count_*`, `highaccel_count_*`, `meddecel_count_*`, `highdecel_count_*` | Treat acceleration/deceleration counts as a separate load family from distance. |
+| quality status | `physical_check_passed`, `count_match`, `count_match_failed` | Filter or flag rows that fail QC before ranking players. |
+
+Choose one comparison basis before plotting:
+
+- absolute match output: `*_full_all` values, best for "what did this player do
+  today?";
+- per-90: `*_p90`, best for season/competition leaderboards with minutes
+  thresholds;
+- ball-in-play: `*_p60bip`, best when comparing intensity independent of dead
+  time;
+- possession phase: `*_p30tip` / `*_p30otip`, best for in-possession versus
+  out-of-possession physical profiles.
+
+Do not mix providers' speed bands silently. SkillCorner HSR/sprint thresholds are
+defined in its glossary; Wyscout exposes similar labels with km/h thresholds, and
+custom tracking pipelines often use local m/s cut-offs. When joining physical
+data to event or video views, keep `match_id`, `player_id`, `team_id`, period,
+minutes basis, units, and QC flags in the exported data.
+
+---
+
+## [5] Physical metrics
+**Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03
+
+## Physical metrics
+
+These metrics are only available for specific competitions and players with at least 60 minutes of active play across all matches.
+
+| Metric | Definition | Products |
+|---|---|---|
+| Count HI per 90 | The number of High Intensity actions: sum of Count HSR (High Speed Runs) and Count Sprint, normalized per 90 minutes. | Advanced Search |
+| Count High Acceleration per 90 | The number of Accelerations detected with a peak value greater than 3 m/s², normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
+| Count High Deceleration per 90 | The number of Decelerations detected with a peak value less than -3 m/s², normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
+| Count HSR per 90 | The number of High Speed Runs detected between 20 km/h and 25 km/h, normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
+| Count Medium Acceleration per 90 | The number of Accelerations detected with a peak value between 1.5 m/s² and 3 m/s², normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
+| Count Medium Deceleration per 90 | The number of Decelerations detected with a peak value between -1.5 m/s² and -3 m/s², normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
+| Count Sprint per 90 | The number of Sprints exceeding 25 km/h, normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
+| HI Distance per 90 | High Intensity. Distance covered above 20 km/h, normalized per 90 minutes. | Advanced Search |
+| HSR Distance per 90 | High Speed Runs. Distance covered between 20 km/h and 25 km/h, normalized per 90 minutes. | Advanced Search |
+| Meter/min | Total distance covered across all actions, divided per number of minutes. | Advanced Search |
+| Max Speed (km/h) | The maximum speed recorded. | Advanced Search |
+| Running Distance per 90 | Distance covered between 15 km/h and 20 km/h, normalized per 90 minutes. | Advanced Search |
+| Sprinting Distance per 90 | Distance covered above 25 km/h, normalized per 90 minutes. | Advanced Search |
+| Total Distance per 90 | Total distance covered, normalized per 90 minutes. | Advanced Search |
+
+Source: [https://dataglossary.wyscout.com/physical_metrics/](https://dataglossary.wyscout.com/physical_metrics/)
+````
+
+### s04 — search_docs {"query": "Catapult", "provider": "catapult"} — error
+
+````text
+Provider "catapult" is not indexed. Call list_providers for available provider keys, or use request_update to suggest adding it.
+````
+
+### g01 — get_provider_docs {"provider": "opta", "topic": "big chance"}
+
+````text
+Provider docs for **opta** (Opta) matching "big chance":
+
+## [1] Zone and low-xG proxies
+**Provider:** opta | **Category:** charting-shot-placement | **Source:** curated by football-docs contributors
+
+## Zone and low-xG proxies
+
+If a continuous xG source is unavailable, zone qualifiers can be used as a rough
+proxy, but label the result as a proxy rather than xG:
+
+| Zone qualifier family | Typical use |
+|---|---|
+| `16`, `60`, `61` | small-box zones; usually exclude from low-xG placement-skill cuts |
+| `17` | box centre |
+| `62`, `63`, `64`, `65` | box wide/deep-box zones |
+| `18` | out-of-box centre |
+| `66`, `67`, `68`, `69` | out-of-box wide/deep zones |
+| `19`, `70`, `71` | thirty-five-plus / long-range zones |
+| `214` | big chance; usually exclude from low-xG placement-skill cuts |
+| `9` | penalty; exclude or analyse separately |
+
+For a robust first pass, join continuous xG from `matchexpectedgoals` where possible.
+If you only have `matchevent`, a low-xG proxy can exclude small-box, big-chance, and
+penalty qualifiers, then report zone-adjusted residuals so wide-angle geometry does
+not masquerade as finishing skill.
+
+---
+
+## [2] Shot Qualifiers
+**Provider:** opta | **Category:** qualifiers | **Source:** curated by football-docs contributors
+
+## Shot Qualifiers
+
+| ID | Name | Notes |
+|----|------|-------|
+| 15 | head | Headed shot/goal |
+| 20 | rightFoot | Right-footed shot |
+| 72 | leftFoot | Left-footed shot |
+| 21 | otherBodyPart | Knee, chest, etc. |
+| 22 | regularPlay | The event happened in open play, not from a set play |
+| 24 | setPiece | The event followed a free kick that was not struck directly. A shot struck directly from a free kick is Q26 |
+| 25 | fromCorner | Shot followed a corner |
+| 26 | freeKick | Shot struck directly from a free kick |
+| 29 | assisted | A team-mate's pass set up the shot or chance |
+| 160 | throwInSetPiece | The shot or pass came from a throw-in set piece |
+| 214 | bigChance | Big chance: a clear-cut chance the player should score, such as a one-on-one |
+| 9 | penalty | Penalty taken, or penalty awarded (on a foul, typeId 4) |
+| 108 | volley | Volley: the ball did not bounce before the shot |
+| 328 | firstTouch | Shot struck first time, without a controlling touch |
+| 263 | directCorner | Shot or goal directly from a corner (Olimpico) |
+| 136 | keeperTouched | Goal where the goalkeeper got a touch on the ball |
+| 82 | blocked | The shot was blocked |
+| 146 | blockedX | X coordinate where the shot was blocked, or where an opponent touched an off-target shot |
+| 147 | blockedY | Y coordinate for the same point as Q146 |
+
+Qualifiers 16-19 and 60-71 are pitch zones for the shot location (for example 16
+small box centre, 17 box centre, 18 out of box centre, 19 35+ centre). See
+charting-shot-placement for the full zone list.
+
+---
+
+## [3] Pass Qualifiers
+**Provider:** opta | **Category:** qualifiers | **Source:** curated by football-docs contributors
+
+## Pass Qualifiers
+
+| ID | Name | Notes |
+|----|------|-------|
+| 1 | longBall | Pass longer than 32 metres |
+| 2 | cross | Cross (Q2). Corners commonly carry Q2 + Q6; free-kick crosses commonly carry Q2 + Q5; open-play crosses are Q2 without Q5/Q6. |
+| 3 | headPass | Headed pass (Q3). Distinct from Q15, the headed shot qualifier. |
+| 4 | throughBall | Through ball (Q4). Do not confuse with Q5 free-kick delivery. |
+| 5 | freeKickTaken | Free kick pass / free-kick delivery (Q5), direct or indirect. |
+| 6 | cornerTaken | Corner kick / corner delivery (Q6). |
+| 107 | throwIn | Throw-in |
+| 124 | goalKick | Goal kick pass. For goal-kick distribution charts, combine with pass end coordinates Q140/Q141. |
+| 279 | kickOff | Kick-off pass. Value `S` is the kick-off that starts a period; `G` is the kick-off after a goal. |
+| 7 | playersCaughtOffside | On an offside pass (typeId 2). The value is the ID of the player caught offside. It is not a goal-kick flag; goal kicks are Q124. |
+| 154 | intentionalAssist | Pass that creates a scoring chance, for example a cross into the box or a through ball |
+| 210 | assist | The pass set up a shot, a goal or a missed chance |
+| 196 | switchOfPlay | Pass crossing centre zone, y-distance > 60 |
+| 212 | length | Estimated distance in metres that the ball travelled on the pass or clearance |
+| 213 | angle | Direction of the pass or clearance relative to the direction of play, in radians (0.00 to 6.28) |
+
+---
+
+## [4] Shot context and consequence filters
+**Provider:** opta | **Category:** charting-shot-placement | **Source:** curated by football-docs contributors
+
+## Shot context and consequence filters
+
+Shot-placement stories often ask whether a miss, save, post hit, or weak finish
+changed the match state. Join each shot row to a running scoreline timeline before
+building late-game, close-game, or "mattered" filters.
+
+| Derived field | How to derive it | Use |
+|---|---|---|
+| `team_score_at_shot` / `opp_score_at_shot` | Count valid goals strictly before the shot clock, from the shooting team's perspective | Tooltip, score-state splits, consequence labels |
+| `goal_diff_at_shot` | `team_score_at_shot - opp_score_at_shot` | Classify whether the shooter was leading, level, or trailing |
+| `state_at_shot` | `winning`, `drawing`, or `losing` from `goal_diff_at_shot` | Filter shot maps by game state or pressure context |
+| `is_late` | minute threshold such as `minute >= 80`, using expanded minutes when available | Late-shot and stoppage-time story filters |
+| `is_close_final` | final margin within one goal, after converting to the shooting team's perspective | Avoid overstating misses in already-decided matches |
+| `mattered` | shot taken while the goal difference was within one and the final margin was within one | Narrative filter for chances that could plausibly change the result |
+
+Use the goal-timeline reconstruction in [charting-game-state.md](charting-game-state.md):
+drop disallowed goals with qualifier `8`, credit own goals with qualifier `28` to
+the opposing team, and sort by period-aware clock or `expandedMinute`. Count only
+goals before the shot; a goal event at the same clock should not retroactively
+change the shot's pre-shot state unless the provider explicitly links them.
+
+Keep these consequence fields separate from provider facts. `mattered`,
+`late`, `close final`, and `pressure shot` are analysis labels layered on top of
+Opta events, not Opta event types.
+````
+
 ### l01 — list_providers {}
 
 ````text
@@ -1636,6 +1917,102 @@ Data: built 2026-09-29T07:27:10.000Z from commit 2d483df (bundled).
 
 ````text
 Provider "Catapult" is not registered. Use request_update to suggest adding it, or open a GitHub issue with the new-provider template.
+````
+
+### p02 — resolve_provider_id {"query": "Reep"}
+
+````text
+Resolved "Reep" to provider ID: **reep**
+**Display name:** Reep
+**Indexed:** yes (29 chunks)
+**Categories:** api (7), data-provenance (2), download-duckdb-csv (9), identity-and-ids (6), overview (5)
+**Aliases:** reep-football, reep.football
+**Access level:** open-data
+**Licence/status:** Releases are CC0 1.0, provider-ID bridges included. The download needs no key. API keys are issued by hand on request (getintouch+nutmeg@withqwerty.com); there is no self-service sign-up.
+**Public-safety notes:** Document the current register only (reep.football, /api/v1). Spec snapshot in specs/reep/ comes from the public, unauthenticated https://reep.football/openapi.yaml - see specs/README.md. Endpoint claims are validated against it in CI. Do not hard-code release counts; they change weekly.
+**Version:** v1
+**Last crawled:** 2026-09-22
+**Registered sources:** curated: https://reep.football/openapi.yaml; curated: https://reep.football/get-started; curated: https://reep.football/id-policy
+````
+
+### p03 — resolve_provider_id {"query": "Opta"}
+
+````text
+Resolved "Opta" to provider ID: **opta**
+**Display name:** Opta
+**Indexed:** yes (73 chunks)
+**Categories:** api-access (8), charting-game-state (9), charting-lineups (6), charting-passmaps (6), charting-set-pieces (6), charting-shot-placement (10), coordinate-system (6), data-provenance (2), event-types (6), identity-surfaces (4), qualifiers (10)
+**Aliases:** statsperform, stats-perform, opta-f24, whoscored, who-scored
+**Access level:** licensed
+**Licence/status:** No complete public API contract; curated notes must avoid restricted payloads.
+**Public-safety notes:** Keep examples general and public-safe; do not include customer feeds or private paths.
+**Version:** unversioned
+**Last crawled:** not crawled
+**Registered sources:** curated
+````
+
+### p04 — resolve_provider_id {"query": "StatsBomb"}
+
+````text
+Resolved "StatsBomb" to provider ID: **statsbomb**
+**Display name:** StatsBomb
+**Indexed:** yes (237 chunks)
+**Categories:** api-access (38), api-endpoints (8), charting-lineups (6), coordinate-system (13), data-model (27), data-provenance (2), event-types (48), identity-surfaces (5), iq-metrics-glossary (14), player-mapping (6), player-match-stats (13), player-season-stats (12), team-match-stats (11), team-season-stats (11), xg-model (23)
+**Aliases:** stats-bomb, statsbomb-open-data, statsbomb-open
+**Access level:** public
+**Licence/status:** Public open-data repository and public documentation; verify upstream licence before redistributing raw data.
+**Public-safety notes:** Index public docs and public-safe event/data-model notes only.
+**Version:** unversioned
+**Last crawled:** not crawled
+**Registered sources:** github_docs: https://github.com/hudl/open-data; curated
+````
+
+### p05 — resolve_provider_id {"query": "FBref"}
+
+````text
+Resolved "FBref" to provider ID: **free-sources**
+**Display name:** Free sources
+**Indexed:** yes (60 chunks)
+**Categories:** contextual-story-joins (8), data-provenance (8), fbref (5), overview (12), understat (19), xg-timelines (8)
+**Aliases:** fbref, football-reference, understat, clubelo, club-elo, football-data, football-data-uk, football-data-co-uk, engsoccerdata, free, free-source
+**Access level:** public-web
+**Licence/status:** Public sources with differing terms; verify upstream terms before redistribution.
+**Public-safety notes:** Document source shapes, joins, and public-safe usage caveats only.
+**Version:** unversioned
+**Last crawled:** not crawled
+**Registered sources:** curated
+````
+
+### p06 — resolve_provider_id {"query": "Transfermarkt"}
+
+````text
+Resolved "Transfermarkt" to provider ID: **transfermarkt**
+**Display name:** Transfermarkt
+**Indexed:** yes (5 chunks)
+**Categories:** data-provenance (2), identity-surfaces (3)
+**Aliases:** none
+**Access level:** public-web
+**Licence/status:** Public website evidence; respect upstream terms and avoid scraped payload dumps.
+**Public-safety notes:** Use identity-surface facts and public-safe observations only.
+**Version:** unversioned
+**Last crawled:** not crawled
+**Registered sources:** curated
+````
+
+### p07 — resolve_provider_id {"query": "Sofascore"}
+
+````text
+Resolved "Sofascore" to provider ID: **soccerdata**
+**Display name:** soccerdata
+**Indexed:** yes (40 chunks)
+**Categories:** data-sources (9), overview (5), usage (26)
+**Aliases:** soccer-data, sofascore, sofa-score
+**Access level:** open-source
+**Licence/status:** Open-source library documentation; upstream site terms vary.
+**Public-safety notes:** Describe supported public sources and avoid private scraper state.
+**Version:** 1.9.1
+**Last crawled:** not crawled
+**Registered sources:** readthedocs: https://soccerdata.readthedocs.io/en/latest/; github_docs: https://github.com/probberechts/soccerdata
 ````
 
 ### r01 — resolve_entity {"provider": "transfermarkt", "namespace": "spieler", "id": "568177"}
