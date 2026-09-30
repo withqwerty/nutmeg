@@ -68,6 +68,33 @@ jobs:
           fi
           echo "All agent files have valid frontmatter"
 
+      - name: Check plugin paths, tool names and hook output
+        run: |
+          errors=0
+          # Skills and agents must reference plugin files through ${CLAUDE_PLUGIN_ROOT}
+          if grep -rnE '`docs/[a-z-]+\.md`' skills/*/SKILL.md agents/*.md; then
+            echo "ERROR: bare docs/ path in a skill or agent (use \${CLAUDE_PLUGIN_ROOT}/docs/...)"
+            errors=$((errors + 1))
+          fi
+          # Every standalone football-docs tool name must sit next to the plugin-namespaced name
+          for file in skills/*/SKILL.md agents/*.md; do
+            standalone=$(grep -o 'mcp__football-docs__[a-z_]*' "$file" | sort -u)
+            for tool in $standalone; do
+              name=${tool#mcp__football-docs__}
+              if ! grep -q "mcp__plugin_nutmeg_football-docs__${name}" "$file"; then
+                echo "ERROR: $file lists $tool without mcp__plugin_nutmeg_football-docs__${name}"
+                errors=$((errors + 1))
+              fi
+            done
+          done
+          # The SessionStart hook must emit valid JSON
+          CLAUDE_PLUGIN_ROOT="$PWD" sh -c 'cat "${CLAUDE_PLUGIN_ROOT}/hooks/session-start.json"' | python3 -m json.tool > /dev/null || {
+            echo "ERROR: hooks/session-start.json is not valid JSON"
+            errors=$((errors + 1))
+          }
+          if [ "$errors" -gt 0 ]; then exit 1; fi
+          echo "Plugin paths, tool names and hook output OK"
+
       - name: Verify plugin version consistency
         run: |
           plugin_ver=$(grep -o '"version": *"[^"]*"' .claude-plugin/plugin.json | head -1 | grep -o '[0-9.]*')
@@ -92,8 +119,10 @@ jobs:
             exit 1
           fi
 
-          # Install both packages together to prevent npm pruning football-docs
-          npm install --no-save football-docs better-sqlite3 2>&1
+          # Install the football-docs version pinned in .mcp.json (plus better-sqlite3 to inspect its index)
+          pinned=$(node -e "const a=require('./.mcp.json').mcpServers['football-docs'].args; const s=a.find(x=>x.startsWith('football-docs')); console.log(s)")
+          echo "Pinned: $pinned"
+          npm install --no-save "$pinned" better-sqlite3 2>&1
 
           # Verify the binary exists and the DB is present
           if [ ! -f node_modules/.bin/football-docs ]; then

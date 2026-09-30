@@ -2,7 +2,7 @@
 name: nutmeg-store
 description: "Choose how and where to store football data. Use when the user asks about database choices, file formats, cloud storage, data pipelines, or how to organise their football data project. Also covers publishing and sharing outputs (Streamlit, Observable, GitHub Pages)."
 argument-hint: "[storage question or 'publish']"
-allowed-tools: ["Read", "Write", "Bash", "AskUserQuestion", "mcp__football-docs__search_docs"]
+allowed-tools: ["Read", "Write", "Bash", "AskUserQuestion", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs"]
 ---
 
 # Store
@@ -11,10 +11,10 @@ Help the user choose storage formats, locations, and publishing methods for thei
 
 ## Accuracy
 
-Read and follow `docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 ## First: check profile
 
-Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` first.
+Read `.nutmeg.user.md`. If it doesn't exist, continue with sensible defaults (Python and pandas, intermediate level) and suggest running `/nutmeg` setup at the end.
 
 ## Storage format decision tree
 
@@ -43,10 +43,12 @@ Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` firs
 
 | Solution | Best for | Cost |
 |----------|---------|------|
-| PostgreSQL | Production apps, complex queries | Free (self-hosted) or ~$7/mo (Railway, Supabase) |
-| BigQuery | Massive analytical queries | Free tier: 1TB/mo queries |
-| Cloudflare R2 | Object storage (raw files) | Free tier: 10GB storage |
-| S3 / GCS | Object storage at scale | ~$0.023/GB/mo |
+| PostgreSQL | Production apps, complex queries | Free self-hosted; managed hosting is paid |
+| BigQuery | Massive analytical queries | Free tier, then pay per query |
+| Cloudflare R2 | Object storage (raw files) | Free tier, then pay per GB |
+| S3 / GCS | Object storage at scale | Pay per GB |
+
+Prices and free tiers change. Check the provider's current pricing page before you quote a number.
 
 ## Directory structure
 
@@ -83,7 +85,7 @@ project/
 |----------|---------|------|-------|
 | Streamlit | Python | Free (community cloud) | Most popular for football analytics. Deploy from GitHub |
 | Observable | JavaScript | Free tier | Great for D3.js visualisations. Notebooks + Framework |
-| Shiny | R | Free (shinyapps.io, 25 hrs/mo) | R ecosystem integration |
+| Shiny | R | Free tier (shinyapps.io) | R ecosystem integration |
 | Gradio | Python | Free (HuggingFace Spaces) | Quick ML model demos |
 
 ### Static sites
@@ -99,7 +101,7 @@ project/
 | Method | Best for |
 |--------|---------|
 | GitHub repo | Small datasets (< 100MB), code + data together |
-| GitHub Releases | Larger files (up to 2GB per release) |
+| GitHub Releases | Larger files (check GitHub's current size limits) |
 | Kaggle Datasets | Community sharing, discoverable, free |
 | HuggingFace Datasets | ML-focused, versioned, free |
 
@@ -118,5 +120,5 @@ Based on the user's `.nutmeg.user.md` goals, flag costs:
 
 - **Exploration/learning:** Everything can be free. StatsBomb open data + Jupyter/Colab + GitHub Pages.
 - **Content creation:** Streamlit Community Cloud is free. Cloudflare Pages is free.
-- **Professional:** Budget for API access ($100-1000+/mo for Opta/StatsBomb commercial).
+- **Professional:** Budget for commercial data access. Provider pricing is negotiated, so do not quote a figure.
 - **Product:** Database hosting ($7-50/mo), consider data licensing costs separately.

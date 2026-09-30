@@ -1,8 +1,8 @@
 ---
 name: nutmeg-analyse
-description: "Explore, interpret, and draw conclusions from football data. Use when the user wants to analyse match events, compare teams or players, understand tactical patterns, build visualisations, or needs guidance on what questions to ask of their data. Adapts to the user's experience level."
+description: "Explore, interpret, and draw conclusions from football data, including judging players or teams from stats (rankings, comparisons, headlines, social posts). Use when the user wants to analyse match events, compare teams or players, understand tactical patterns, build visualisations, or needs guidance on what questions to ask of their data. Adapts to the user's experience level."
 argument-hint: "[analysis question or topic]"
-allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__football-docs__search_docs"]
+allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs"]
 ---
 
 # Analyse
@@ -11,10 +11,10 @@ Help the user explore and interpret football data. Adapt depth and approach to t
 
 ## Accuracy
 
-Read and follow `docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 ## First: check profile
 
-Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` first.
+Read `.nutmeg.user.md`. If it doesn't exist, continue with sensible defaults (Python and pandas, intermediate level) and suggest running `/nutmeg` setup at the end.
 
 ## Adapt to experience level
 
@@ -102,6 +102,10 @@ Focus on rigour:
 - Use football pitch backgrounds for spatial data (mplsoccer in Python, ggsoccer in R).
 - Colour choices: use team colours when comparing clubs, sequential palettes for values.
 - Credit your data source.
+
+## Before you publish a claim
+
+Read `${CLAUDE_PLUGIN_ROOT}/docs/metric-misuse.md` and check each stat against it. If the user asks you to write a claim a stat cannot support (a post, headline or case), say so first and propose the better measure; draft only what the evidence supports.
 
 ## Data honesty
 

@@ -16,3 +16,6 @@ dist/
 
 # Local reference docs
 docs/setup-guide.md
+
+# Eval run output
+evals/results/

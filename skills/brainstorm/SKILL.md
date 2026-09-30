@@ -2,7 +2,7 @@
 name: nutmeg-brainstorm
 description: "Brainstorm football data visualisations and chart designs. Use when the user wants ideas for how to visualise football data, needs inspiration for chart types, wants to explore design approaches for match reports, player profiles, team dashboards, or any football analytics graphic. Searches the web for popular approaches and real-world examples before proposing options."
 argument-hint: "[what to visualise, e.g. 'shot map for a single match' or 'player comparison radar']"
-allowed-tools: ["Read", "Write", "Bash", "WebSearch", "WebFetch", "Agent", "mcp__football-docs__search_docs"]
+allowed-tools: ["Read", "Write", "Bash", "WebSearch", "WebFetch", "Agent", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs"]
 ---
 
 # Brainstorm
@@ -11,11 +11,11 @@ Help the user explore and choose football data visualisation approaches through 
 
 ## Accuracy
 
-Read and follow `docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 
 ## First: check profile
 
-Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` first. Use their profile for:
+Read `.nutmeg.user.md`. If it doesn't exist, continue with sensible defaults (Python and pandas, intermediate level) and suggest running `/nutmeg` setup at the end. Use their profile for:
 - Programming language (Python/R/JS)
 - Visualisation libraries they use (mplsoccer, matplotlib, ggplot2, d3, Observable)
 - Experience level (adapt complexity of suggestions)
@@ -27,9 +27,9 @@ This skill has two reference documents. Load them when relevant — don't read b
 
 | Reference | When to load | Path |
 |---|---|---|
-| **Chart Canon** | When discussing specific football chart types, conventions, or anti-patterns | `skills/brainstorm/references/chart-canon.md` |
-| **Viz Styles** | When helping the user choose a design approach or aesthetic direction | `skills/brainstorm/references/viz-styles.md` |
-| **Campos Bridge** | Strong React/campos signal in cwd — loads the bridge; soft signals surface a mention only | `skills/_shared/campos-bridge.md` |
+| **Chart Canon** | When discussing specific football chart types, conventions, or anti-patterns | `${CLAUDE_PLUGIN_ROOT}/skills/brainstorm/references/chart-canon.md` |
+| **Viz Styles** | When helping the user choose a design approach or aesthetic direction | `${CLAUDE_PLUGIN_ROOT}/skills/brainstorm/references/viz-styles.md` |
+| **Campos Bridge** | Strong React/campos signal in cwd — loads the bridge; soft signals surface a mention only | `${CLAUDE_PLUGIN_ROOT}/skills/_shared/campos-bridge.md` |
 
 ## Process
 
@@ -45,13 +45,13 @@ Don't ask all of these upfront. Start with the most important one based on what 
 
 **Detect React/campos context before proposing approaches:**
 
-- **Strong signal** — Read cwd's `package.json`; if it contains `react` or `@withqwerty/campos-react` in `dependencies`/`devDependencies`, load `skills/_shared/campos-bridge.md` and include campos options alongside Python/R in Phase 3.
+- **Strong signal** — Read cwd's `package.json`; if it contains `react` or `@withqwerty/campos-react` in `dependencies`/`devDependencies`, load `${CLAUDE_PLUGIN_ROOT}/skills/_shared/campos-bridge.md` and include campos options alongside Python/R in Phase 3.
 - **Soft signal** — user mentions React/TS/Next/Vite/campos/browser chart in conversation AND cwd does not have `pyproject.toml` / `requirements.txt` / `renv.lock` / `Gemfile`. Do not auto-load; mention the bridge exists and offer to load if the user confirms they want a React chart.
 - **Conflicting signal** — cwd is a Python/R/Ruby project. Keep the existing mplsoccer/ggplot2 path; soft signals are ignored. Strong signals still win (monorepo case).
 - **Integration-self signal** — cwd IS the campos or nutmeg repo itself (see the bridge doc for detection). Downgrade to soft — working on the integration is not the same as using it.
 - **No signal** — existing path unchanged.
 
-**Determine their style early.** Load `references/viz-styles.md` and identify which style fits their context (Analytical, Social Media, Editorial, Minimal/Academic). For advanced users, skip the style discussion — they know what they want. Focus on the specific technique.
+**Determine their style early.** Load `${CLAUDE_SKILL_DIR}/references/viz-styles.md` and identify which style fits their context (Analytical, Social Media, Editorial, Minimal/Academic). For advanced users, skip the style discussion — they know what they want. Focus on the specific technique.
 
 ### Phase 2: Research approaches
 
@@ -64,7 +64,7 @@ Before proposing options, research what works well.
    - `search_docs(query="[concept] visualisation")` — check if any provider docs cover this
 
 2. **Load the chart canon** if the question involves a standard football chart type:
-   - Read `skills/brainstorm/references/chart-canon.md`
+   - Read `${CLAUDE_PLUGIN_ROOT}/skills/brainstorm/references/chart-canon.md`
    - Check conventions, known weaknesses, and anti-patterns for the chart type
 
 3. **Search the web for real-world examples:**
@@ -112,7 +112,7 @@ Once the user picks an approach:
    - Reference the chart canon for conventions (e.g., "xG maps to circle area, not radius")
 
 3. **Flag anti-patterns:**
-   - Load `references/chart-canon.md` and check the anti-patterns section
+   - Load `${CLAUDE_SKILL_DIR}/references/chart-canon.md` and check the anti-patterns section
    - Warn about common mistakes for this chart type (e.g., overloaded radars, misleading xG, context-free percentiles)
 
 ## Key principles

@@ -2,7 +2,7 @@
 name: nutmeg-compute
 description: "Calculate derived football metrics and models. Use when the user wants to compute xG, xGOT, PPDA, passing networks, expected threat, possession value, pressing intensity, or any derived football statistic from raw data."
 argument-hint: "[metric to compute]"
-allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__football-docs__search_docs"]
+allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs"]
 ---
 
 # Compute
@@ -11,10 +11,10 @@ Help the user calculate derived football metrics from raw event or stat data.
 
 ## Accuracy
 
-Read and follow `docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 ## First: check profile
 
-Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` first.
+Read `.nutmeg.user.md`. If it doesn't exist, continue with sensible defaults (Python and pandas, intermediate level) and suggest running `/nutmeg` setup at the end.
 
 ## Metric reference
 
@@ -22,17 +22,14 @@ Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` firs
 
 **What it measures:** Probability of a shot resulting in a goal, based on shot location, type, body part, and game situation.
 
-**If provider already has xG:**
-- StatsBomb: included on shot events (`shot.statsbomb_xg`)
-- Opta: qualifier 321 on `matchexpectedgoals` endpoint (NOT on standard event stream)
-- Understat: available via web scraping per match
+**If provider already has xG:** look up where it lives before writing code, with `search_docs(query="expected goals xG", provider="[provider]")`. Providers differ: some put xG on shot events, some serve it from a separate endpoint, and scraped sources can drop it. Name the doc you used.
 
 **Building your own xG model:**
 1. Gather shot data with outcomes (goal/no goal)
 2. Features: distance to goal, angle, body part, shot type (open play/set piece/counter), number of defenders
 3. Model: logistic regression for baseline, gradient boosting for better accuracy
-4. Minimum ~10,000 shots for a usable model (1-2 PL seasons)
-5. Validate with calibration plots and log-loss
+4. Use as many shots as you can, from several seasons, and keep penalties out (or model them separately)
+5. Validate on held-out matches or seasons with calibration plots and log-loss, and compare with a simple baseline
 
 **Common pitfall:** xG models trained on one league may not transfer well to another. Playing styles and league quality differ.
 
@@ -40,7 +37,7 @@ Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` firs
 
 **What it measures:** Probability of a shot resulting in a goal, given where it was placed in the goal mouth. Higher than xG for well-placed shots, 0 for off-target.
 
-**Available from:** Opta (qualifier 322), StatsBomb (post-shot xG).
+**Available from:** some providers publish it; check with `search_docs(query="xGOT post-shot xG", provider="[provider]")`.
 
 ### PPDA (Passes Allowed Per Defensive Action)
 
@@ -54,7 +51,7 @@ PPDA = opponent_passes_in_own_half / (tackles + interceptions + fouls_committed 
 Variations:
 - Some definitions use opponent's defensive third only (stricter)
 - Some exclude fouls from defensive actions
-- Typical PL range: 6-15 (Klopp's Liverpool ~7, deep blocks ~14)
+- Say which definition you used, because values from different definitions are not comparable
 
 ### Passing Networks
 
@@ -73,18 +70,19 @@ Variations:
 
 **What it measures:** How much a ball movement (pass or carry) increases the probability of scoring.
 
-**Calculation:**
-1. Divide the pitch into a 12x8 grid
-2. For each cell, calculate the probability of a shot from that cell resulting in a goal
-3. For each cell, also calculate the probability of moving the ball to a higher-value cell
-4. xT of a movement = xT(destination) - xT(origin)
-5. Requires ~50,000+ possessions for stable estimates
+**Calculation** (Karun Singh's original model, [karun.in/blog/expected-threat.html](https://karun.in/blog/expected-threat.html)):
+1. Divide the pitch into a grid (the original uses 16x12, 192 zones)
+2. For each zone, estimate the probability of shooting from it (s), the probability that a shot from it scores (g), and the probability of moving the ball instead (m)
+3. Estimate a transition matrix T: where moves from each zone end up. The original counts successful moves only
+4. Solve iteratively: xT(zone) = s × g + m × Σ T(zone → other) × xT(other)
+5. xT of an action = xT(destination) - xT(origin)
+6. Use enough seasons of event data that each zone has a stable estimate; sparse zones give noisy values
 
-**Reference implementation:** Karun Singh's original xT model (2018).
+**Reference implementation:** socceraction (or its maintained successor, silly-kicks) implements xT; check the current API with `search_docs(query="expected threat xT", provider="socceraction")`.
 
 ### Possession Value Models
 
-**VAEP (Valuing Actions by Estimating Probabilities):**
+**VAEP (Valuing Actions by Estimating Probabilities; Decroos et al., 2019):**
 - Trains two models: P(goal scored in next 10 actions) and P(goal conceded in next 10 actions)
 - Value of an action = change in scoring probability - change in conceding probability
 - Requires significant data and ML expertise
@@ -119,7 +117,7 @@ When implementing any metric:
 1. State assumptions clearly (what's included/excluded)
 2. Handle edge cases (matches with 0 shots, players with 0 minutes)
 3. Per-90 normalisation for player-level stats: `(stat / minutes) * 90`
-4. Minimum sample sizes before drawing conclusions (~10 matches for team metrics, ~900 minutes for player metrics)
+4. Minimum sample sizes before drawing conclusions. Common rules of thumb are about 10 matches for team metrics and about 900 minutes for player per-90 metrics; some skills need far more (a finishing verdict needs several hundred shots)
 5. Always show confidence/sample size alongside the metric
 
 ## Security

@@ -11,10 +11,10 @@ Diagnose and fix broken football data pipelines. When a scraper or API call fail
 
 ## Accuracy
 
-Read and follow `docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 ## First: check profile
 
-Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` first.
+Read `.nutmeg.user.md`. If it doesn't exist, continue with sensible defaults (Python and pandas, intermediate level) and suggest running `/nutmeg` setup at the end.
 
 ## Diagnosis process
 
@@ -24,7 +24,8 @@ Ask the user for the error message or behaviour. Common categories:
 
 | Symptom | Likely cause |
 |---------|-------------|
-| HTTP 403/429 | Rate limited or blocked. Wait and retry with backoff |
+| HTTP 429 | Rate limited. Wait and retry with backoff, and slow down |
+| HTTP 403 with a "challenge" (Cloudflare or similar) | Anti-bot protection is rejecting automated requests. Waiting and retrying will not fix it (see below) |
 | HTTP 404 | URL/endpoint changed. Check if site restructured |
 | Parse error (HTML) | Website redesigned. Scraper selectors need updating |
 | Parse error (JSON) | API response schema changed. Check for versioning |
@@ -63,6 +64,14 @@ Ask the user for the error message or behaviour. Common categories:
 2. Update the local code to handle the new format
 3. If using a scraping library, submit an issue to that library
 
+## Anti-bot blocks
+
+A 403 "challenge" means the site is deliberately blocking automated access. Tell the user that plainly:
+
+- Explain that retries, new headers or a new user agent usually do not help.
+- Say that evading the protection may breach the site's terms of use. Do not write code to get round it.
+- Offer routes that do not depend on evading it: another source for the same data (check coverage with `search_docs`), an official API or licence, a manual export, or waiting for an upstream fix in the scraping library.
+
 ## Self-healing patterns
 
 When writing data acquisition code via `/nutmeg:acquire`, build in resilience:
@@ -89,8 +98,8 @@ def fetch_with_retry(url, max_retries=3):
 
 | Source | Common issue | Fix |
 |--------|-------------|-----|
-| FBref | 429 rate limit | Add 6s delay between requests |
-| WhoScored | Cloudflare blocks | Use headed browser (Playwright) |
+| FBref | 429 rate limit | Slow down to the documented rate (look it up with `search_docs`) and cache pages |
+| WhoScored, Sofascore | 403 challenge (anti-bot) | Treat as a block, not a bug (see below) |
 | Understat | JSON parse error | Response is JSONP, strip callback wrapper |
 | SportMonks | 401 | Token expired or plan limit hit |
 | StatsBomb open data | 404 | Match/competition not in open dataset |

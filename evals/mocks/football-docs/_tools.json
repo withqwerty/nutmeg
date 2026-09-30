@@ -1,0 +1,255 @@
+{
+  "tools": [
+    {
+      "name": "search_docs",
+      "description": "Search football data provider documentation. Use for finding event types, qualifier IDs, API endpoints, coordinate systems, data models, and cross-provider mappings. Returns the most relevant documentation chunks. Results that do not contain every query term are marked \"partial\", and the reply names any query term that no indexed doc mentions: if the question is about that term, it is not indexed.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query. Examples: 'Opta goal qualifier', 'StatsBomb shot event type', 'coordinate system differences', 'xG qualifier ID', 'SportMonks fixture endpoint', 'FMDB Pro players endpoint'"
+          },
+          "provider": {
+            "description": "Optional provider filter. Use list_providers for indexed provider keys. Common aliases such as fbref, understat, ClubElo, football-data.co.uk, engsoccerdata, Sofascore, ESPN, FMDB, TransferRoom, Hudl Wyscout, Stats Perform, Opta F24, WhoScored, Metrica, Sportec/DFL, TRACAB, Second Spectrum, SportRadar API, Soccer Extended, TheSportsDB, and TSDB are accepted.",
+            "type": "string"
+          },
+          "max_results": {
+            "default": 10,
+            "description": "Maximum number of results to return (default 10)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "resolve_provider_id",
+      "description": "Resolve a football data provider name or alias to the canonical football-docs provider key before searching. Use when users mention brands, vendors, products, or aliases such as Stats Perform, Opta F24, Hudl Wyscout, Second Spectrum, FMDB, Transfer Room, FBref, Sofascore, or TheSportsDB.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Provider name, brand, product, or alias to resolve to a canonical provider key."
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "get_provider_docs",
+      "description": "Retrieve documentation for a resolved provider, optionally filtered by topic or indexed category. Use after resolve_provider_id when you know which provider to inspect and want provenance-bearing docs.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "description": "Provider key or alias. Use resolve_provider_id first when the provider name is ambiguous."
+          },
+          "topic": {
+            "description": "Optional topic to search within this provider's docs.",
+            "type": "string"
+          },
+          "category": {
+            "description": "Optional indexed category to restrict results, such as api-endpoints, qualifiers, identity-surfaces, or tracking-rendering.",
+            "type": "string"
+          },
+          "max_results": {
+            "default": 10,
+            "description": "Maximum number of provider docs to return (default 10).",
+            "type": "number"
+          }
+        },
+        "required": [
+          "provider"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "list_providers",
+      "description": "List all indexed football data providers, their document count, and coverage categories. Use to understand what documentation is available. Call this first to see what providers are indexed before searching.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "compare_providers",
+      "description": "Compare what two or more providers offer for a specific data type or concept. For example: 'How do Opta and StatsBomb represent shot events differently?'",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string",
+            "description": "The concept to compare across providers. Examples: 'shot events', 'coordinate systems', 'xG', 'pass types'"
+          },
+          "providers": {
+            "description": "Providers to compare. If omitted, compares all indexed providers. Use list_providers for indexed keys; common aliases such as ClubElo, football-data.co.uk, engsoccerdata, Sofascore, ESPN, StatsBomb Open Data, Opta F24, WhoScored, SkillCorner, Metrica, Sportec/DFL, TRACAB, Second Spectrum, SportRadar API, Soccer Extended, TheSportsDB, and TSDB are accepted.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "topic"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "request_update",
+      "description": "Request that a provider's documentation be added, updated, or recrawled. Use when you notice docs are outdated, a provider is missing, or you know of a better documentation source. Requests are queued for review.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "new_provider",
+              "recrawl",
+              "flag_outdated",
+              "suggest_source"
+            ],
+            "description": "Type of request: new_provider (add a new tool/library), recrawl (refresh existing docs), flag_outdated (mark docs as stale), suggest_source (recommend a better doc source like llms.txt)"
+          },
+          "provider": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Provider name (existing or proposed). Examples: 'statsbomb', 'mplsoccer', 'floodlight'"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "Why this update is needed. Be specific: version bump, missing event types, new API endpoints, etc."
+          },
+          "suggested_urls": {
+            "description": "URLs for documentation sources (readthedocs, GitHub, llms.txt, etc.)",
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500,
+              "format": "uri"
+            }
+          }
+        },
+        "required": [
+          "type",
+          "provider",
+          "reason"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "resolve_entity",
+      "description": "Map a football entity (player, coach, referee, team, competition, season, stage or match) to its IDs at every provider through the Reep register: Opta, Transfermarkt, Wyscout, SkillCorner, StatsBomb, FotMob, API-Football and more. Look up by provider + id (pass namespace too, e.g. transfermarkt 'spieler', opta 'person'), by reep_id, or by name. Sources, in order: a local copy of the free register (REEP_DUCKDB_PATH), then the Reep API (REEP_API_KEY; keys are issued by hand on request, never self-service). With neither set, it returns setup steps and a DuckDB query. Keeping the local file current: Reep releases weekly. Every local answer ends with the file's release stamp checked against https://data.reep.football/releases/latest.json. If it says the file is out of date, tell the user and offer to run the curl command it gives, which downloads https://reep.football/downloads/duckdb over the same path; the next call uses the new file without a restart. Before bulk matching, make sure the file is current.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "provider": {
+            "description": "Provider key for an ID lookup, e.g. 'transfermarkt', 'opta', 'wyscout', 'skillcorner', 'fotmob'",
+            "type": "string"
+          },
+          "id": {
+            "description": "The provider's own ID, used with provider",
+            "type": "string"
+          },
+          "namespace": {
+            "description": "The provider's namespace for that ID, e.g. 'spieler' or 'verein' for Transfermarkt, 'person' or 'team' for Opta, 'player' for Wyscout. Recommended: some providers reuse numbers across entity types.",
+            "type": "string"
+          },
+          "reep_id": {
+            "description": "A Reep ID (e.g. 'rp1b829f1d3468c4') to list every provider ID for",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name to search, at least 3 characters (e.g. 'Declan Rice'). A name match is a shortlist, not an answer.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Restrict results to one entity type",
+            "type": "string",
+            "enum": [
+              "player",
+              "coach",
+              "referee",
+              "team",
+              "competition",
+              "season",
+              "stage",
+              "match"
+            ]
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": true
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    }
+  ]
+}

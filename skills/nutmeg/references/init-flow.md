@@ -45,6 +45,11 @@ Present as a single multi-select: StatsBomb open, FBref, Understat, ClubElo, Spo
 
 If multiple: "Which is your primary goal?"
 
+## Q7: Joining providers (optional)
+"Will you join data from more than one provider (for example FBref stats with Transfermarkt values)?"
+- **Yes** — offer to set up a local copy of the Reep Register (several hundred MB), following "Looking Up IDs" in `docs/entity-resolution-routing.md` in the nutmeg plugin folder. Record the file path and release stamp in the profile.
+- **No / later** — skip. Nutmeg will offer it when a join comes up.
+
 ## Write the profile
 
 Write `.nutmeg.user.md` with YAML frontmatter:
@@ -59,6 +64,8 @@ statistics_level: basic | intermediate | advanced
 providers: [statsbomb-open, fbref, understat, ...]
 goals: [explore, content, academic, product, professional]
 primary_goal: content
+reep_duckdb_path: /absolute/path/reep-register-v1.duckdb   # optional
+reep_release: 20260926T145536Z                            # optional, stamp of that file
 initialized: YYYY-MM-DD
 ---
 ```
@@ -67,7 +74,7 @@ initialized: YYYY-MM-DD
 
 Based on their answers, include relevant warnings:
 
-**If using scraped sources (FBref, Understat):** Scrapers break when sites change. Respect rate limits (FBref: ~10 req/min). Cache aggressively.
+**If using scraped sources (FBref, Understat):** Scrapers break when sites change, and sources can drop fields without notice. Respect each site's rate limits and terms (nutmeg looks them up in football-docs). Cache aggressively.
 
 **If new to football data:** Start with StatsBomb open data. Don't trust xG models blindly. Don't draw conclusions from fewer than 10 matches or 900 minutes.
 
@@ -82,4 +89,4 @@ Based on their answers, include relevant warnings:
 Adapt to their level:
 - **New:** "Just describe what you want to explore — I'll handle the rest. Try: 'show me shot locations from the 2022 World Cup final'"
 - **Familiar:** "Ask me anything. Try: 'get PL xG data from Understat and compare the top 6'"
-- **Experienced/Expert:** "All sub-skills are available directly if you prefer: `/nutmeg-acquire`, `/nutmeg-analyse`, etc. Or just describe what you need."
+- **Experienced/Expert:** "All sub-skills are available directly if you prefer: `/nutmeg:acquire`, `/nutmeg:analyse`, etc. Or just describe what you need."

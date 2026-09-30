@@ -2,7 +2,7 @@
 name: nutmeg-learn
 description: "Learn about football analytics concepts and explore provider documentation. Use when the user asks what a metric means (xG, PPDA, expected threat, xT), wants learning resources, papers, or courses, is new to football analytics, or wants a learning path. Also use when the user asks about data provider documentation — qualifier IDs, coordinate systems, event types, API schemas, field mappings, identity surfaces, provider ID schemes — or wants to compare providers, look something up in the docs, or find out what data a provider offers."
 argument-hint: "[concept, 'getting started', or provider query]"
-allowed-tools: ["Read", "mcp__football-docs__search_docs", "mcp__football-docs__list_providers", "mcp__football-docs__compare_providers", "mcp__football-docs__resolve_entity"]
+allowed-tools: ["Read", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs", "mcp__plugin_nutmeg_football-docs__list_providers", "mcp__football-docs__list_providers", "mcp__plugin_nutmeg_football-docs__compare_providers", "mcp__football-docs__compare_providers", "mcp__plugin_nutmeg_football-docs__resolve_entity", "mcp__football-docs__resolve_entity", "mcp__plugin_nutmeg_football-docs__get_provider_docs", "mcp__football-docs__get_provider_docs", "mcp__plugin_nutmeg_football-docs__resolve_provider_id", "mcp__football-docs__resolve_provider_id"]
 ---
 
 # Learn
@@ -11,11 +11,11 @@ Teach football analytics concepts, recommend resources, provide a learning path,
 
 ## Accuracy
 
-Read and follow `docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 
 ## First: check profile
 
-Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` first.
+Read `.nutmeg.user.md`. If it doesn't exist, continue with sensible defaults (Python and pandas, intermediate level) and suggest running `/nutmeg` setup at the end.
 
 ## Glossary of core concepts
 
@@ -56,7 +56,7 @@ Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` firs
 |--------|--------------|
 | Shots per 90 | Shot volume normalised by playing time |
 | Conversion rate | Goals / shots (noisy, small sample issues) |
-| Big chance | High-xG opportunity (typically xG > 0.3) |
+| Big chance | A chance an analyst judges the player should reasonably score. It is a coded label, not an xG threshold; check the provider's definition with `search_docs` |
 | Shot on target % | Shots on target / total shots |
 
 ### Defensive
@@ -78,7 +78,7 @@ per_90 = (raw_stat / minutes_played) * 90
 
 Why: a player with 2 goals in 180 minutes (per 90: 1.0) is performing the same as one with 1 goal in 90 minutes. Per-match stats penalise part-time players.
 
-**Minimum sample:** ~900 minutes (10 full matches) before per-90 stats are meaningful.
+**Minimum sample:** about 900 minutes (10 full matches) is a common rule of thumb for per-90 stats. Noisy stats need far more: a finishing verdict needs several hundred shots.
 
 ## Learning path
 
@@ -94,7 +94,7 @@ Why: a player with 2 goals in 180 minutes (per 90: 1.0) is performing the same a
 1. **Read:** "Soccermatics" by David Sumpter. Mathematical modelling applied to football.
 2. **Learn:** How to make pass networks and xG timelines.
 3. **Practice:** Analyse a full match. Write up what happened and what the data shows.
-4. **Explore:** FBref for season-level stats. Compare teams across multiple dimensions.
+4. **Explore:** FBref (basic stats) and Understat (xG) for season-level numbers. Compare teams across multiple dimensions.
 5. **Tool up:** Learn pandas/polars (Python), tidyverse (R), or D3.js (JavaScript) for data manipulation and visualisation.
 
 ### Stage 3: Going deeper
@@ -106,7 +106,7 @@ Why: a player with 2 goals in 180 minutes (per 90: 1.0) is performing the same a
    - Spearman (2018) "Beyond Expected Goals" (pitch control + off-ball)
 2. **Build a model:** Train your own xG model. Compare with provider xG.
 3. **Tracking data:** If you can access it, explore player positioning data.
-4. **Community:** Join football analytics Twitter/X, attend OptaPro Forum or StatsBomb Conference talks (many are free online).
+4. **Community:** Join football analytics Twitter/X, and watch Opta Forum (formerly OptaPro Forum) or StatsBomb Conference talks (many are free online).
 
 ### Stage 4: Professional level
 
@@ -122,9 +122,9 @@ Why: a player with 2 goals in 180 minutes (per 90: 1.0) is performing the same a
 | StatsBomb open data | Free event data, best starting point |
 | Friends of Tracking (YouTube) | University-level video lectures on football analytics |
 | McKay Johns (YouTube) | Python football analytics tutorials |
-| FBref | Free season stats, powered by StatsBomb data |
+| FBref | Free season stats. Basic stats only since January 2026, when its advanced (Opta) data was removed |
 | The Athletic | Journalism with analytics focus |
-| OptaPro Forum | Annual analytics conference (talks online) |
+| Opta Forum (formerly OptaPro Forum) | Annual analytics conference (talks online) |
 | StatsBomb Conference | Annual conference with published research |
 | r/socceranalytics | Reddit community |
 | Football Analytics Slack | Community workspace |
@@ -154,12 +154,12 @@ Examples:
 
 ### Entity resolution
 
-For entity-resolution questions, also read `docs/entity-resolution-routing.md`.
+For entity-resolution questions, also read `${CLAUDE_PLUGIN_ROOT}/docs/entity-resolution-routing.md`.
 Keep the boundary clear:
 
 - provider facts and quirks come from `football-docs`;
 - public Reep ID lookup uses the Reep Register tooling where available;
-- reusable matching code and public-safe schemas belong in `reep-scripts`;
+- reusable matching guidance, schemas and reference scripts belong in `reep-toolkit`;
 - private matching logic pack material is referenced only when the user has
   access or provides the relevant contents.
 
