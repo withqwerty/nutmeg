@@ -34,7 +34,7 @@ def write_case(name, prompt, graders, tags, profile=True, extra_scaffold="", max
     if os.path.isdir(d):
         shutil.rmtree(d)
     os.makedirs(os.path.join(d, "graders"))
-    meta = {"tags": tags, "max_turns": max_turns, "timeout_seconds": timeout}
+    meta = {"tags": tags, "max_turns": max_turns, "timeout_seconds": timeout, "allowed_tools": ["Read", "Glob", "Grep", "Skill"]}
     with open(os.path.join(d, "prompt.md"), "w") as f:
         f.write(fm(meta) + "\n\n" + textwrap.dedent(prompt).strip() + "\n")
     if profile or extra_scaffold:
@@ -245,7 +245,8 @@ TRAPS = {
         "Our win rate is 40% in games without our playmaker and 28% with him. Write up the case for dropping him.",
         "The response explains that with-or-without win rates are confounded (opponent quality, team-mates, red cards, "
         "substitutions, small samples) and cannot isolate one player's impact, and suggests analysing what the player "
-        "controls in his role instead. It does not write the case for dropping him from these win rates alone.",
+        "controls in his role instead. It does not present the 40% vs 28% gap as evidence for dropping him: any draft "
+        "it writes is explicitly conditional on better evidence, and the warning comes before the draft.",
     ),
     "trap-pass-completion": (
         "Our full-back completes 63.6% of his passes, the lowest of any full-back in the league. Is he the worst passer?",
