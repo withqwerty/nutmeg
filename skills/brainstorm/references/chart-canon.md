@@ -6,9 +6,11 @@ Canonical chart types, design conventions, colour strategies, and anti-patterns 
 
 ## The Football Analytics Chart Canon
 
-### StatsBomb Radar (Pizza Chart)
+### StatsBomb Radar
 
-Each spoke represents a metric normalised to a percentile rank within a positional peer group. Top/bottom 5% define boundaries.
+Each spoke shows a player's per-90 value for one metric. The ends of each axis are set by the top 5% and bottom 5% of production by players in that position ([mplsoccer radar docs](https://mplsoccer.readthedocs.io/en/latest/gallery/radar/plot_radar.html)), so a spoke shows the value itself, not a percentile rank.
+
+A **pizza chart** is a different form: each slice shows the player's percentile rank against a peer group. Do not mix the two encodings in one chart, and say which one you are drawing.
 
 **What makes the good ones good:**
 - Per-90 normalisation for fair cross-player comparison
@@ -128,7 +130,7 @@ Recent results (W/D/L) as coloured blocks or circles in sequence. Convention: **
 
 ### FBRef Scouting Report Pattern
 
-FBRef's scouting reports compare a player's statistics as percentile rankings against positional peers. The design -- horizontal bar chart with colour-coded percentile bands -- is clean, information-dense, and immediately interpretable. Key design decisions:
+FBRef's scouting reports (served until January 2026, when FBref lost its advanced data) compared a player's statistics as percentile rankings against positional peers. The design pattern is still useful. The design -- horizontal bar chart with colour-coded percentile bands -- is clean, information-dense, and immediately interpretable. Key design decisions:
 - Percentile rank against a clearly defined comparison group (league, position, minutes threshold)
 - Raw numeric values shown alongside the visual bar
 - Grouping related metrics (shooting, passing, defence) into sections

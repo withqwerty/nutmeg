@@ -35,6 +35,11 @@ agents/            # Specialised sub-agents
 
 docs/
   accuracy-guardrail.md  # Shared guardrail: always use search_docs, never guess from training
+  metric-misuse.md       # Stat-misuse checks (Worville's ten commandments), used by analyse
+  entity-resolution-routing.md  # Reep lookup, joins and routing
+
+hooks/             # SessionStart hook: injects the core football-data rules every session
+evals/             # claude plugin eval suite + football-docs replay mock (see README "Evals")
 
 .mcp.json          # Declares football-docs MCP server dependency
 ```
@@ -42,10 +47,14 @@ docs/
 ## Key conventions
 
 - Every provider-touching skill includes the accuracy guardrail section
+- Skills and agents reference plugin files as `${CLAUDE_PLUGIN_ROOT}/...` (a bare `docs/...` path resolves against the user's project, not the plugin)
+- Plugin MCP tools are named `mcp__plugin_nutmeg_football-docs__<tool>`; frontmatter tool lists carry that name and the standalone `mcp__football-docs__<tool>`
+- Skills and agents do not hard-code provider facts; they look them up with `search_docs` and name the source
+- Run the eval suite before a release and compare with the previous version
 - Skills use `search_docs` from the football-docs MCP server for all provider-specific facts
 - Entity-resolution tasks route through `docs/entity-resolution-routing.md`:
   provider facts in `football-docs`, public ID lookup through Reep Register,
-  reusable matching code in `reep-scripts`, and private matching logic pack
+  reusable matching guidance in `reep-toolkit`, and private matching logic pack
   material only when the user has access
 - User profile lives at `.nutmeg.user.md` (created by `/nutmeg` on first run)
 - Skills adapt to user's language (Python/R/JS), experience level, and available data sources

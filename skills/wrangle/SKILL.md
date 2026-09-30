@@ -2,7 +2,7 @@
 name: nutmeg-wrangle
 description: "Transform, filter, reshape, join, and manipulate football data. Use when the user needs to clean data, merge datasets, convert between formats, handle missing values, work with large datasets, or do any data manipulation task on football data."
 argument-hint: "[what to do with the data]"
-allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__football-docs__search_docs"]
+allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs"]
 ---
 
 # Wrangle
@@ -11,10 +11,10 @@ Help the user manipulate football data effectively. This skill is about the mech
 
 ## Accuracy
 
-Read and follow `docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 ## First: check profile
 
-Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` first. Use their profile for language preference and stack.
+Read `.nutmeg.user.md`. If it doesn't exist, continue with sensible defaults (Python and pandas, intermediate level) and suggest running `/nutmeg` setup at the end. Use their profile for language preference and stack.
 
 ## Core operations
 
@@ -22,11 +22,10 @@ Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` firs
 
 Football data coordinates vary by provider. Always verify and convert before combining data.
 
-Use `search_docs(query="coordinate system", provider="[provider]")` to look up the specific system. Key conversions:
+Use `search_docs(query="coordinate system", provider="[provider]")` to look up each provider's origin, ranges and y-axis direction. Do not write a conversion formula from memory: providers differ in which touchline y=0 sits on, so a formula that only rescales can mirror the pitch.
 
-- Opta (0-100) to StatsBomb (120x80): `x * 1.2`, `y * 0.8`
-- Wyscout to Opta: `x` stays, `y = 100 - y` (invert Y)
-- Any to kloppy normalised: use kloppy's `.transform()` in Python
+- Python: prefer kloppy's `.transform()` or mplsoccer's `Standardizer`, which encode each provider's orientation.
+- Hand-written transforms: derive them from the looked-up definitions, then test them. A kick-off should land on the centre spot, and a team's shots should cluster at the goal it attacks.
 
 ### Filtering events
 
@@ -34,7 +33,7 @@ Common filtering patterns for football event data:
 
 **By event type:**
 - Shots: filter for shot/miss/goal/saved event types
-- Passes in final third: filter passes where x > 66.7 (Opta coords)
+- Passes in final third: filter passes in the last third of the provider's x range (for a 0-100 pitch, x > 66.7)
 - Defensive actions: tackles + interceptions + ball recoveries
 
 **By match state:**
@@ -43,8 +42,8 @@ Common filtering patterns for football event data:
 - Score state: track running score to filter "when winning", "when losing"
 
 **By zone:**
-- Penalty area actions: x > 83, 21 < y < 79 (Opta coords)
-- High press: actions in opponent's defensive third (x > 66.7)
+- Penalty area actions: look up the provider's box bounds with `search_docs(query="pitch zones", provider="[provider]")`; they are approximate on a normalised pitch
+- High press: actions in the opponent's defensive third (the last third of the provider's x range)
 
 ### Joining datasets
 
@@ -54,19 +53,14 @@ Common joins in football data:
 |------|-----|-------|
 | Events + lineups | player_id + match_id | Get player names/positions for each event |
 | Events + xG | match_id + event sequence | Match xG to specific shots |
-| Multiple providers | match date + team names | Fuzzy matching often needed |
+| Multiple providers | Reep ID | Map each provider's `(provider, namespace, id)` to a Reep ID, then join on the Reep ID |
 | Season data + Elo | date | Join Elo rating at time of match |
 
-**Fuzzy team name matching** is a constant pain. Build a mapping table:
-```python
-TEAM_MAP = {
-    'Man City': 'Manchester City',
-    'Man United': 'Manchester United',
-    'Spurs': 'Tottenham Hotspur',
-    'Wolves': 'Wolverhampton Wanderers',
-    # ...
-}
-```
+**Joining providers:** join through Reep Register IDs, not names (see `${CLAUDE_PLUGIN_ROOT}/docs/entity-resolution-routing.md`). Names differ across providers ("Man City" / "Manchester City"), players share names, and a fuzzy name match fails silently.
+
+- Look up IDs with `resolve_entity`, or query the Reep release DuckDB for bulk joins.
+- Keep rows that do not resolve, and report how many there are per provider. Never drop them silently.
+- Use a hand-made name map only as a last resort for entities Reep does not cover, and mark those rows as name-matched so the user can check them.
 
 ### Reshaping
 
@@ -79,10 +73,10 @@ Common reshaping operations:
 
 ### Handling large datasets
 
-Full event data for a PL season is ~500MB+ (380 matches x ~1700 events). Strategies:
+A full season of event data can run to hundreds of megabytes, and tracking data to far more. Strategies:
 
 **Python:**
-- Use polars instead of pandas for 5-10x speed improvement
+- Use polars instead of pandas for large tables; it is usually much faster
 - Process match-by-match in a loop, don't load all into memory
 - Use DuckDB for SQL queries on Parquet files without loading into memory
 
@@ -101,7 +95,7 @@ Always validate after wrangling:
 
 | Check | What to look for |
 |-------|-----------------|
-| Event counts | ~1500-2000 events per PL match. Much less = data issue |
+| Event counts | Compare each match with the other matches in the same dataset. Typical counts depend on the provider, so flag outliers rather than using a fixed number |
 | Coordinate range | Should be within provider's expected range |
 | Missing player IDs | Some events lack player attribution (ball out, etc.) |
 | Duplicate events | Same event_id appearing twice |

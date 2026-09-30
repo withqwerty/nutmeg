@@ -14,7 +14,7 @@ nutmeg gives Claude deep knowledge of football data so it can help you:
 
 - **Acquire** data from Opta, StatsBomb, Wyscout, SportMonks, FBref, Understat, and more
 - **Wrangle** event streams, transform coordinates, join datasets, handle large files
-- **Route entity-resolution work** to the right public surface: provider facts in football-docs, public ID lookup in Reep Register, reusable matching code in reep-scripts
+- **Route entity-resolution work** to the right public surface: provider facts in football-docs, public ID lookup in Reep Register, reusable matching guidance in reep-toolkit
 - **Compute** derived metrics like xG, PPDA, passing networks, expected threat
 - **Store** data in the right format and publish results via Streamlit, Observable, or static sites
 - **Analyse** matches, players, and teams with statistical rigour
@@ -102,15 +102,19 @@ docs/
 
 ## Providers covered
 
-| Provider | Event data | Stats | xG | Tracking | Free? |
-|----------|-----------|-------|----|----------|-------|
-| StatsBomb | Yes | Yes | Yes | No | Open data (select comps) |
-| Opta/Perform | Yes | Yes | Yes (xGOT too) | Yes | No (unofficial feed exists) |
-| Wyscout | Yes | Yes | No | No | No |
-| SportMonks | Partial | Yes | No | No | Free tier |
-| FBref | No | Yes | Yes (via StatsBomb) | No | Yes (scraping) |
-| Understat | No | Partial | Yes | No | Yes (scraping) |
-| ClubElo | No | No | No | No | Yes (API) |
+Nutmeg does not keep its own provider facts. Coverage, fields, IDs, access terms and rate limits come from football-docs, which indexes 26 providers and tools, including Opta, StatsBomb, Wyscout, SkillCorner, Sportradar, SportMonks, Impect, FBref, Understat, kloppy, socceraction, mplsoccer and databallpy. Ask nutmeg "which providers do you cover?" or call `list_providers` for the current list.
+
+Cross-provider player, team and match IDs come from the [Reep Register](https://reep.football) (CC0), through the `resolve_entity` tool.
+
+## Evals
+
+`evals/` holds a behaviour suite for `claude plugin eval`: provider-fact grounding, abstention, Reep joins, common stat misuses and 2026 source changes. A replay mock stands in for the football-docs server, so runs do not depend on the live index.
+
+```bash
+claude plugin eval . --runs 2 --scaffold --no-publish --model sonnet --judge-model sonnet
+```
+
+`--scaffold` runs each case's `scaffold.sh`, which writes a nutmeg profile into the sandbox. To refresh the mock after football-docs changes, run `evals/_scaffold/record_football_docs.py`.
 
 ## License
 

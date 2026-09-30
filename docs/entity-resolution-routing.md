@@ -19,8 +19,9 @@ Use this routing whenever the user asks about:
 |---|---|
 | "What does this provider ID represent?" | Use `football-docs` identity-surface docs with `search_docs`. |
 | "Which fields are safe evidence for this provider?" | Use `football-docs`; search for `identity surfaces`, `id schemes`, and provider quirks. |
-| "Resolve this public player/team/coach ID." | Use the Reep Register lookup via `resolve_entity` when available. |
-| "Write matching or candidate-recovery code." | Point to `reep-scripts` for public reusable schemas, loaders, matchers, and templates. |
+| "Resolve this public player/team/coach ID." | Use the Reep Register lookup via `resolve_entity` (see "Looking up IDs" below). |
+| "Join two providers' data." | Join through Reep IDs: `(provider, namespace, id)` → Reep ID → the other provider's ID. Report unmatched rows; never join on names alone. |
+| "Write matching or candidate-recovery code." | Point to `reep-toolkit` for public guides, provider cards, schemas, templates and reference scripts. |
 | "How should a partner/team run an entity-resolution process?" | Mention the matching logic pack only if the user has access to that private material. |
 | "What is Reep's private minting doctrine?" | Do not answer from Nutmeg. Point to Reep Register documentation or ask the user to provide the private docs. |
 
@@ -43,16 +44,53 @@ search_docs(query="provider quirks duplicate players split teams season stages",
 search_docs(query="lineup squad career membership current team", provider="<provider>")
 ```
 
+## Looking Up IDs
+
+The Reep Register is published as a CC0 release (DuckDB and CSV). The
+`resolve_entity` tool reads a local copy of the release DuckDB; API keys are
+issued only to data partners.
+
+Set up a local copy once:
+
+1. Download the release: `curl -L -o reep-register-v1.duckdb https://reep.football/downloads/duckdb`
+   (several hundred MB).
+2. Set `REEP_DUCKDB_PATH` to the file's absolute path in the shell that starts
+   Claude Code, then restart it.
+3. Record the release stamp. `resolve_entity` prints it and says when a newer
+   release exists; the current stamp is at
+   `https://data.reep.football/releases/latest.json`.
+
+Call `resolve_entity` with a full provider key where you have one:
+
+```text
+resolve_entity(provider="transfermarkt", namespace="spieler", id="568177")
+resolve_entity(reep_id="rp53af22bbeaa667")
+resolve_entity(name="Cole Palmer", type="player")   # shortlist only
+```
+
+- Provider + namespace + id is the reliable path. Check the provider's
+  namespaces with `search_docs(query="identity surfaces", provider="<provider>")`.
+- A name search returns a shortlist, and it can miss players whose register
+  label is their full legal name. Confirm a name hit with a provider ID, club or
+  season before you use it.
+- If a lookup returns no match, report the entity as unresolved. Do not supply
+  an ID from memory.
+
+For bulk joins, query the release DuckDB directly (its `bridges` table maps
+`provider`, `namespace` and `external_id` to `reep_id`). Follow redirects for
+merged or withdrawn IDs as the release documentation describes, and keep the
+release stamp with your output.
+
 ## Matching Code
 
 When the user needs reusable code rather than a one-off lookup, route them to
-`reep-scripts`. That is the public toolkit surface for:
+`reep-toolkit` (https://github.com/withqwerty/reep-toolkit). It is the public
+surface for:
 
-- evidence and candidate schemas;
-- provider bridge/candidate records;
-- loaders for Reep exports;
-- public-safe matching helpers;
-- non-mutating recipe templates and fixtures.
+- guides on bridging provider IDs and matching thresholds;
+- provider cards with ID semantics and quirks;
+- reference schemas and evidence/candidate templates;
+- small reference scripts and fixtures.
 
 Nutmeg can explain which surface to use and help wire it into the user's
 project, but it should not define a separate evidence schema.
@@ -66,8 +104,8 @@ Do not leak or invent private pack doctrine. If the user lacks access, answer
 with the public surfaces:
 
 - provider facts: `football-docs`;
-- public matching code: `reep-scripts`;
-- public IDs and bridges: Reep Register exports/API;
+- public matching guidance and reference scripts: `reep-toolkit`;
+- public IDs and bridges: the Reep Register release (DuckDB/CSV);
 - process guidance: public Reep documentation and correction intake.
 
 ## Safe Defaults

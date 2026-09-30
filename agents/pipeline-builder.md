@@ -33,6 +33,7 @@ tools:
   - Glob
   - Grep
   - Agent
+  - mcp__plugin_nutmeg_football-docs__search_docs
   - mcp__football-docs__search_docs
   - AskUserQuestion
 ---
@@ -52,8 +53,8 @@ You are a football data pipeline architect. Your job is to design complete, prac
 
    **Source selection:** Which data source(s) have what they need? Use `search_docs` to check provider coverage. Prefer free sources when possible.
    For entity-resolution or provider-ID matching steps, read
-   `docs/entity-resolution-routing.md`: provider facts come from
-   `football-docs`, reusable matching code belongs in `reep-scripts`, and
+   `${CLAUDE_PLUGIN_ROOT}/docs/entity-resolution-routing.md`: provider facts come from
+   `football-docs`, reusable matching guidance belongs in `reep-toolkit`, and
    private matching logic pack material is referenced only when the user has
    access.
 

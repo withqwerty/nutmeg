@@ -2,7 +2,7 @@
 name: nutmeg-review
 description: "Review football data code and visualisations for correctness. Use after building a chart, data pipeline, or analysis. Dispatches specialised reviewers for data correctness, chart conventions, visual inspection, and interactive edge cases."
 argument-hint: "[what to review, e.g. 'my shot map code' or 'the passmap page']"
-allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "WebFetch", "mcp__football-docs__search_docs"]
+allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "WebFetch", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs"]
 ---
 
 # Review
@@ -11,11 +11,11 @@ Dispatch specialised reviewers to check football data code and visualisations fo
 
 ## Accuracy
 
-Read and follow `docs/accuracy-guardrail.md` before answering any question about provider-specific facts.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts.
 
 ## First: check profile
 
-Read `.nutmeg.user.md`. If it doesn't exist, tell the user to run `/nutmeg` first.
+Read `.nutmeg.user.md`. If it doesn't exist, continue with sensible defaults (Python and pandas, intermediate level) and suggest running `/nutmeg` setup at the end.
 
 ## Determine scope
 
@@ -27,7 +27,7 @@ Look at what the user wants reviewed. Read the relevant files. Then decide which
 | Code renders a chart or visualisation | **chart-reviewer** agent (Mode 1: Code Review) |
 | User provides a URL or says "check how it looks" | **chart-reviewer** agent (Mode 2: Visual Inspection) |
 | Chart has filters, tooltips, state, or dynamic data | **chart-reviewer** agent (Mode 3: Interactive Edge Cases) |
-| Code imports `@withqwerty/campos-*` (React + campos) | **chart-reviewer** agent (Mode 4: React + Campos) — pass `skills/_shared/campos-bridge.md` in context |
+| Code imports `@withqwerty/campos-*` (React + campos) | **chart-reviewer** agent (Mode 4: React + Campos) — pass `${CLAUDE_PLUGIN_ROOT}/skills/_shared/campos-bridge.md` in context |
 | Code does both data processing AND chart rendering | **Both agents** in parallel |
 
 **Always dispatch at least one.** If unclear, dispatch both — redundant findings are better than missed issues.
@@ -67,7 +67,7 @@ Their concern: [WHAT_THEY_SAID]
 Stack: [LANGUAGE + LIBRARIES from profile]
 [If visual inspection: URL or instructions to render]
 
-Load skills/brainstorm/references/chart-canon.md for convention checking.
+Load ${CLAUDE_PLUGIN_ROOT}/skills/brainstorm/references/chart-canon.md for convention checking.
 ```
 
 ## Synthesise findings
