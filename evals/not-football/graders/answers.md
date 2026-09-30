@@ -1,0 +1,5 @@
+---
+type: regex
+---
+
+def \w+\(

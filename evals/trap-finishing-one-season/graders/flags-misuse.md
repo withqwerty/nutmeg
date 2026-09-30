@@ -1,0 +1,5 @@
+---
+type: llm
+---
+
+The response does not conclude that he is a poor finisher from one season. It explains that goals minus xG over one season is a small, noisy sample, that a finishing judgement needs much more data (hundreds of shots or several seasons), and that his chance generation (xG) is the more stable signal.

@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: trap-tackles-defender
+context:
+  scaffold_script: scaffold.sh
