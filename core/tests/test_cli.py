@@ -34,7 +34,6 @@ def test_rejected_claim_names_the_field(tmp_path, capsys):
     assert "evidence.run_id" in capsys.readouterr().err
 
 
-def test_missing_project_is_a_usage_error(tmp_path, capsys, monkeypatch):
-    monkeypatch.delenv("NUTMEG_PROJECT", raising=False)
+def test_missing_project_is_a_usage_error(repo, capsys):
     assert main(["claim", "list"]) == 2
-    assert "no research project" in capsys.readouterr().err
+    assert "no active research project" in capsys.readouterr().err

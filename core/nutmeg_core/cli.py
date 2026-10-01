@@ -9,8 +9,9 @@ import os
 import sys
 from pathlib import Path
 
-from . import __version__
-from .ledger import KINDS, ClaimError, Ledger
+from . import __version__, project as projects
+from .config import ConfigError, data_in_git_policy, load_team, user_name
+from .ledger import KINDS, REST_TYPES, ClaimError, Ledger
 from .redact import Redactor
 
 
@@ -28,13 +29,16 @@ def find_repo_root(start):
 
 
 def resolve_project(args):
-    """The project folder for this command: --project, then $NUTMEG_PROJECT."""
+    """The project for this command: --project, $NUTMEG_PROJECT, then the active project."""
     chosen = args.project or os.environ.get("NUTMEG_PROJECT")
-    if not chosen:
-        raise UsageError("no research project given; pass --project research/<slug>")
-    project = Path(chosen).resolve()
-    if not project.is_dir():
-        raise UsageError(f"research project not found: {chosen}")
+    if chosen:
+        project = Path(chosen).resolve()
+        if not project.is_dir():
+            raise UsageError(f"research project not found: {chosen}")
+        return project
+    project = projects.active_project(find_repo_root(Path.cwd()))
+    if project is None:
+        raise UsageError("no active research project; start one with `nutmeg new <slug>` or pass --project research/<slug>")
     return project
 
 
@@ -86,6 +90,90 @@ def cmd_claim_show(args):
     return 0
 
 
+def cmd_new(args):
+    repo = find_repo_root(Path.cwd())
+    try:
+        policy = data_in_git_policy(load_team(repo))
+    except ConfigError as exc:
+        raise UsageError(str(exc))
+    choice, source = args.data_in_git, "user"
+    if policy == "no":
+        if choice == "yes":
+            raise UsageError("the team policy in .nutmeg/team.json keeps data out of git; drop --data-in-git yes")
+        choice, source = "no", "team"
+    elif policy == "yes" and choice is None:
+        choice, source = "yes", "team"
+    if choice is None:
+        raise UsageError(
+            "no team policy for data in git. Ask the user whether to keep data, run outputs and "
+            "figure snapshots out of git, then run again with --data-in-git no (keep out) or --data-in-git yes"
+        )
+    try:
+        folder = projects.create(repo, args.slug, choice, question=args.question or "",
+                                 author=user_name(repo), title=args.title, policy_source=source)
+    except projects.ProjectError as exc:
+        raise UsageError(str(exc))
+    kept = "kept out of git" if choice == "no" else "committed with the project"
+    print(f"Started research/{args.slug} (active). Data and run outputs are {kept} ({source} choice).")
+    print(f"Next: fill in {folder.relative_to(repo)}/question.md, then add plan choices with `nutmeg plan choose`.")
+    return 0
+
+
+def cmd_open(args):
+    repo = find_repo_root(Path.cwd())
+    try:
+        projects.set_active(repo, args.slug)
+    except projects.ProjectError as exc:
+        raise UsageError(str(exc))
+    print(f"research/{args.slug} is now the active project.")
+    return 0
+
+
+def cmd_close(args):
+    slug = projects.close(find_repo_root(Path.cwd()))
+    print(f"Closed research/{slug}; no project is active." if slug else "No project was active.")
+    return 0
+
+
+def cmd_status(args):
+    repo = find_repo_root(Path.cwd())
+    project = projects.active_project(repo)
+    if project is None:
+        print("No active research project.")
+        return 0
+    claims, problems = Ledger(project / "claims.jsonl").read()
+    choices = projects.parse_choices((project / "plan.md").read_text(encoding="utf-8"))
+    runs = [p for p in (project / "runs").iterdir() if p.is_dir() and not p.name.startswith(".")] if (project / "runs").is_dir() else []
+    print(f"Active project: {project.relative_to(repo)}")
+    print(f"  plan choices: {len(choices)}  claims: {len(claims)}  runs: {len(runs)}")
+    if problems:
+        print(f"  ledger problems: {len(problems)} (run `nutmeg claim list`)")
+    return 0
+
+
+def cmd_plan_choose(args):
+    project = resolve_project(args)
+    try:
+        projects.add_choice(project, args.kind, args.choice, args.why, args.rests_type, args.rests_ref)
+    except projects.ProjectError as exc:
+        raise UsageError(str(exc))
+    print(f"Added {args.kind}: {args.choice} to plan.md")
+    return 0
+
+
+def cmd_plan_check(args):
+    project = resolve_project(args)
+    choices = projects.parse_choices((project / "plan.md").read_text(encoding="utf-8"))
+    problems = projects.check_choices(choices)
+    for problem in problems:
+        print(problem)
+    if not choices:
+        print("plan.md has no choices yet.")
+    elif not problems:
+        print(f"All {len(choices)} plan choices have a reason and what they rest on.")
+    return 1 if problems else 0
+
+
 def build_parser():
     parser = argparse.ArgumentParser(
         prog="nutmeg",
@@ -94,6 +182,33 @@ def build_parser():
     parser.add_argument("--version", action="version", version=f"nutmeg {__version__}")
     parser.add_argument("--project", help="research project folder (default: the active project)")
     commands = parser.add_subparsers(dest="command", metavar="<command>")
+
+    new = commands.add_parser("new", help="start a research project and make it active")
+    new.add_argument("slug", help="short name, for example shortlist-lb")
+    new.add_argument("--question", help="the question, in one sentence")
+    new.add_argument("--title", help="a readable title (default: from the slug)")
+    new.add_argument("--data-in-git", choices=("yes", "no"),
+                     help="commit data and run outputs (yes) or keep them out of git (no)")
+    new.set_defaults(handler=cmd_new)
+
+    opener = commands.add_parser("open", help="make an existing project active")
+    opener.add_argument("slug")
+    opener.set_defaults(handler=cmd_open)
+
+    commands.add_parser("close", help="clear the active project").set_defaults(handler=cmd_close)
+    commands.add_parser("status", help="show the active project").set_defaults(handler=cmd_status)
+
+    plan = commands.add_parser("plan", help="add or check plan choices")
+    plan_commands = plan.add_subparsers(dest="plan_command", metavar="<action>")
+    choose = plan_commands.add_parser("choose", help="add a choice with its reason to plan.md")
+    choose.add_argument("--kind", required=True, choices=projects.CHOICE_KINDS)
+    choose.add_argument("--choice", required=True, help="what was chosen, for example 'npxG per 90'")
+    choose.add_argument("--why", required=True, help="one sentence: why this was chosen")
+    choose.add_argument("--rests-type", required=True, choices=REST_TYPES, help="what the reason rests on")
+    choose.add_argument("--rests-ref", required=True,
+                        help="the reference: a football-docs page, rule, paper, claim ID or the user's words")
+    choose.set_defaults(handler=cmd_plan_choose)
+    plan_commands.add_parser("check", help="check every choice has a reason").set_defaults(handler=cmd_plan_check)
 
     claim = commands.add_parser("claim", help="add, list or show ledger claims")
     claim_commands = claim.add_subparsers(dest="claim_command", metavar="<action>")

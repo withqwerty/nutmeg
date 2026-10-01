@@ -1,12 +1,12 @@
 {
-  "description": "Adds nutmeg's core football-data rules to each session, so they apply even when no nutmeg skill loads.",
+  "description": "Adds nutmeg's core football-data and research-project rules to each session, so they apply even when no nutmeg skill loads.",
   "hooks": {
     "SessionStart": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "cat \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.json\""
+            "command": "sed \"s|@PLUGIN_ROOT@|${CLAUDE_PLUGIN_ROOT}|g\" \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.json\""
           }
         ]
       }

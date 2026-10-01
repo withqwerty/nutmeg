@@ -1,15 +1,16 @@
 # nutmeg
 
-A Claude Code plugin for football data analytics. 10 skills (2 entry points + 8 sub-skills), 3 agents, powered by the football-docs MCP server.
+A Claude Code plugin for football data analytics. 11 skills (3 entry points + 8 sub-skills), 3 agents, powered by the football-docs MCP server.
 
 ## Architecture: progressive disclosure
 
-Users interact through **two entry points**. Sub-skills are dispatched automatically or invoked directly by power users.
+Users interact through **three entry points**. Sub-skills are dispatched automatically or invoked directly by power users.
 
 | Layer | Skills | How invoked |
 |-------|--------|-------------|
 | **Entry** | `/nutmeg` (router) | User describes any football analytics task — routes automatically |
 | **Teaching** | `/nutmeg:learn` | Concepts, resources, provider docs, learning paths |
+| **Research** | `/nutmeg:research` | Analysis to publish or decide on: question card, plan with reasons, claim ledger |
 | **Sub-skills** | `acquire`, `wrangle`, `compute`, `analyse`, `brainstorm`, `store`, `review`, `heal` | Auto-dispatched by router, or directly by power users |
 
 ## Structure
@@ -18,6 +19,7 @@ Users interact through **two entry points**. Sub-skills are dispatched automatic
 skills/
   nutmeg/          # Router — single entry point, handles init + dispatch
   learn/           # Teaching + provider documentation (merged from old providers/)
+  research/        # Research projects: question, plan with reasons, claim ledger
   acquire/         # Fetch data + credential management (merged from old credentials/)
   analyse/         # Explore and interpret data
   brainstorm/      # Visualisation ideation with research + style options
@@ -27,6 +29,10 @@ skills/
   review/          # Dispatch data-reviewer + chart-reviewer agents
   store/           # Storage format and publishing
   wrangle/         # Transform, filter, reshape data
+
+core/              # nutmeg command (stdlib Python >= 3.10): ledger, projects, redaction
+  nutmeg.py        # Entry point: python3 "${CLAUDE_PLUGIN_ROOT}/core/nutmeg.py" <command>
+  nutmeg_core/     # Package; tests in core/tests (python3 -m pytest core/tests)
 
 agents/            # Specialised sub-agents
   data-reviewer.md       # Reviews data code (coordinates, xG, filtering, sample sizes)
@@ -38,7 +44,7 @@ docs/
   metric-misuse.md       # Stat-misuse checks (Worville's ten commandments), used by analyse
   entity-resolution-routing.md  # Reep lookup, joins and routing
 
-hooks/             # SessionStart hook: injects the core football-data rules every session
+hooks/             # SessionStart hook: injects the core football-data and research-project rules every session
 evals/             # claude plugin eval suite + football-docs replay mock (see README "Evals")
 
 .mcp.json          # Declares football-docs MCP server dependency

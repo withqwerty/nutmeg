@@ -87,8 +87,14 @@ jobs:
               fi
             done
           done
-          # The SessionStart hook must emit valid JSON
-          CLAUDE_PLUGIN_ROOT="$PWD" sh -c 'cat "${CLAUDE_PLUGIN_ROOT}/hooks/session-start.json"' | python3 -m json.tool > /dev/null || {
+          # The SessionStart hook must emit valid JSON with the plugin path filled in
+          hook_cmd=$(python3 -c "import json; print(json.load(open('hooks/hooks.json'))['hooks']['SessionStart'][0]['hooks'][0]['command'])")
+          CLAUDE_PLUGIN_ROOT="$PWD" sh -c "$hook_cmd" > /tmp/session-start.out
+          if grep -q '@PLUGIN_ROOT@' /tmp/session-start.out; then
+            echo "ERROR: SessionStart output still has the @PLUGIN_ROOT@ placeholder"
+            errors=$((errors + 1))
+          fi
+          python3 -m json.tool /tmp/session-start.out > /dev/null || {
             echo "ERROR: hooks/session-start.json is not valid JSON"
             errors=$((errors + 1))
           }

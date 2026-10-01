@@ -50,7 +50,7 @@ claude mcp add football-docs -- npx -y football-docs@0.15.0
 
 For other agents, add the same command (`npx -y football-docs@0.15.0`) as an MCP server in their settings. Without it, nutmeg says it cannot check provider facts, and labels anything it answers from memory as unverified.
 
-This installs the 10 skills but not the agents or MCP docs server. For the full experience (searchable provider docs, pipeline builder agent, data reviewer agent), use the plugin install above.
+This installs the 11 skills but not the agents or MCP docs server. For the full experience (searchable provider docs, pipeline builder agent, data reviewer agent), use the plugin install above.
 
 ## Setup
 
@@ -66,6 +66,9 @@ Most users only need two commands — `/nutmeg` routes everything else automatic
 |-------|-------------|
 | `/nutmeg` | **Start here.** Describe what you want — it handles setup, routing, and dispatch |
 | `/nutmeg:learn` | Concepts, resources, provider docs, learning paths |
+| `/nutmeg:research` | Run analysis you will publish or decide on as a research project: a question card, a plan with reasons, and a claim ledger that ties every number to its evidence |
+
+Research projects need Python 3.10 or newer (`python3`). Without it, everything else in nutmeg works as before.
 
 ### Sub-skills (auto-dispatched or direct)
 
