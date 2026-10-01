@@ -76,7 +76,33 @@ nutmeg plan choose --kind metric --choice "npxG per 90" \
 Run `nutmeg plan check`, fix what it reports, then show the user the plan and ask them to approve
 or change it before you fetch or compute anything.
 
-## 4. Record claims
+## 4. Run the analysis through the gate
+
+Put each analysis step in a `.py`, `.R` or `.sql` file in the repository, then run it with:
+
+```bash
+nutmeg run analysis.py --input data/events.csv --sql queries/shots.sql -- --season 2025
+```
+
+- `--input` once for each data file or folder the step reads. Nutmeg hashes each one.
+- `--sql` once for each SQL file the script runs, so the user sees the exact query.
+- `--sends host:columns` for any data the step sends to an outside service, for example
+  `--sends api.example.com:player_id,minutes`.
+- Arguments after `--` go to the script.
+- Write output files to the folder in `$NUTMEG_OUTPUT_DIR`, so the run records them.
+
+Run `nutmeg run` on its own: no `&&`, `;`, pipes or redirects. Before it runs, the user sees a gate
+card with the services and data the step uses, the inputs and the exact code and SQL, and approves
+it. A re-run shows only what changed since the last run of the same file. If the user declines,
+ask what to change.
+
+If the user wants to see the card without running anything (or run the code themselves), use
+`nutmeg gate` with the same arguments.
+
+Inside a project, a direct `python3 script.py`, `Rscript`, `duckdb` or `psql` call raises a "not
+recorded" card. Numbers from an unrecorded run cannot go into the ledger, so use `nutmeg run`.
+
+## 5. Record claims
 
 Every number, provider fact, ID, citation, definition and interpretation that appears in the
 project's outputs goes into the ledger:
@@ -91,7 +117,7 @@ Each kind needs its evidence:
 
 | Kind | Use for | Evidence it needs |
 |---|---|---|
-| `computed` | a number the analysis produced | `run_id` of the recorded run, plus `value`; add `metric`, `n`, `filters` |
+| `computed` | a number the analysis produced | `run_id` of the recorded run (`nutmeg run` prints it), plus `value`; add `metric`, `n`, `filters` |
 | `provider_fact` | a fact about a provider's data | `provider`, and `source`: the football-docs result you used |
 | `identity` | a player, team or match ID | `reep_id` and `release` from the Reep Register |
 | `literature` | a citation | `citation`; add `source_id` and the quote match from football-docs |
@@ -103,7 +129,7 @@ Each kind needs its evidence:
 - Never write a number in an output that is not in the ledger.
 - `nutmeg claim list` shows the ledger and any bad lines.
 
-## 5. Close
+## 6. Close
 
 When the user is done with the project, run `nutmeg close`. The files stay; only the active marker
 goes. `nutmeg open <slug>` makes it active again.

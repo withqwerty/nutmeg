@@ -9,8 +9,9 @@ import os
 import sys
 from pathlib import Path
 
-from . import __version__, project as projects
+from . import __version__, card as cards, project as projects, run as runs
 from .config import ConfigError, data_in_git_policy, load_team, user_name
+from .gate import pending_key
 from .ledger import KINDS, REST_TYPES, ClaimError, Ledger
 from .redact import Redactor
 
@@ -174,6 +175,37 @@ def cmd_plan_check(args):
     return 1 if problems else 0
 
 
+def _run_args(args):
+    return cards.normalise_run_args(args)
+
+
+def cmd_gate(args):
+    """Build and print the gate card without running anything (autonomy level L1)."""
+    project = resolve_project(args)
+    repo, cwd = find_repo_root(project), Path.cwd()
+    run_args = _run_args(args)
+    card = cards.build_run_card(run_args, repo, project, cwd)
+    cards.save_pending(project, pending_key(cards.run_key(run_args, repo, cwd)), card)
+    print(cards.render_text(card))
+    return 1 if card["problems"] else 0
+
+
+def cmd_run(args):
+    project = resolve_project(args)
+    repo = find_repo_root(project)
+    try:
+        run_id, exit_code, record = runs.execute(_run_args(args), repo, project, Path.cwd())
+    except runs.RunError as exc:
+        raise UsageError(f"run refused: {exc}")
+    note = ""
+    if record["gate"]["changed_since_gate"]:
+        note = f"; changed after the gate card was shown: {', '.join(record['gate']['changed_since_gate'])}"
+    print(f"nutmeg: recorded run {run_id} ({record['status']}, exit {exit_code}) in "
+          f"{project.relative_to(repo)}/runs/{run_id}{note}. Cite it as run_id {run_id} in computed claims.",
+          file=sys.stderr)
+    return exit_code
+
+
 def build_parser():
     parser = argparse.ArgumentParser(
         prog="nutmeg",
@@ -210,6 +242,14 @@ def build_parser():
     choose.set_defaults(handler=cmd_plan_choose)
     plan_commands.add_parser("check", help="check every choice has a reason").set_defaults(handler=cmd_plan_check)
 
+    run = commands.add_parser("run", help="run a .py, .R or .sql file and record it")
+    cards.add_run_arguments(run)
+    run.set_defaults(handler=cmd_run)
+
+    gate = commands.add_parser("gate", help="show the gate card for a run without running it")
+    cards.add_run_arguments(gate)
+    gate.set_defaults(handler=cmd_gate)
+
     claim = commands.add_parser("claim", help="add, list or show ledger claims")
     claim_commands = claim.add_subparsers(dest="claim_command", metavar="<action>")
 
@@ -230,7 +270,10 @@ def build_parser():
 
 def main(argv=None):
     parser = build_parser()
+    argv = list(sys.argv[1:] if argv is None else argv)
+    argv, script_args = cards.split_script_args(argv)
     args = parser.parse_args(argv)
+    args.script_args = script_args
     handler = getattr(args, "handler", None)
     if handler is None:
         parser.print_help()

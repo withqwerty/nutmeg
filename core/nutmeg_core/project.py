@@ -118,6 +118,8 @@ def create(repo_root, slug, data_in_git, question="", author="unknown", title=No
 
     root.mkdir(parents=True, exist_ok=True)
     _ensure_line(root / ".gitignore", ACTIVE_FILE)
+    _ensure_line(root / ".gitignore", ".python-warned")
+    _ensure_line(root / ".gitignore", "*/runs/.pending/")
     _ensure_line(root / ".gitattributes", "claims.jsonl merge=union")
     _ensure_line(root / ".gitattributes", "receipts.jsonl merge=union")
 
