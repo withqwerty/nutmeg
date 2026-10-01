@@ -25,7 +25,8 @@ from pathlib import Path
 
 from .config import ConfigError, load_effective
 from .ledger import Ledger
-from .project import append_receipt, find_repo_root
+from . import glossary
+from .project import append_receipt, find_repo_root, parse_choices
 
 CHECKS_FILE = "checks.json"
 NOT_OUTPUTS = {"question.md", "plan.md"}
@@ -153,6 +154,16 @@ def run_checks(project):
 
     for lineno, message in problems:
         warnings.append(f"claims.jsonl line {lineno}: {message}")
+
+    # A metric in the plan should link to a meaning: a glossary entry or a definition claim.
+    definitions = " ".join(c["statement"] + " " + str((c.get("evidence") or {}).get("definition", ""))
+                           for c in live.values() if c["kind"] == "definition").lower()
+    plan_text = (project / "plan.md").read_text(encoding="utf-8") if (project / "plan.md").is_file() else ""
+    for choice in parse_choices(plan_text):
+        if choice["kind"] == "metric" and not glossary.find(choice["choice"]) \
+                and choice["choice"].lower() not in definitions:
+            warnings.append(f"plan metric \"{choice['choice']}\" has no glossary entry or definition claim; "
+                            "add a definition claim so readers know what it means")
 
     for path in output_files(project):
         rel = path.relative_to(project).as_posix()

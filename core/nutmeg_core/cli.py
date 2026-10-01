@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 from . import __version__, card as cards, check as checks, figure as figures, project as projects, publish as publishing
-from . import bundle as bundling, review, run as runs, why as whys
+from . import bundle as bundling, review, run as runs, why as whys, workspace as workspaces
 from .config import (LEVELS, PERSONAS, STAGES, ConfigError, data_in_git_policy, load_effective, load_team,
                      save_user, user_config_path, user_name)
 from .gate import pending_key
@@ -381,6 +381,13 @@ def cmd_bundle(args):
     return 0
 
 
+def cmd_workspace(args):
+    project = resolve_project(args)
+    path = workspaces.write(project, find_repo_root(project))
+    print(f"Wrote {path.relative_to(find_repo_root(project))}. Open it in a browser; it is view-only.")
+    return 0
+
+
 def build_parser(parser_class=cards.NutmegParser):
     parser = parser_class(
         prog="nutmeg",
@@ -456,6 +463,9 @@ def build_parser(parser_class=cards.NutmegParser):
     publish = commands.add_parser("publish", help="publish the outputs (refuses while checks have open problems)")
     publish.add_argument("--to", help="also copy the outputs to this folder in the repository")
     publish.set_defaults(handler=cmd_publish)
+
+    commands.add_parser("workspace", help="write workspace.html: question, plan, ledger, figures, review queue"
+                        ).set_defaults(handler=cmd_workspace)
 
     why = commands.add_parser("why", help="show a claim's value, evidence, reason and history")
     why.add_argument("claim_id")
