@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 
-from . import __version__, card as cards, check as checks, project as projects, run as runs
+from . import __version__, card as cards, check as checks, project as projects, review, run as runs, why as whys
 from .config import ConfigError, data_in_git_policy, load_team, user_name
 from .gate import pending_key
 from .ledger import KINDS, REST_TYPES, ClaimError, Ledger
@@ -230,6 +230,42 @@ def cmd_check(args):
     return 1
 
 
+def cmd_why(args):
+    project = resolve_project(args)
+    try:
+        lines = whys.why_lines(project, find_repo_root(project), args.claim_id)
+    except KeyError:
+        raise UsageError(f"no claim {args.claim_id} in {project.name}; `nutmeg claim list` shows the IDs")
+    print("\n".join(lines))
+    return 0
+
+
+def cmd_trace(args):
+    project = resolve_project(args)
+    print("\n".join(whys.trace_lines(project, find_repo_root(project))))
+    return 0
+
+
+def cmd_contest(args):
+    project = resolve_project(args)
+    try:
+        written = review.contest(project, args.claim_id, args.note, user_name(find_repo_root(project)))
+    except review.ReviewError as exc:
+        raise UsageError(str(exc))
+    print(f"{written['id']} is now {written['status']} ({written['by']}: {written['note']})")
+    return 0
+
+
+def cmd_resolve(args):
+    project = resolve_project(args)
+    try:
+        written = review.resolve(project, args.claim_id, args.note, user_name(find_repo_root(project)))
+    except review.ReviewError as exc:
+        raise UsageError(str(exc))
+    print(f"{written['id']} is now {written['status']} ({written['by']}: {written['note']})")
+    return 0
+
+
 def build_parser():
     parser = argparse.ArgumentParser(
         prog="nutmeg",
@@ -278,6 +314,22 @@ def build_parser():
     check.add_argument("--accept", metavar="ID", help="close an open problem with the user's reason")
     check.add_argument("--reason", help="why the problem is accepted (required with --accept)")
     check.set_defaults(handler=cmd_check)
+
+    why = commands.add_parser("why", help="show a claim's value, evidence, reason and history")
+    why.add_argument("claim_id")
+    why.set_defaults(handler=cmd_why)
+
+    commands.add_parser("trace", help="show inputs, runs, claims and figures as a tree").set_defaults(handler=cmd_trace)
+
+    contest = commands.add_parser("contest", help="mark a claim disputed, with a note")
+    contest.add_argument("claim_id")
+    contest.add_argument("--note", required=True, help="what is wrong or unclear")
+    contest.set_defaults(handler=cmd_contest)
+
+    resolve = commands.add_parser("resolve", help="resolve a disputed claim, with a note")
+    resolve.add_argument("claim_id")
+    resolve.add_argument("--note", required=True, help="how it was resolved")
+    resolve.set_defaults(handler=cmd_resolve)
 
     claim = commands.add_parser("claim", help="add, list or show ledger claims")
     claim_commands = claim.add_subparsers(dest="claim_command", metavar="<action>")

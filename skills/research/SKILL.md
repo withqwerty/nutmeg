@@ -143,7 +143,19 @@ When a step ends with open problems, nutmeg stops you once with the list. Fix th
 says a problem is not one, record their reason:
 `nutmeg check --accept <id> --reason "<the user's reason>"`. Never accept a problem on your own.
 
-## 7. Close
+## 7. Explain and review claims
+
+- `nutmeg why <claim>` prints a claim's value, definition, evidence (the run and code lines, the
+  docs source, the Reep ID and release, or the paper and quote), filters, n, up to five sample
+  rows, the reason and its history. Use it to answer "where does this number come from?". Add
+  `code_lines` (for example `analysis.py:12-20`) and `snapshot` (a CSV or JSON of the rows behind
+  the number) to a computed claim's evidence so `why` can show them.
+- `nutmeg trace` prints inputs, runs, claims and figures as a tree.
+- A teammate who doubts a claim runs `nutmeg contest <claim> --note "<what is wrong>"`; the claim
+  becomes disputed (an interpretation becomes contested). `nutmeg resolve <claim> --note "<how>"`
+  returns it to its earlier status. Both record the person's name.
+
+## 8. Close
 
 When the user is done with the project, run `nutmeg close`. The files stay; only the active marker
 goes. `nutmeg open <slug>` makes it active again.

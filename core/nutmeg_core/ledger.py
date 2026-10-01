@@ -32,6 +32,9 @@ REST_TYPES = ("docs", "registry", "rule", "user", "paper", "claim")
 # A reason is one sentence; the detail lives in rests_on.
 MAX_WHY_LENGTH = 240
 
+# Fields that describe one version's change and are not carried forward.
+PER_VERSION_FIELDS = ("note", "by", "previous_status")
+
 # Fields nutmeg sets on write; callers do not supply them.
 SYSTEM_FIELDS = ("version", "at")
 
@@ -89,7 +92,7 @@ def validate(record):
     if rests_on is not None:
         if not isinstance(rests_on, dict) or rests_on.get("type") not in REST_TYPES or not rests_on.get("ref"):
             raise ClaimError("rests_on", f"must be {{type, ref}} with type one of {', '.join(REST_TYPES)}")
-    for field in ("why", "note", "author", "signer"):
+    for field in ("why", "note", "author", "signer", "by"):
         if field in record and record[field] is not None and not isinstance(record[field], str):
             raise ClaimError(field, "must be text")
     why = record.get("why")
@@ -187,4 +190,6 @@ class Ledger:
         current = self.get(claim_id)
         if current is None:
             raise KeyError(claim_id)
-        return self.append({**current, **changes})
+        # A note and its author belong to the version that made the change.
+        carried = {k: v for k, v in current.items() if k not in PER_VERSION_FIELDS}
+        return self.append({**carried, **changes})
