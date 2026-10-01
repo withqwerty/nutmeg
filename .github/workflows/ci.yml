@@ -156,3 +156,20 @@ jobs:
           agents=$(ls agents/*.md 2>/dev/null | wc -l | tr -d ' ')
           refs=$(find skills -name "*.md" -path "*/references/*" 2>/dev/null | wc -l | tr -d ' ')
           echo "Skills: $skills | Agents: $agents | Reference docs: $refs"
+
+  core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Run the core with no install
+        run: python3 core/nutmeg.py --help
+
+      - name: Test the core package
+        run: |
+          python3 -m pip install --quiet pytest
+          python3 -m pytest core/tests

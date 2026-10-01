@@ -19,3 +19,7 @@ docs/setup-guide.md
 
 # Eval run output
 evals/results/
+
+# Python
+__pycache__/
+.pytest_cache/
