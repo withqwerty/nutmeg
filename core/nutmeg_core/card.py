@@ -39,9 +39,27 @@ class CardError(ValueError):
     pass
 
 
-class _Parser(argparse.ArgumentParser):
+class NutmegParser(argparse.ArgumentParser):
+    """The nutmeg command's parser: no abbreviated options, so `--proj` is not `--project`."""
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("allow_abbrev", False)
+        super().__init__(*args, **kwargs)
+
+
+class RaisingParser(NutmegParser):
+    """The same parser for the gate: errors raise instead of exiting."""
+
     def error(self, message):
         raise CardError(message)
+
+    def exit(self, status=0, message=None):
+        raise SystemExit(status)
+
+
+# Interpreter options that run code given on the command line instead of the file.
+CODE_FLAGS = {"-c", "-e", "-m", "--eval", "--command", "-cmd", "-init", "--expr", "--execute", "-x", "-f", "--file"}
+PENDING_MAX_AGE_SECONDS = 3600
 
 
 def add_run_arguments(parser):
@@ -69,7 +87,7 @@ def split_script_args(args):
 
 def parse_run_args(args):
     own, script_args = split_script_args(args)
-    namespace = add_run_arguments(_Parser(prog="nutmeg run", add_help=False)).parse_args(own)
+    namespace = add_run_arguments(RaisingParser(prog="nutmeg run", add_help=False)).parse_args(own)
     namespace.script_args = script_args
     return normalise_run_args(namespace)
 
@@ -93,6 +111,7 @@ def run_key(run_args, repo_root, cwd):
         return str((Path(cwd) / Path(path).expanduser()).resolve()) if path else path
 
     return {
+        "cwd": str(Path(cwd).resolve()),
         "file": resolve(run_args["file"]),
         "sql": [resolve(p) for p in run_args["sql"]],
         "input": [resolve(p) for p in run_args["input"]],
@@ -103,12 +122,6 @@ def run_key(run_args, repo_root, cwd):
     }
 
 
-def project_from_global(global_args, cwd):
-    if "--project" in global_args:
-        index = global_args.index("--project")
-        if index + 1 < len(global_args):
-            return (Path(cwd) / global_args[index + 1]).resolve()
-    return None
 
 
 def _now():
@@ -205,7 +218,16 @@ def choose_interpreter(path, override=None, db=None):
     """Return (argv prefix, name, stdin file or None) for running `path`."""
     path = Path(path)
     if override:
-        argv = shlex.split(override)
+        try:
+            argv = shlex.split(override)
+        except ValueError as exc:
+            raise CardError(f"--interpreter could not be read ({exc})")
+        if not argv:
+            raise CardError("--interpreter is empty")
+        code_flags = [t for t in argv[1:] if t.split("=", 1)[0] in CODE_FLAGS]
+        if code_flags:
+            raise CardError(f"--interpreter must not carry code-running options ({', '.join(code_flags)}); "
+                            "put the code in the file so the card shows what runs")
         return argv + [str(path)], argv[0], None
     suffix = path.suffix.lower()
     if suffix == ".py":
@@ -217,6 +239,14 @@ def choose_interpreter(path, override=None, db=None):
         argv = [tool] + ([str(db)] if db else [])
         return argv, tool, path
     raise CardError(f"nutmeg run supports .py, .R and .sql files; use --interpreter for {path.name}")
+
+
+def display_argv(argv, repo_root, stdin=None):
+    """The command as it will run, with repository paths shown relative."""
+    shown = [_rel(a, repo_root) if Path(a).is_absolute() else a for a in argv]
+    if stdin is not None:
+        shown += ["<", _rel(stdin, repo_root)]
+    return shown
 
 
 # --- building cards -------------------------------------------------------
@@ -257,7 +287,7 @@ def _changes(card, project):
     for entry in card["code"]:
         if old_code.get(entry["path"]) == entry["sha256"]:
             continue
-        old_file = folder / "code" / Path(entry["path"]).name
+        old_file = folder / "code" / entry["path"]
         old_text = old_file.read_text(encoding="utf-8", errors="replace") if old_file.is_file() else ""
         diff = list(difflib.unified_diff(old_text.splitlines(), entry["text"].splitlines(),
                                          f"{record['id']}/{entry['path']}", entry["path"], lineterm="", n=1))
@@ -269,7 +299,10 @@ def _changes(card, project):
     for path in old_inputs:
         if path not in {i["path"] for i in card["inputs"]}:
             changes["inputs"].append(f"{path} (no longer an input)")
-    changes["same"] = not changes["code"] and not changes["inputs"]
+    changes["command"] = None
+    if record.get("argv") and card.get("argv") and record["argv"] != card["argv"]:
+        changes["command"] = {"before": shlex.join(record["argv"]), "after": shlex.join(card["argv"])}
+    changes["same"] = not changes["code"] and not changes["inputs"] and not changes["command"]
     return changes
 
 
@@ -283,6 +316,8 @@ def build_run_card(run_args, repo_root, project, cwd, recorded=True, command=Non
         "command": command,
         "file": None,
         "interpreter": None,
+        "argv": None,
+        "cwd": _rel(cwd, repo_root),
         "services": {"detected": [], "declared": [], "local_modules": [], "packages": [],
                      "ai_provider": "what the run prints goes back to the AI model in this session"},
         "inputs": [],
@@ -290,7 +325,7 @@ def build_run_card(run_args, repo_root, project, cwd, recorded=True, command=Non
         "changes": None,
         "problems": [],
     }
-    paths = [("file", run_args["file"])] + [("sql", p) for p in run_args["sql"]]
+    paths = ([("file", run_args["file"])] if run_args["file"] else []) + [("sql", p) for p in run_args["sql"]]
     script = None
     for role, raw in paths:
         try:
@@ -308,8 +343,9 @@ def build_run_card(run_args, repo_root, project, cwd, recorded=True, command=Non
             card["file"] = entry["path"]
     if script is not None:
         try:
-            _, name, _ = choose_interpreter(script, run_args.get("interpreter"), run_args.get("db"))
+            argv, name, stdin = choose_interpreter(script, run_args.get("interpreter"), run_args.get("db"))
             card["interpreter"] = name
+            card["argv"] = display_argv(argv + list(run_args.get("script_args") or []), repo_root, stdin)
         except CardError as exc:
             card["problems"].append(str(exc))
 
@@ -410,6 +446,8 @@ def render_text(card):
         out.append(f"nutmeg run gate · {card['project']} · needs approval; nothing has run yet")
         out.append(f"If approved, nutmeg runs {card['file'] or '?'} with {card['interpreter'] or '?'} "
                    "and records the code, inputs and outputs.")
+        if card.get("argv"):
+            out.append(f"Command: {shlex.join(card['argv'])} (in {card.get('cwd') or '.'})")
     else:
         out.append(f"nutmeg research gate · {card['project']} · needs approval; nothing has run yet")
         out.append(f"NOT RECORDED: `{card['command']}` would run directly. Numbers from it cannot be ledger claims.")
@@ -455,6 +493,9 @@ def render_text(card):
     elif changes:
         out.append("")
         out.append(f"Changes since run {changes['since']}")
+        if changes.get("command"):
+            out.append(f"- command was: {changes['command']['before']}")
+            out.append(f"- command now: {changes['command']['after']}")
         for path in changes["inputs"]:
             out.append(f"- input changed: {path}")
         budget = TEXT_DIFF_LINES

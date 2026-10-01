@@ -18,7 +18,10 @@ WRAPPER = PLUGIN / "hooks" / "run-hook.sh"
 @pytest.fixture
 def project(repo):
     main(["new", "demo", "--data-in-git", "yes"])
-    return repo / "research" / "demo"
+    folder = repo / "research" / "demo"
+    (folder / "runs" / "R1").mkdir(parents=True)
+    (folder / "runs" / "R1" / "run.json").write_text(json.dumps({"id": "R1", "status": "ok", "exit_code": 0}))
+    return folder
 
 
 def add(project, **claim):

@@ -61,6 +61,23 @@ class ProjectError(ValueError):
     pass
 
 
+def find_repo_root(start):
+    """The nearest folder above `start` that holds `.git`, else `start`."""
+    start = Path(start).resolve()
+    for folder in (start, *start.parents):
+        if (folder / ".git").exists():
+            return folder
+    return start
+
+
+def open_ledger(project):
+    """The project's ledger, redacting secrets on every write."""
+    from .ledger import Ledger
+    from .redact import Redactor
+
+    return Ledger(Path(project) / "claims.jsonl", redactor=Redactor.for_repo(find_repo_root(project)))
+
+
 def research_root(repo_root):
     return Path(repo_root) / RESEARCH_DIR
 
@@ -120,6 +137,7 @@ def create(repo_root, slug, data_in_git, question="", author="unknown", title=No
     _ensure_line(root / ".gitignore", ACTIVE_FILE)
     _ensure_line(root / ".gitignore", ".python-warned")
     _ensure_line(root / ".gitignore", "*/runs/.pending/")
+    _ensure_line(root / ".gitignore", "*/claims.jsonl.lock")
     _ensure_line(root / ".gitattributes", "claims.jsonl merge=union")
     _ensure_line(root / ".gitattributes", "receipts.jsonl merge=union")
 
@@ -237,7 +255,9 @@ def add_choice(project, kind, choice, why, rests_type, rests_ref):
 
 def append_receipt(project, kind, **fields):
     """Record an approval, override or setting change in receipts.jsonl."""
-    record = {"kind": kind, "at": _now(), **fields}
+    from .redact import Redactor
+
+    record = Redactor.for_repo(find_repo_root(project)).obj({"kind": kind, "at": _now(), **fields})
     with (Path(project) / "receipts.jsonl").open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
     return record

@@ -7,8 +7,15 @@ the latest version wins on read. Git merges concurrent appends with the
 `merge=union` attribute.
 """
 import json
+import secrets
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
+
+try:  # POSIX only; on other systems appends are not locked
+    import fcntl
+except ImportError:  # pragma: no cover
+    fcntl = None
 
 KINDS = ("computed", "provider_fact", "identity", "literature", "definition", "interpretation")
 
@@ -104,6 +111,20 @@ def _now():
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+@contextmanager
+def _locked(path):
+    """Hold an exclusive lock on `<path>.lock` while allocating an ID and appending."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(f"{path}.lock", "a") as lock:
+        if fcntl is not None:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            if fcntl is not None:
+                fcntl.flock(lock, fcntl.LOCK_UN)
+
+
 class Ledger:
     """Read and append claims in one `claims.jsonl` file."""
 
@@ -172,18 +193,46 @@ class Ledger:
         existing ID becomes that claim's next version.
         """
         record = {k: v for k, v in dict(record).items() if k not in SYSTEM_FIELDS}
-        if not record.get("id"):
-            record["id"] = self.next_id()
-        record.setdefault("status", "draft")
-        if self.redactor is not None:
-            record = self.redactor.obj(record)
-        validate(record)
-        record["version"] = len(self.history(record["id"])) + 1
-        record["at"] = _now()
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self.path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
+        with _locked(self.path):
+            if not record.get("id"):
+                record["id"] = self.next_id()
+            record.setdefault("status", "draft")
+            if self.redactor is not None:
+                record = self.redactor.obj(record)
+            validate(record)
+            history = self.history(record["id"])
+            if not record.get("origin"):
+                # The origin ties a claim's versions together. Two teammates who both create
+                # C5 get different origins, so a merged ledger shows the clash instead of
+                # silently treating one claim as a new version of the other.
+                record["origin"] = history[-1].get("origin") if history else secrets.token_hex(4)
+            record["version"] = len(history) + 1
+            record["at"] = _now()
+            with self.path.open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
         return record
+
+    def conflicts(self):
+        """Claim IDs used by more than one claim (different origins), with who made each."""
+        seen = {}
+        for version in self._all_versions():
+            origin = version.get("origin") or "legacy"
+            seen.setdefault(version["id"], {}).setdefault(origin, version.get("author") or version.get("by") or "unknown")
+        return {cid: origins for cid, origins in seen.items() if len(origins) > 1}
+
+    def _all_versions(self):
+        if not self.path.exists():
+            return []
+        out = []
+        with self.path.open(encoding="utf-8") as handle:
+            for line in handle:
+                try:
+                    record = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if isinstance(record, dict) and isinstance(record.get("id"), str):
+                    out.append(record)
+        return out
 
     def update(self, claim_id, **changes):
         """Append a new version of an existing claim with some fields changed."""

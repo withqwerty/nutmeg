@@ -6,8 +6,8 @@ new version to the ledger and a receipt.
 """
 from pathlib import Path
 
-from .ledger import Ledger
-from .project import append_receipt
+from .project import append_receipt, find_repo_root, open_ledger
+from .redact import Redactor
 
 
 class ReviewError(ValueError):
@@ -21,7 +21,8 @@ def _contested_status(claim):
 def contest(project, claim_id, note, by):
     if not note or not note.strip():
         raise ReviewError("say what is wrong with --note")
-    ledger = Ledger(Path(project) / "claims.jsonl")
+    ledger = open_ledger(project)
+    note = Redactor.for_repo(find_repo_root(project)).text(note or "")
     claim = ledger.get(claim_id)
     if claim is None:
         raise ReviewError(f"no claim {claim_id} in this project")
@@ -37,7 +38,8 @@ def contest(project, claim_id, note, by):
 def resolve(project, claim_id, note, by):
     if not note or not note.strip():
         raise ReviewError("say how it was resolved with --note")
-    ledger = Ledger(Path(project) / "claims.jsonl")
+    ledger = open_ledger(project)
+    note = Redactor.for_repo(find_repo_root(project)).text(note or "")
     claim = ledger.get(claim_id)
     if claim is None:
         raise ReviewError(f"no claim {claim_id} in this project")

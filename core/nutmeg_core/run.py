@@ -35,6 +35,31 @@ def _now():
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+TEXT_OUTPUTS = (".csv", ".tsv", ".json", ".jsonl", ".txt", ".md", ".html", ".log", ".sql", ".yaml", ".yml")
+MAX_REDACT_BYTES = 50 * 1024 * 1024
+
+
+def _age_seconds(stamp):
+    try:
+        then = datetime.strptime(stamp, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    except (TypeError, ValueError):
+        return float("inf")
+    return (datetime.now(timezone.utc) - then).total_seconds()
+
+
+def _redact_file(path, redactor):
+    """Mask secrets in a text output file the run wrote."""
+    if path.suffix.lower() not in TEXT_OUTPUTS or path.stat().st_size > MAX_REDACT_BYTES:
+        return
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return
+    cleaned = redactor.text(text)
+    if cleaned != text:
+        path.write_text(cleaned, encoding="utf-8")
+
+
 def next_run_id(project):
     runs = Path(project) / "runs"
     highest = 0
@@ -92,9 +117,12 @@ def execute(run_args, repo_root, project, cwd, stream=True):
         raise RunError(str(exc))
     argv = argv + run_args["script_args"]
 
-    # The card as things stand now, and the one the gate showed, if any.
+    # The card as things stand now, and the one the gate showed, if any. A card
+    # older than an hour is stale: the run counts as not shown.
     key = pending_key(cards.run_key(run_args, repo_root, cwd))
     shown, pending_path = cards.load_pending(project, key)
+    if shown is not None and _age_seconds(shown.get("created")) > cards.PENDING_MAX_AGE_SECONDS:
+        shown = None
     current = cards.build_run_card(run_args, repo_root, project, cwd)
     if current["problems"]:
         raise RunError("; ".join(current["problems"]))
@@ -104,13 +132,19 @@ def execute(run_args, repo_root, project, cwd, stream=True):
         shown_code = {c["path"]: c.get("sha256") for c in shown.get("code", [])}
         changed_since_gate += [i["path"] for i in current["inputs"] if shown_inputs.get(i["path"]) != i["sha256"]]
         changed_since_gate += [c["path"] for c in current["code"] if shown_code.get(c["path"]) != c["sha256"]]
+        if shown.get("argv") != current.get("argv"):
+            changed_since_gate.append("command")
 
     run_id = next_run_id(project)
     folder = project / "runs" / run_id
     (folder / "code").mkdir(parents=True)
     (folder / "outputs").mkdir()
     for entry in current["code"]:
-        shutil.copy2(repo_root / entry["path"], folder / "code" / Path(entry["path"]).name)
+        # Keep the repository path, so files that share a name do not overwrite each other,
+        # and redact the copy: the hash in run.json is the original file's.
+        copy = folder / "code" / entry["path"]
+        copy.parent.mkdir(parents=True, exist_ok=True)
+        copy.write_text(redactor.text(entry["text"]), encoding="utf-8")
     gate_card = shown if shown is not None else current
     gate_card = {**gate_card, "gate_shown": shown is not None, "changed_since_gate": changed_since_gate}
     gate_card.pop("card_path", None)
@@ -142,6 +176,7 @@ def execute(run_args, repo_root, project, cwd, stream=True):
 
     outputs = []
     for path in sorted(p for p in (folder / "outputs").rglob("*") if p.is_file()):
+        _redact_file(path, redactor)
         outputs.append({"path": str(path.relative_to(repo_root)), "sha256": cards.sha256_path(path)})
     for path in _changed_files(before, project):
         outputs.append({"path": str(path.relative_to(repo_root)), "sha256": cards.sha256_path(path)})
@@ -151,7 +186,7 @@ def execute(run_args, repo_root, project, cwd, stream=True):
         "file": current["file"],
         "interpreter": interpreter,
         "interpreter_version": interpreter_version(argv[0]),
-        "argv": redactor.obj([argv[0]] + [cards._rel(a, repo_root) if Path(a).is_absolute() else a for a in argv[1:]]),
+        "argv": current["argv"],
         "cwd": cards._rel(cwd, repo_root),
         "code": [{"path": c["path"], "sha256": c["sha256"]} for c in current["code"]],
         "inputs": [{"path": i["path"], "sha256": i["sha256"]} for i in current["inputs"]],

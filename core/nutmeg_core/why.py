@@ -15,6 +15,7 @@ import re
 from pathlib import Path
 
 from .ledger import Ledger
+from .redact import inside_repo
 
 SAMPLE_ROWS = 5
 _CODE_LINES = re.compile(r"^(?:(?P<file>[^:]+):)?(?P<start>\d+)(?:-(?P<end>\d+))?$")
@@ -34,9 +35,14 @@ def _code_excerpt(project, run, spec):
     if not match or run is None:
         return []
     name = match["file"] or (run.get("file") or "")
-    copy = Path(project) / "runs" / run["id"] / "code" / Path(name).name
+    code_dir = Path(project) / "runs" / run["id"] / "code"
+    copy = code_dir / name
     if not copy.is_file():
-        return [f"(code copy {Path(name).name} not found in run {run['id']})"]
+        # A bare file name: find the one copy with that name.
+        found = [p for p in code_dir.rglob(Path(name).name) if p.is_file()] if code_dir.is_dir() else []
+        if len(found) != 1:
+            return [f"(code copy {name} not found in run {run['id']})"]
+        copy = found[0]
     lines = copy.read_text(encoding="utf-8", errors="replace").splitlines()
     start = int(match["start"])
     end = int(match["end"] or start)
@@ -45,7 +51,10 @@ def _code_excerpt(project, run, spec):
 
 def sample_rows(repo_root, snapshot, limit=SAMPLE_ROWS):
     """Up to `limit` rows from a CSV or JSON data snapshot, as (header, rows)."""
-    path = Path(repo_root) / snapshot
+    try:
+        path = inside_repo(snapshot, repo_root)
+    except ValueError:
+        return None, []
     if not path.is_file():
         return None, []
     if path.suffix.lower() in (".csv", ".tsv"):

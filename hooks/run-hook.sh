@@ -12,7 +12,9 @@ script="$1"
 here="${0%/*}"
 
 # Find research/.active from the project folder up to the repository root.
+# Stop at the filesystem root, a drive root (C:) or after 64 steps.
 dir="${CLAUDE_PROJECT_DIR:-$PWD}"
+steps=0
 while :; do
   if [ -f "$dir/research/.active" ]; then
     break
@@ -20,10 +22,15 @@ while :; do
   if [ -e "$dir/.git" ]; then
     exit 0
   fi
-  if [ -z "$dir" ] || [ "$dir" = "/" ]; then
+  parent="${dir%/*}"
+  if [ "$parent" = "$dir" ]; then
+    parent="${dir%\\*}"
+  fi
+  steps=$((steps + 1))
+  if [ -z "$parent" ] || [ "$parent" = "$dir" ] || [ "$steps" -gt 64 ]; then
     exit 0
   fi
-  dir="${dir%/*}"
+  dir="$parent"
 done
 
 if ! command -v python3 >/dev/null 2>&1 || ! python3 -c 'import sys; sys.exit(sys.version_info < (3, 10))' 2>/dev/null; then

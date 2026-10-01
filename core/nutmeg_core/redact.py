@@ -45,12 +45,26 @@ def parse_env_file(path):
                 break
         else:
             continue
-        value = value.strip()
-        if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
-            value = value[1:-1]
+        value = _env_value(value.strip())
         if name.strip() and value:
             values[name.strip()] = value
     return values
+
+
+def _env_value(raw):
+    """A dotenv value without its quotes or trailing comment. Nothing is evaluated."""
+    if raw[:1] in ("'", '"'):
+        quote = raw[0]
+        end = raw.find(quote, 1)
+        while quote == '"' and end > 0 and raw[end - 1] == "\\":
+            end = raw.find(quote, end + 1)
+        value = raw[1:end] if end > 0 else raw[1:]
+        return value.replace('\\"', '"') if quote == '"' else value
+    # Unquoted: a comment starts at " #".
+    for marker in (" #", "\t#"):
+        if marker in raw:
+            raw = raw.split(marker, 1)[0]
+    return raw.strip()
 
 
 class Redactor:

@@ -20,13 +20,7 @@ class UsageError(Exception):
     """A user-facing error: printed without a traceback, exit code 2."""
 
 
-def find_repo_root(start):
-    """The nearest folder above `start` that holds `.git`, else `start`."""
-    start = Path(start).resolve()
-    for folder in (start, *start.parents):
-        if (folder / ".git").exists():
-            return folder
-    return start
+find_repo_root = projects.find_repo_root
 
 
 def resolve_project(args):
@@ -43,8 +37,7 @@ def resolve_project(args):
     return project
 
 
-def open_ledger(project):
-    return Ledger(project / "claims.jsonl", redactor=Redactor.for_repo(find_repo_root(project)))
+open_ledger = projects.open_ledger
 
 
 def _read_record(args):
@@ -236,13 +229,14 @@ def cmd_why(args):
         lines = whys.why_lines(project, find_repo_root(project), args.claim_id)
     except KeyError:
         raise UsageError(f"no claim {args.claim_id} in {project.name}; `nutmeg claim list` shows the IDs")
-    print("\n".join(lines))
+    print(Redactor.for_repo(find_repo_root(project)).text("\n".join(lines)))
     return 0
 
 
 def cmd_trace(args):
     project = resolve_project(args)
-    print("\n".join(whys.trace_lines(project, find_repo_root(project))))
+    repo = find_repo_root(project)
+    print(Redactor.for_repo(repo).text("\n".join(whys.trace_lines(project, repo))))
     return 0
 
 
@@ -266,14 +260,14 @@ def cmd_resolve(args):
     return 0
 
 
-def build_parser():
-    parser = argparse.ArgumentParser(
+def build_parser(parser_class=cards.NutmegParser):
+    parser = parser_class(
         prog="nutmeg",
         description="Record and check the claims, runs and figures in a nutmeg research project.",
     )
     parser.add_argument("--version", action="version", version=f"nutmeg {__version__}")
     parser.add_argument("--project", help="research project folder (default: the active project)")
-    commands = parser.add_subparsers(dest="command", metavar="<command>")
+    commands = parser.add_subparsers(dest="command", metavar="<command>", parser_class=parser_class)
 
     new = commands.add_parser("new", help="start a research project and make it active")
     new.add_argument("slug", help="short name, for example shortlist-lb")

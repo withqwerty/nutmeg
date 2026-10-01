@@ -51,8 +51,9 @@ _SKIP_SPANS = [
     re.compile(r"\b\d{1,2}/\d{1,2}/\d{2,4}\b"),                  # 12/03/2025
     re.compile(r"\b\d{1,2}(?:st|nd|rd|th)?\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?(?:\s+\d{4})?\b", re.I),
     re.compile(r"\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2}(?:,\s*\d{4})?\b", re.I),
-    re.compile(r"\b\d+\s?[-–]\s?\d+\b"),                         # scorelines and ranges 2-1, 3–0
+    re.compile(r"(?<![\d.,])\d{1,2}\s?[-–]\s?\d{1,2}(?![\d%]|[.,]\d)"),  # scorelines 2-1, 3–0 (not 1.2–1.8 or 0.12-0.18)
     re.compile(r"\b(?:per|/)\s?90\b|\bp90\b", re.I),             # per 90
+    re.compile(r"\b(?:80|90|95|99)\s?%\s*(?=(?:CI|confidence|credible|prediction|interval))", re.I),  # 95% CI
     re.compile(r"\b(?:top|bottom|last|first|next)\s+\d+\b", re.I),  # top 5
     re.compile(r"\b\d+(?:st|nd|rd|th)\b"),                        # ordinals
     # years, but not counts such as "2010 minutes"
@@ -75,9 +76,13 @@ def output_files(project):
     return sorted(set(files))
 
 
+# A dash between two numbers in a range or interval ("1.2–1.8", "0.12-0.18"): each end is a number.
+_RANGE_DASH = re.compile(r"(?<=\d)(\s?)[-–](\s?)(?=\d)")
+
+
 def _masked(line):
     """The line with skipped spans blanked out, so positions stay the same."""
-    chars = list(line)
+    chars = list(_RANGE_DASH.sub(lambda m: m.group(1) + " " + m.group(2), line))
     marker = _LIST_MARKER.match(line)
     if marker:
         chars[: marker.end()] = " " * marker.end()
@@ -176,8 +181,28 @@ def run_checks(project):
                 failures.append({**where, "kind": "ambiguous", "id": _failure_id("ambiguous", rel, raw, context[:80]),
                                  "message": f"{raw} matches {', '.join(hits)}; name the claim next to it, for example {raw} [{hits[0]}]"})
 
+    for cid, origins in Ledger(project / "claims.jsonl").conflicts().items():
+        failures.append({"kind": "id clash", "id": _failure_id("clash", cid, *sorted(origins)), "claim": cid,
+                         "message": f"{cid} is used by {len(origins)} different claims (made by "
+                                    f"{', '.join(sorted(set(origins.values())))}), probably after a merge; give one "
+                                    "of them a new ID in claims.jsonl and in the outputs that cite it"})
+
     for cid, claim in live.items():
         evidence = claim.get("evidence") or {}
+        if claim["kind"] == "computed":
+            run_file = project / "runs" / str(evidence.get("run_id")) / "run.json"
+            try:
+                run = json.loads(run_file.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                run = None
+            if run is None:
+                failures.append({"kind": "unrecorded run", "id": _failure_id("run", cid, evidence.get("run_id")),
+                                 "claim": cid, "message": f"{cid} ({claim['statement'][:60]}) cites run "
+                                 f"{evidence.get('run_id')}, which is not recorded in runs/"})
+            elif run.get("status") != "ok":
+                failures.append({"kind": "failed run", "id": _failure_id("failedrun", cid, run.get("id")),
+                                 "claim": cid, "message": f"{cid} ({claim['statement'][:60]}) cites run "
+                                 f"{run.get('id')}, which failed (exit {run.get('exit_code')})"})
         if claim["kind"] == "literature":
             match = evidence.get("match")
             if not evidence.get("source_id") or match not in GOOD_QUOTE_MATCHES:

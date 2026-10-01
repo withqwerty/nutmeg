@@ -34,7 +34,7 @@ def project(repo):
 def test_both_nutmeg_forms_match(command):
     parsed = gate.parse(command)
     assert parsed.kind == "nutmeg" and parsed.subcommand == "run"
-    assert parsed.args[0] == "analysis.py"
+    assert parsed.namespace.file == "analysis.py"
 
 
 @pytest.mark.parametrize("command", [
