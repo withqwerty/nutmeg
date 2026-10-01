@@ -54,3 +54,22 @@ def resolve(project, claim_id, note, by):
     append_receipt(project, "resolve", claim=claim_id, by=by, note=note.strip(), status=previous,
                    version=written["version"])
     return written
+
+
+def signoff(project, claim_id, by, note=None, signoff_required=False):
+    """Verify a claim with the signer's name. With the team sign-off rule, the author cannot sign their own claim."""
+    ledger = open_ledger(project)
+    claim = ledger.get(claim_id)
+    if claim is None:
+        raise ReviewError(f"no claim {claim_id} in this project")
+    if signoff_required and claim.get("author") and claim["author"] == by:
+        raise ReviewError(f"{claim_id} was made by {by}; the team requires a different person to sign it off")
+    target = "supported" if claim["kind"] == "interpretation" else "verified"
+    if claim.get("status") in ("disputed", "contested"):
+        raise ReviewError(f"{claim_id} is {claim['status']}; resolve it first")
+    changes = {"status": target, "signer": by, "by": by}
+    if note:
+        changes["note"] = Redactor.for_repo(find_repo_root(project)).text(note)
+    written = ledger.update(claim_id, **changes)
+    append_receipt(project, "signoff", claim=claim_id, by=by, status=target, version=written["version"])
+    return written

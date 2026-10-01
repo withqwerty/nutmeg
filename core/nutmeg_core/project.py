@@ -115,6 +115,20 @@ def _now():
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+RESEARCH_IGNORES = (ACTIVE_FILE, ".python-warned", ".config-seen", "*/runs/.pending/", "*/claims.jsonl.lock")
+RESEARCH_ATTRIBUTES = ("claims.jsonl merge=union", "receipts.jsonl merge=union")
+
+
+def ensure_research_files(repo_root):
+    """Keep research/.gitignore and research/.gitattributes up to date (older projects lack newer lines)."""
+    root = research_root(repo_root)
+    root.mkdir(parents=True, exist_ok=True)
+    for line in RESEARCH_IGNORES:
+        _ensure_line(root / ".gitignore", line)
+    for line in RESEARCH_ATTRIBUTES:
+        _ensure_line(root / ".gitattributes", line)
+
+
 def set_active(repo_root, slug):
     root = research_root(repo_root)
     if not (root / slug).is_dir():
@@ -133,13 +147,7 @@ def create(repo_root, slug, data_in_git, question="", author="unknown", title=No
     if folder.exists():
         raise ProjectError(f"research/{slug} already exists; switch to it with `nutmeg open {slug}`")
 
-    root.mkdir(parents=True, exist_ok=True)
-    _ensure_line(root / ".gitignore", ACTIVE_FILE)
-    _ensure_line(root / ".gitignore", ".python-warned")
-    _ensure_line(root / ".gitignore", "*/runs/.pending/")
-    _ensure_line(root / ".gitignore", "*/claims.jsonl.lock")
-    _ensure_line(root / ".gitattributes", "claims.jsonl merge=union")
-    _ensure_line(root / ".gitattributes", "receipts.jsonl merge=union")
+    ensure_research_files(repo_root)
 
     for sub in ("runs", "figures", "data"):
         (folder / sub).mkdir(parents=True)

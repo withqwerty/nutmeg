@@ -22,12 +22,15 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from .config import service_status
 from .redact import Redactor, inside_repo
 
 TEXT_CODE_LINES = 60  # code lines shown in the permission prompt; the card file has all
 TEXT_DIFF_LINES = 80
 SCRIPT_EXTENSIONS = (".py", ".r", ".sql")
 
+_FILE_LITERAL = re.compile(
+    r"""["']([^"'\n]{1,200}\.(?:sql|csv|tsv|parquet|jsonl?|xlsx|feather|arrow|duckdb|sqlite3?|db))["']""", re.I)
 _URL = re.compile(r"\bhttps?://([A-Za-z0-9.-]+\.[A-Za-z]{2,}|localhost)(?::\d+)?", re.IGNORECASE)
 _PY_IMPORT = re.compile(r"^\s*(?:from\s+(\.*[\w.]*)\s+import\b|import\s+([\w.]+(?:\s*,\s*[\w.]+)*))", re.MULTILINE)
 _R_LIBRARY = re.compile(r"\b(?:library|require|requireNamespace)\(\s*[\"']?([A-Za-z][\w.]*)", re.MULTILINE)
@@ -214,6 +217,21 @@ def detect_dependencies(path, text, repo_root, cwd):
     return sorted(local), sorted(packages)
 
 
+def _named_file(raw, repo_root, cwd, script):
+    """A file named in the code, if it exists inside the repository."""
+    if "://" in raw or "*" in raw or "{" in raw:
+        return None
+    for base in (Path(cwd), Path(script).parent, Path(repo_root)):
+        candidate = base / Path(raw).expanduser()
+        try:
+            resolved = inside_repo(candidate, repo_root)
+        except ValueError:
+            continue
+        if resolved.is_file():
+            return resolved
+    return None
+
+
 def choose_interpreter(path, override=None, db=None):
     """Return (argv prefix, name, stdin file or None) for running `path`."""
     path = Path(path)
@@ -253,7 +271,7 @@ def display_argv(argv, repo_root, stdin=None):
 
 def _code_entry(path, repo_root):
     text = Path(path).read_text(encoding="utf-8", errors="replace")
-    return {"path": _rel(path, repo_root), "sha256": sha256_path(path), "lines": text.count("\n") + 1, "text": text}
+    return {"path": _rel(path, repo_root), "sha256": sha256_path(path), "lines": len(text.splitlines()), "text": text}
 
 
 def previous_run(project, rel_file):
@@ -306,7 +324,7 @@ def _changes(card, project):
     return changes
 
 
-def build_run_card(run_args, repo_root, project, cwd, recorded=True, command=None):
+def build_run_card(run_args, repo_root, project, cwd, recorded=True, command=None, approved=None):
     repo_root, cwd = Path(repo_root), Path(cwd)
     card = {
         "kind": "run" if recorded else "direct",
@@ -319,7 +337,8 @@ def build_run_card(run_args, repo_root, project, cwd, recorded=True, command=Non
         "argv": None,
         "cwd": _rel(cwd, repo_root),
         "services": {"detected": [], "declared": [], "local_modules": [], "packages": [],
-                     "ai_provider": "what the run prints goes back to the AI model in this session"},
+                     "ai_provider": "what the run prints goes back to the AI model in this session",
+                     "approved": list(approved or [])},
         "inputs": [],
         "code": [],
         "changes": None,
@@ -349,6 +368,23 @@ def build_run_card(run_args, repo_root, project, cwd, recorded=True, command=Non
         except CardError as exc:
             card["problems"].append(str(exc))
 
+    # SQL and data files the code names but the command did not declare: show the SQL,
+    # hash the data, and say they were found rather than declared.
+    listed = {e["path"] for e in card["code"]}
+    found_inputs = []
+    for entry in list(card["code"]):
+        for raw in _FILE_LITERAL.findall(entry["text"]):
+            named = _named_file(raw, repo_root, cwd, repo_root / entry["path"])
+            if named is None:
+                continue
+            rel = _rel(named, repo_root)
+            if named.suffix.lower() == ".sql":
+                if rel not in listed:
+                    listed.add(rel)
+                    card["code"].append({**_code_entry(named, repo_root), "found_in_code": True})
+            elif rel not in found_inputs:
+                found_inputs.append(rel)
+
     hosts, local, packages = set(), set(), set()
     for entry in card["code"]:
         hosts.update(detect_hosts(entry["text"]))
@@ -375,6 +411,12 @@ def build_run_card(run_args, repo_root, project, cwd, recorded=True, command=Non
             continue
         card["inputs"].append({"path": _rel(resolved, repo_root), "sha256": sha256_path(resolved),
                                "bytes": _size(resolved), "columns": _columns(resolved)})
+    declared = {i["path"] for i in card["inputs"]}
+    for rel in found_inputs:
+        if rel not in declared:
+            path = repo_root / rel
+            card["inputs"].append({"path": rel, "sha256": sha256_path(path), "bytes": _size(path),
+                                   "columns": _columns(path), "found_in_code": True})
     if card["file"]:
         card["changes"] = _changes(card, project)
     return Redactor.for_repo(repo_root).obj(card)
@@ -462,11 +504,14 @@ def render_text(card):
     services = card["services"]
     out.append("")
     out.append("Data sent and services")
+    approved = services.get("approved") or []
     for host in services["detected"]:
-        out.append(f"- detected: {host} (a URL in the code)")
+        status = service_status(host, approved)
+        out.append(f"- detected: {host} (a URL in the code){' · ' + status if status else ''}")
     for item in services["declared"]:
         columns = ", ".join(item["columns"]) or "columns not stated"
-        out.append(f"- declared: {item['host']}: {columns}")
+        status = service_status(item["host"], approved)
+        out.append(f"- declared: {item['host']}: {columns}{' · ' + status if status else ''}")
     if services["local_modules"]:
         out.append(f"- not inspected (local code): {', '.join(services['local_modules'])}")
     if services["packages"]:
@@ -478,13 +523,14 @@ def render_text(card):
     out.append("")
     out.append("Inputs")
     if not card["inputs"]:
-        out.append("- none declared (pass --input for each data file the run reads)")
+        out.append("- none declared or named in the code (pass --input for each data file the run reads)")
     for item in card["inputs"]:
         if item.get("sha256") is None:
             out.append(f"- {item['path']}: missing")
             continue
         columns = f"; columns: {', '.join(item['columns'])}" if item.get("columns") else ""
-        out.append(f"- {item['path']} · {_human_bytes(item.get('bytes'))} · sha256 {item['sha256'][:12]}{columns}")
+        found = " (named in the code, not declared with --input)" if item.get("found_in_code") else ""
+        out.append(f"- {item['path']} · {_human_bytes(item.get('bytes'))} · sha256 {item['sha256'][:12]}{columns}{found}")
 
     changes = card.get("changes")
     if changes and changes["same"]:
@@ -509,7 +555,8 @@ def render_text(card):
         for entry in card["code"]:
             out.append("")
             label = "SQL" if entry["path"].lower().endswith(".sql") else "Code"
-            out.append(f"{label}: {entry['path']} ({entry['lines']} lines)")
+            found = ", named in the code" if entry.get("found_in_code") else ""
+            out.append(f"{label}: {entry['path']} ({entry['lines']} lines{found})")
             out.extend(_numbered(entry["text"], TEXT_CODE_LINES))
     if card.get("card_path"):
         out.append("")

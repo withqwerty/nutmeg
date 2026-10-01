@@ -146,7 +146,8 @@ def execute(run_args, repo_root, project, cwd, stream=True):
         copy.parent.mkdir(parents=True, exist_ok=True)
         copy.write_text(redactor.text(entry["text"]), encoding="utf-8")
     gate_card = shown if shown is not None else current
-    gate_card = {**gate_card, "gate_shown": shown is not None, "changed_since_gate": changed_since_gate}
+    gate_card = {**gate_card, "gate_shown": shown is not None and shown.get("review") != "queued",
+                 "changed_since_gate": changed_since_gate}
     gate_card.pop("card_path", None)
     (folder / "gate.json").write_text(json.dumps(gate_card, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     if pending_path.exists():
@@ -195,12 +196,15 @@ def execute(run_args, repo_root, project, cwd, stream=True):
         "duration_seconds": duration,
         "exit_code": exit_code,
         "status": "ok" if exit_code == 0 else "failed",
-        "gate": {"shown": shown is not None, "changed_since_gate": changed_since_gate},
+        "gate": {"shown": shown is not None and shown.get("review") != "queued",
+                 "queued_for_review": shown is not None and shown.get("review") == "queued",
+                 "changed_since_gate": changed_since_gate},
         "outputs": outputs,
     }
     (folder / "run.json").write_text(json.dumps(record, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     append_receipt(project, "run", run_id=run_id, file=record["file"], status=record["status"],
-                   gate_shown=record["gate"]["shown"], changed_since_gate=changed_since_gate)
+                   gate_shown=record["gate"]["shown"], queued_for_review=record["gate"]["queued_for_review"],
+                   changed_since_gate=changed_since_gate)
 
     if stream:
         if stdout:
@@ -208,3 +212,32 @@ def execute(run_args, repo_root, project, cwd, stream=True):
         if stderr:
             sys.stderr.write(stderr if stderr.endswith("\n") else stderr + "\n")
     return run_id, exit_code, record
+
+
+def review_queue(project):
+    """Runs that went ahead under run-then-review and nobody has reviewed yet."""
+    project = Path(project)
+    reviewed = set()
+    receipts = project / "receipts.jsonl"
+    if receipts.is_file():
+        for line in receipts.read_text(encoding="utf-8").splitlines():
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if record.get("kind") == "run_reviewed":
+                reviewed.add(record.get("run_id"))
+    queue = []
+    runs = project / "runs"
+    if runs.is_dir():
+        for folder in sorted(runs.iterdir(), key=lambda p: int(p.name[1:]) if p.name[1:].isdigit() else 0):
+            meta = folder / "run.json"
+            if not meta.is_file():
+                continue
+            try:
+                record = json.loads(meta.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                continue
+            if record.get("gate", {}).get("queued_for_review") and record["id"] not in reviewed:
+                queue.append(record)
+    return queue

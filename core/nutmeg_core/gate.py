@@ -26,6 +26,7 @@ import shlex
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from . import config
 from .redact import Redactor
 
 INTERPRETERS = ("python", "python3", "Rscript", "duckdb", "sqlite3", "psql", "bq")
@@ -270,12 +271,64 @@ def _decide(command, repo_root, project, cwd):
     target = _target_project(parsed, cwd, project)
     if target is None or not Path(target).is_dir():
         return Decision("ask", f"nutmeg research gate: research project not found ({target}); nutmeg will refuse this command.")
+    try:
+        settings = config.load_effective(repo_root)
+    except config.ConfigError as exc:
+        return Decision("ask", f"nutmeg research gate: the team or user config is broken ({exc}), so the strictest "
+                               "gate applies. Fix the config file, then try again.")
+    changed = settings_changed(repo_root, settings)
     if parsed.subcommand == "run":
         run_args = cards.normalise_run_args(parsed.namespace)
-        built = cards.build_run_card(run_args, repo_root, target, cwd)
+        built = cards.build_run_card(run_args, repo_root, target, cwd, approved=settings["approved_services"])
+        level = settings["levels"]["run"]
+        allow = settings["run_then_review"] and not changed and not built["problems"]
+        built["review"] = "queued" if allow else "asked"
         cards.save_pending(target, pending_key(cards.run_key(run_args, repo_root, cwd)), built)
-        return Decision("ask", cards.render_text(built), built)
-    return _decide_release(parsed, repo_root, target)
+        text = cards.render_text(built)
+        if changed:
+            text = changed + "\n\n" + text
+        elif level == "L1":
+            text = ("Your run level is L1 (suggest): nutmeg shows the card and you run the code yourself. "
+                    "Approve only if you want nutmeg to run it now.\n\n" + text)
+        if allow:
+            return Decision("allow", "run-then-review: this run goes ahead and its card waits in the review queue "
+                                     "(`nutmeg queue`).\n\n" + text, built)
+        return Decision("ask", text, built)
+    decision = _decide_release(parsed, repo_root, target)
+    if changed:
+        decision.reason = changed + "\n\n" + decision.reason
+    return decision
+
+
+SEEN_FILE = ".config-seen"
+
+
+def settings_changed(repo_root, settings):
+    """A message if the team or user config changed since the last gate, else ''. Records the change."""
+    from .project import active_project, append_receipt, ensure_research_files, research_root
+
+    ensure_research_files(repo_root)
+    seen_path = research_root(repo_root) / SEEN_FILE
+    current = config.config_hash(repo_root)
+    try:
+        previous = seen_path.read_text(encoding="utf-8").strip()
+    except OSError:
+        previous = ""
+    if previous == current:
+        return ""
+    try:
+        seen_path.write_text(current + "\n", encoding="utf-8")
+    except OSError:
+        pass
+    if not previous:
+        return ""  # first gate on this machine: nothing to compare with
+    levels = ", ".join(f"{stage} {settings['levels'][stage]}" for stage in config.STAGES)
+    project = active_project(repo_root)
+    if project is not None:
+        append_receipt(project, "gate_settings_changed", levels=settings["levels"],
+                       run_then_review=settings["run_then_review"])
+    return (f"Gate settings changed since the last gate (team or user config). Now: {levels}; "
+            f"run-then-review {settings['reasons']['run_then_review']}. This step asks again.")
 
 
 def _decide_release(parsed, repo_root, target):

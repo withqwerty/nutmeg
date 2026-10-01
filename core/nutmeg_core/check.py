@@ -23,8 +23,9 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
+from .config import ConfigError, load_effective
 from .ledger import Ledger
-from .project import append_receipt
+from .project import append_receipt, find_repo_root
 
 CHECKS_FILE = "checks.json"
 NOT_OUTPUTS = {"question.md", "plan.md"}
@@ -186,6 +187,17 @@ def run_checks(project):
                          "message": f"{cid} is used by {len(origins)} different claims (made by "
                                     f"{', '.join(sorted(set(origins.values())))}), probably after a merge; give one "
                                     "of them a new ID in claims.jsonl and in the outputs that cite it"})
+
+    try:
+        settings = load_effective(find_repo_root(project))
+    except ConfigError as exc:
+        settings = {"signoff_required": False}
+        warnings.append(f"team or user config: {exc}")
+    for cid, claim in live.items():
+        if settings.get("signoff_required") and claim.get("headline") and not claim.get("signer"):
+            failures.append({"kind": "needs sign-off", "id": _failure_id("signoff", cid, claim.get("version")),
+                             "claim": cid, "message": f"{cid} ({claim['statement'][:60]}) is a headline claim; the "
+                             "team requires a teammate who is not its author to run `nutmeg signoff`"})
 
     for cid, claim in live.items():
         evidence = claim.get("evidence") or {}

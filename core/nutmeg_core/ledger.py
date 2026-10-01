@@ -40,7 +40,10 @@ REST_TYPES = ("docs", "registry", "rule", "user", "paper", "claim")
 MAX_WHY_LENGTH = 240
 
 # Fields that describe one version's change and are not carried forward.
-PER_VERSION_FIELDS = ("note", "by", "previous_status")
+PER_VERSION_FIELDS = ("note", "by", "previous_status", "signer")
+
+# Fields whose change makes a claim a new statement that needs checking again.
+CONTENT_FIELDS = ("kind", "statement", "value", "evidence")
 
 # Fields nutmeg sets on write; callers do not supply them.
 SYSTEM_FIELDS = ("version", "at")
@@ -241,4 +244,7 @@ class Ledger:
             raise KeyError(claim_id)
         # A note and its author belong to the version that made the change.
         carried = {k: v for k, v in current.items() if k not in PER_VERSION_FIELDS}
+        # A claim whose content changes goes back to draft: its earlier check or sign-off no longer holds.
+        if "status" not in changes and any(k in changes and changes[k] != current.get(k) for k in CONTENT_FIELDS):
+            changes = {**changes, "status": "draft"}
         return self.append({**carried, **changes})

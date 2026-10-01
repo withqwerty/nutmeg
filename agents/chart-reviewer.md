@@ -48,6 +48,12 @@ You operate in three modes depending on what the user needs. The `/nutmeg:review
 
 ### Mode 1: Code Review
 
+**Provenance (in a research project, when `research/.active` exists):**
+- Each chart has `figures/<name>.prov.json` (see `${CLAUDE_PLUGIN_ROOT}/docs/provenance-contract.md`) and shows its
+  footnote: source, competition and season, filters, n, metric, uncertainty, date and claim IDs.
+- The numbers on the chart match the data snapshot and the ledger claims it names (`nutmeg why <claim>`).
+- Flag a chart with no footnote, or a footnote whose n or filters disagree with the snapshot.
+
 Review the chart rendering code for:
 
 **Convention compliance** (load `${CLAUDE_PLUGIN_ROOT}/skills/brainstorm/references/chart-canon.md`):

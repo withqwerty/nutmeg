@@ -9,8 +9,10 @@ import os
 import sys
 from pathlib import Path
 
-from . import __version__, card as cards, check as checks, project as projects, review, run as runs, why as whys
-from .config import ConfigError, data_in_git_policy, load_team, user_name
+from . import __version__, card as cards, check as checks, figure as figures, project as projects, publish as publishing
+from . import review, run as runs, why as whys
+from .config import (LEVELS, PERSONAS, STAGES, ConfigError, data_in_git_policy, load_effective, load_team,
+                     save_user, user_config_path, user_name)
 from .gate import pending_key
 from .ledger import KINDS, REST_TYPES, ClaimError, Ledger
 from .redact import Redactor
@@ -48,12 +50,17 @@ def _read_record(args):
         raise UsageError(f"the claim is not valid JSON ({exc.msg} at line {exc.lineno})")
     if args.kind:
         record["kind"] = args.kind
+    if isinstance(record, dict) and args.headline:
+        record["headline"] = True
     return record
 
 
 def cmd_claim_add(args):
-    ledger = open_ledger(resolve_project(args))
+    project = resolve_project(args)
+    ledger = open_ledger(project)
     record = _read_record(args)
+    if isinstance(record, dict) and not record.get("id"):
+        record.setdefault("author", user_name(find_repo_root(project)))
     try:
         written = ledger.append(record)
     except ClaimError as exc:
@@ -260,6 +267,107 @@ def cmd_resolve(args):
     return 0
 
 
+def cmd_figure_register(args):
+    project = resolve_project(args)
+    repo = find_repo_root(project)
+    claims = [c.strip() for c in (args.claims or "").split(",") if c.strip()]
+    try:
+        prov = figures.register(project, repo, args.name, args.data, args.source, claims, n=args.n,
+                                competition_season=args.season, filters=args.filters, metric=args.metric,
+                                uncertainty=args.uncertainty, run_id=args.run, image=args.image, panels=args.panel)
+    except figures.FigureError as exc:
+        raise UsageError(str(exc))
+    print(f"Footnote (put it under the chart): {prov['footnote']}")
+    print(f"Provenance: {project.relative_to(repo)}/figures/{prov['figure']}.prov.json")
+    return 0
+
+
+def cmd_publish(args):
+    project = resolve_project(args)
+    repo = find_repo_root(project)
+    try:
+        record = publishing.publish(project, repo, user_name(repo), to=args.to)
+    except publishing.PublishError as exc:
+        raise UsageError(f"publish refused: {exc}")
+    where = f" and copied to {record['to']}" if record["to"] else ""
+    print(f"Published {len(record['files'])} file(s) with {len(record['figures'])} figure(s){where}; "
+          f"recorded in {project.relative_to(repo)}/published.json.")
+    return 0
+
+
+def cmd_signoff(args):
+    project = resolve_project(args)
+    repo = find_repo_root(project)
+    try:
+        settings = load_effective(repo)
+        written = review.signoff(project, args.claim_id, user_name(repo), note=args.note,
+                                 signoff_required=settings["signoff_required"])
+    except (review.ReviewError, ConfigError) as exc:
+        raise UsageError(str(exc))
+    print(f"{written['id']} is now {written['status']}, signed off by {written['signer']}.")
+    return 0
+
+
+def cmd_config_show(args):
+    repo = find_repo_root(Path.cwd())
+    try:
+        settings = load_effective(repo)
+    except ConfigError as exc:
+        raise UsageError(str(exc))
+    print(f"Persona: {settings['persona']}")
+    for stage in STAGES:
+        print(f"  {stage}: {settings['levels'][stage]} - {settings['reasons'][stage]}")
+    print(f"  run-then-review: {settings['reasons']['run_then_review']}")
+    print(f"Sign-off required for headline claims: {'yes' if settings['signoff_required'] else 'no'}")
+    print(f"Data in git: {settings['data_in_git']}")
+    if settings["approved_services"]:
+        print(f"Team-approved services: {', '.join(settings['approved_services'])}")
+    print(f"User config: {user_config_path()}")
+    return 0
+
+
+def cmd_config_set(args):
+    values = {}
+    if args.persona:
+        values["persona"] = args.persona
+    for stage in STAGES:
+        level = getattr(args, f"autonomy_{stage}")
+        if level:
+            values[f"autonomy_{stage}"] = level
+    if args.run_then_review:
+        values["run_then_review"] = args.run_then_review == "yes"
+    if args.name:
+        values["name"] = args.name
+    if not values:
+        raise UsageError("nothing to set; see `nutmeg config set --help`")
+    path = save_user(values)
+    project = projects.active_project(find_repo_root(Path.cwd()))
+    if project is not None:
+        projects.append_receipt(project, "config_changed", values=values, file=str(path))
+    print(f"Saved {', '.join(sorted(values))} to {path}.")
+    return cmd_config_show(args)
+
+
+def cmd_queue(args):
+    project = resolve_project(args)
+    repo = find_repo_root(project)
+    if args.done:
+        known = {r["id"] for r in runs.review_queue(project)}
+        if args.done not in known:
+            raise UsageError(f"{args.done} is not in the review queue")
+        projects.append_receipt(project, "run_reviewed", run_id=args.done, by=user_name(repo), note=args.note)
+        print(f"Marked {args.done} as reviewed.")
+    queue = runs.review_queue(project)
+    if not queue:
+        print("The review queue is empty.")
+        return 0
+    print(f"{len(queue)} run(s) went ahead under run-then-review and wait for review:")
+    for record in queue:
+        print(f"- {record['id']} {record.get('file')} · {record.get('status')} · {record.get('started')}"
+              f" (card: {project.relative_to(repo)}/runs/{record['id']}/gate.json)")
+    return 0
+
+
 def build_parser(parser_class=cards.NutmegParser):
     parser = parser_class(
         prog="nutmeg",
@@ -309,6 +417,27 @@ def build_parser(parser_class=cards.NutmegParser):
     check.add_argument("--reason", help="why the problem is accepted (required with --accept)")
     check.set_defaults(handler=cmd_check)
 
+    figure = commands.add_parser("figure", help="register a chart's data and provenance")
+    figure_commands = figure.add_subparsers(dest="figure_command", metavar="<action>")
+    register = figure_commands.add_parser("register", help="write <name>.prov.json and print the footnote")
+    register.add_argument("name", help="figure name, for example shot-map")
+    register.add_argument("--data", help="CSV or JSON of the rows the chart plots (required)")
+    register.add_argument("--source", action="append", default=[], help="a data source (repeat for each)")
+    register.add_argument("--panel", action="append", default=[], help="the panel each --source feeds, in order")
+    register.add_argument("--claims", help="claim IDs the chart shows, comma-separated")
+    register.add_argument("--n", type=int, help="sample size (default: rows in --data)")
+    register.add_argument("--season", help="competition and season, for example 'Premier League 2025/26'")
+    register.add_argument("--filters", help="filters, for example 'min 900 minutes'")
+    register.add_argument("--metric", help="the metric plotted")
+    register.add_argument("--uncertainty", help="uncertainty shown, for example 'bootstrap 95%% CI'")
+    register.add_argument("--run", help="the run that produced the data")
+    register.add_argument("--image", help="the chart file")
+    register.set_defaults(handler=cmd_figure_register)
+
+    publish = commands.add_parser("publish", help="publish the outputs (refuses while checks have open problems)")
+    publish.add_argument("--to", help="also copy the outputs to this folder in the repository")
+    publish.set_defaults(handler=cmd_publish)
+
     why = commands.add_parser("why", help="show a claim's value, evidence, reason and history")
     why.add_argument("claim_id")
     why.set_defaults(handler=cmd_why)
@@ -325,12 +454,34 @@ def build_parser(parser_class=cards.NutmegParser):
     resolve.add_argument("--note", required=True, help="how it was resolved")
     resolve.set_defaults(handler=cmd_resolve)
 
+    queue = commands.add_parser("queue", help="list runs waiting for review (run-then-review)")
+    queue.add_argument("--done", metavar="RUN", help="mark a run as reviewed")
+    queue.add_argument("--note", help="what you checked")
+    queue.set_defaults(handler=cmd_queue)
+
+    signoff = commands.add_parser("signoff", help="verify a claim with your name (a teammate's check)")
+    signoff.add_argument("claim_id")
+    signoff.add_argument("--note", help="what you checked")
+    signoff.set_defaults(handler=cmd_signoff)
+
+    config = commands.add_parser("config", help="show or set your persona and autonomy levels")
+    config_commands = config.add_subparsers(dest="config_command", metavar="<action>")
+    config_commands.add_parser("show", help="show the settings in force and why").set_defaults(handler=cmd_config_show)
+    setter = config_commands.add_parser("set", help="change your user settings (the team floor still applies)")
+    setter.add_argument("--persona", choices=sorted(PERSONAS))
+    for stage in STAGES:
+        setter.add_argument(f"--autonomy-{stage}", choices=LEVELS, dest=f"autonomy_{stage}")
+    setter.add_argument("--run-then-review", choices=("yes", "no"))
+    setter.add_argument("--name", help="your name for sign-offs and notes (default: git user.name)")
+    setter.set_defaults(handler=cmd_config_set)
+
     claim = commands.add_parser("claim", help="add, list or show ledger claims")
     claim_commands = claim.add_subparsers(dest="claim_command", metavar="<action>")
 
     add = claim_commands.add_parser("add", help="append a claim (JSON from --json or stdin)")
     add.add_argument("--json", help="the claim as a JSON object")
     add.add_argument("--kind", choices=KINDS, help="set the claim kind")
+    add.add_argument("--headline", action="store_true", help="mark a headline claim (needs sign-off when the team requires it)")
     add.set_defaults(handler=cmd_claim_add)
 
     listing = claim_commands.add_parser("list", help="list the latest version of every claim")

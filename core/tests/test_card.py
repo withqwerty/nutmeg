@@ -87,3 +87,19 @@ def test_sql_uses_duckdb_or_sqlite(repo, monkeypatch):
 def test_unsupported_extension(repo):
     with pytest.raises(cards.CardError):
         cards.choose_interpreter(Path("a.ipynb"))
+
+
+def test_sql_and_data_named_in_code_are_shown(project, repo):
+    (repo / "queries").mkdir()
+    (repo / "queries" / "q.sql").write_text("SELECT player FROM players;\n")
+    (repo / "data").mkdir()
+    (repo / "data" / "players.csv").write_text("player\nA\n")
+    (repo / "a.py").write_text("sql = open('queries/q.sql').read()\nrows = open(\"data/players.csv\").read()\n"
+                               "remote = 'https://x.io/file.csv'\n")
+    card = cards.build_run_card(args("a.py"), repo, project, repo)
+    assert [c["path"] for c in card["code"]] == ["a.py", "queries/q.sql"]
+    assert card["inputs"][0]["path"] == "data/players.csv" and card["inputs"][0]["found_in_code"]
+    text = cards.render_text(card)
+    assert "SQL: queries/q.sql (1 lines, named in the code)" in text
+    assert "SELECT player FROM players;" in text
+    assert "not declared with --input" in text

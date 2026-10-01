@@ -143,7 +143,15 @@ When a step ends with open problems, nutmeg stops you once with the list. Fix th
 says a problem is not one, record their reason:
 `nutmeg check --accept <id> --reason "<the user's reason>"`. Never accept a problem on your own.
 
-## 7. Explain and review claims
+## 7. Charts and publishing
+
+- Save the rows each chart plots as a CSV or JSON snapshot, then register the chart:
+  `nutmeg figure register <name> --data <snapshot> --source "<source>" --claims C3,C5 --season "<competition and season>" --filters "<filters>" --metric "<metric>" --run R2 --image <chart file>`.
+  Put the footnote it prints under the chart. `/nutmeg:brainstorm` has the chart conventions.
+- `nutmeg publish` releases the outputs. The user first sees each figure's n, filters and first rows, and approves.
+  It refuses while `nutmeg check` has open problems. `--to <folder>` also copies the outputs there.
+
+## 8. Explain and review claims
 
 - `nutmeg why <claim>` prints a claim's value, definition, evidence (the run and code lines, the
   docs source, the Reep ID and release, or the paper and quote), filters, n, up to five sample
@@ -155,7 +163,17 @@ says a problem is not one, record their reason:
   becomes disputed (an interpretation becomes contested). `nutmeg resolve <claim> --note "<how>"`
   returns it to its earlier status. Both record the person's name.
 
-## 8. Close
+## 9. Control and sign-off
+
+- `nutmeg config show` prints the user's persona and autonomy levels (L1 suggest, L2 draft, L3 execute with
+  checkpoints) and the team limits from `.nutmeg/team.json`. Follow them:
+  - L1 for runs: use `nutmeg gate` with the run's arguments to show the card, and let the user run the code.
+  - L2: run with `nutmeg run`; the user approves each run.
+  - L3 with run-then-review: runs go ahead; `nutmeg queue` lists the cards waiting for review. Tell the user.
+- Mark the claims a decision rests on with `--headline` when you add them. When the team requires sign-off, a
+  teammate who is not the author runs `nutmeg signoff <claim>`; never sign off a claim yourself.
+
+## 10. Close
 
 When the user is done with the project, run `nutmeg close`. The files stay; only the active marker
 goes. `nutmeg open <slug>` makes it active again.
