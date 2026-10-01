@@ -129,7 +129,21 @@ Each kind needs its evidence:
 - Never write a number in an output that is not in the ledger.
 - `nutmeg claim list` shows the ledger and any bad lines.
 
-## 6. Close
+## 6. Write outputs and check them
+
+Write the report as `research/<slug>/report.md` (more reports can go in `research/<slug>/reports/`)
+and figure captions next to the figures. Put the claim ID next to each number.
+
+Run `nutmeg check`. It lists every number with no ledger claim, every number that matches more
+than one claim, every citation without a resolved source and quote match, and every provider fact
+without a football-docs source. Fix each one: add the claim with its evidence, or correct the
+output.
+
+When a step ends with open problems, nutmeg stops you once with the list. Fix them. If the user
+says a problem is not one, record their reason:
+`nutmeg check --accept <id> --reason "<the user's reason>"`. Never accept a problem on your own.
+
+## 7. Close
 
 When the user is done with the project, run `nutmeg close`. The files stay; only the active marker
 goes. `nutmeg open <slug>` makes it active again.

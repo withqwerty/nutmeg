@@ -1,5 +1,5 @@
 {
-  "description": "Adds nutmeg's core football-data and research-project rules to each session, and shows a gate card before runs inside an active research project.",
+  "description": "Adds nutmeg's core football-data and research-project rules to each session. Inside an active research project, shows a gate card before runs and checks outputs against the claim ledger before a step ends.",
   "hooks": {
     "SessionStart": [
       {
@@ -19,6 +19,17 @@
             "type": "command",
             "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\" gate_hook.py",
             "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\" stop_check.py",
+            "timeout": 60
           }
         ]
       }

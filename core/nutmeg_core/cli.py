@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 
-from . import __version__, card as cards, project as projects, run as runs
+from . import __version__, card as cards, check as checks, project as projects, run as runs
 from .config import ConfigError, data_in_git_policy, load_team, user_name
 from .gate import pending_key
 from .ledger import KINDS, REST_TYPES, ClaimError, Ledger
@@ -206,6 +206,30 @@ def cmd_run(args):
     return exit_code
 
 
+def cmd_check(args):
+    project = resolve_project(args)
+    repo = find_repo_root(project)
+    if args.accept:
+        try:
+            record = checks.accept(project, args.accept, args.reason, user_name(repo))
+        except ValueError as exc:
+            raise UsageError(str(exc))
+        print(f"Accepted {record['id']}: {record['failure']['message']} (reason recorded in receipts.jsonl)")
+    state = checks.check(project)
+    files = checks.output_files(project)
+    for warning in state.get("warnings", []):
+        print(f"warning: {warning}")
+    if not state["open"]:
+        print(f"No open problems in {len(files)} output file(s) and {project.relative_to(repo)}/claims.jsonl.")
+        return 0
+    print(f"{len(state['open'])} open problem(s):")
+    for failure in state["open"]:
+        print(f"- {checks.describe(failure)}")
+    print("Fix each one (add the claim with its evidence, or correct the output), or record the user's reason "
+          "with `nutmeg check --accept <id> --reason \"...\"`.")
+    return 1
+
+
 def build_parser():
     parser = argparse.ArgumentParser(
         prog="nutmeg",
@@ -249,6 +273,11 @@ def build_parser():
     gate = commands.add_parser("gate", help="show the gate card for a run without running it")
     cards.add_run_arguments(gate)
     gate.set_defaults(handler=cmd_gate)
+
+    check = commands.add_parser("check", help="check that every number, citation and fact in the outputs traces to the ledger")
+    check.add_argument("--accept", metavar="ID", help="close an open problem with the user's reason")
+    check.add_argument("--reason", help="why the problem is accepted (required with --accept)")
+    check.set_defaults(handler=cmd_check)
 
     claim = commands.add_parser("claim", help="add, list or show ledger claims")
     claim_commands = claim.add_subparsers(dest="claim_command", metavar="<action>")
