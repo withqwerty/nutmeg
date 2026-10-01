@@ -50,7 +50,8 @@ def resolve(project, claim_id, note, by):
         if version.get("previous_status"):
             previous = version["previous_status"]
             break
-    written = ledger.update(claim_id, status=previous, note=note.strip(), by=by)
+    written = ledger.update(claim_id, trusted=True, status=previous, note=note.strip(), by=by,
+                            signer=claim.get("signer"))
     append_receipt(project, "resolve", claim=claim_id, by=by, note=note.strip(), status=previous,
                    version=written["version"])
     return written
@@ -62,7 +63,9 @@ def signoff(project, claim_id, by, note=None, signoff_required=False):
     claim = ledger.get(claim_id)
     if claim is None:
         raise ReviewError(f"no claim {claim_id} in this project")
-    if signoff_required and claim.get("author") and claim["author"] == by:
+    if signoff_required and not claim.get("author"):
+        raise ReviewError(f"{claim_id} has no recorded author, so the team's sign-off rule cannot be checked")
+    if signoff_required and claim["author"] == by:
         raise ReviewError(f"{claim_id} was made by {by}; the team requires a different person to sign it off")
     target = "supported" if claim["kind"] == "interpretation" else "verified"
     if claim.get("status") in ("disputed", "contested"):
@@ -70,6 +73,6 @@ def signoff(project, claim_id, by, note=None, signoff_required=False):
     changes = {"status": target, "signer": by, "by": by}
     if note:
         changes["note"] = Redactor.for_repo(find_repo_root(project)).text(note)
-    written = ledger.update(claim_id, **changes)
+    written = ledger.update(claim_id, trusted=True, **changes)
     append_receipt(project, "signoff", claim=claim_id, by=by, status=target, version=written["version"])
     return written

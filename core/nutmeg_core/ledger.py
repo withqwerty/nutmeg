@@ -128,6 +128,30 @@ def _locked(path):
                 fcntl.flock(lock, fcntl.LOCK_UN)
 
 
+APPROVED_STATUSES = ("verified", "supported")
+
+
+def _guard(record, history, trusted):
+    """Apply the rules every new version must follow, whoever writes it."""
+    record = dict(record)
+    latest = history[-1] if history else None
+    if history and history[0].get("author"):
+        record["author"] = history[0]["author"]
+    changed = latest is not None and any(record.get(k) != latest.get(k) for k in CONTENT_FIELDS)
+    if changed:
+        record.pop("signer", None)
+        if record.get("status") in APPROVED_STATUSES:
+            record["status"] = "draft"
+    if not trusted:
+        same_approval = (latest is not None and not changed and record.get("status") == latest.get("status")
+                         and record.get("signer") == latest.get("signer"))
+        if record.get("status") in APPROVED_STATUSES and not same_approval:
+            record["status"] = "draft"
+        if record.get("signer") and not same_approval:
+            record.pop("signer", None)
+    return record
+
+
 class Ledger:
     """Read and append claims in one `claims.jsonl` file."""
 
@@ -189,11 +213,14 @@ class Ledger:
                 highest = max(highest, int(claim_id[1:]))
         return f"C{highest + 1}"
 
-    def append(self, record):
+    def append(self, record, trusted=False):
         """Validate and append a claim; return the record as written.
 
         A record without an ID gets the next free ID. A record with an
-        existing ID becomes that claim's next version.
+        existing ID becomes that claim's next version. Only trusted callers
+        (sign-off and resolve) may set a verified or supported status or a
+        signer; a change to a claim's content returns it to draft and clears
+        its sign-off, whoever makes it. A claim keeps its first author.
         """
         record = {k: v for k, v in dict(record).items() if k not in SYSTEM_FIELDS}
         with _locked(self.path):
@@ -204,6 +231,7 @@ class Ledger:
                 record = self.redactor.obj(record)
             validate(record)
             history = self.history(record["id"])
+            record = _guard(record, history, trusted)
             if not record.get("origin"):
                 # The origin ties a claim's versions together. Two teammates who both create
                 # C5 get different origins, so a merged ledger shows the clash instead of
@@ -237,7 +265,7 @@ class Ledger:
                     out.append(record)
         return out
 
-    def update(self, claim_id, **changes):
+    def update(self, claim_id, trusted=False, **changes):
         """Append a new version of an existing claim with some fields changed."""
         current = self.get(claim_id)
         if current is None:
@@ -247,4 +275,4 @@ class Ledger:
         # A claim whose content changes goes back to draft: its earlier check or sign-off no longer holds.
         if "status" not in changes and any(k in changes and changes[k] != current.get(k) for k in CONTENT_FIELDS):
             changes = {**changes, "status": "draft"}
-        return self.append({**carried, **changes})
+        return self.append({**carried, **changes}, trusted=trusted)

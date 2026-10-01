@@ -54,7 +54,7 @@ def test_unreadable_wrapper_asks():
 # 3. --interpreter cannot swap in other code, and the card shows the full command.
 def test_interpreter_with_inline_code_is_refused(project, repo, capsys):
     decision = gate.decide("nutmeg run a.py --interpreter \"python3 -c 'print(999)'\"", repo, project, repo)
-    assert "code-running options" in decision.reason
+    assert "may only add the flags" in decision.reason
     assert main(["run", "a.py", "--interpreter", "python3 -c 'print(999)'"]) == 2
     assert not (project / "runs" / "R1").exists()
 
@@ -235,4 +235,190 @@ def test_session_start_json_for_odd_paths(tmp_path, name):
                             env=dict(os.environ, CLAUDE_PLUGIN_ROOT=str(root)))
     context = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
     assert "@PLUGIN_ROOT@" not in context
+    assert f'python3 "{root}/core/nutmeg.py"' in context
+
+
+# --- second review (findings on U6-U10, U14) ------------------------------------------------
+
+@pytest.mark.parametrize("command", [
+    "env --split-string='python3 -c print(1)'", "env -Spython3", "sh -c 'nutmeg publish'", "bash -c 'python3 a.py'",
+    "env --chdir=sub nutmeg run a.py", "env -C sub python3 a.py", "uv run --directory sub python a.py",
+    "conda run --cwd sub python a.py", "find . -name '*.py' -exec python3 {} ;", "xargs python3",
+])
+def test_string_and_directory_wrappers_ask(command):
+    assert gate.parse(command).kind == "compound", command
+
+
+def test_nutmeg_project_option_behind_uv_is_still_a_run():
+    parsed = gate.parse('uv run python3 "/p/core/nutmeg.py" --project research/club run a.py')
+    assert parsed.kind == "nutmeg" and parsed.subcommand == "run"
+
+
+@pytest.mark.parametrize("interpreter", ["python3 -cprint(123)", "python3 other.py", "sh", "env python3",
+                                         "python3 -m http.server"])
+def test_interpreter_must_be_one_program(project, repo, interpreter):
+    decision = gate.decide(f"nutmeg run a.py --interpreter '{interpreter}'", repo, project, repo)
+    assert "PROBLEM" in decision.reason
+
+
+def test_interpreter_with_safe_flag_is_allowed(project, repo):
+    decision = gate.decide("nutmeg run a.py --interpreter 'python3 -u'", repo, project, repo)
+    assert "PROBLEM" not in decision.reason and "Command: python3 -u a.py" in decision.reason
+
+
+def test_other_repositorys_project_uses_its_own_team_floor(repo, tmp_path_factory):
+    other = tmp_path_factory.mktemp("other")
+    subprocess.run(["git", "init", "-q", str(other)], check=True)
+    (other / ".nutmeg").mkdir()
+    (other / ".nutmeg" / "team.json").write_text(json.dumps({"max_autonomy": {"run": "L2"}}))
+    (other / "research" / "p" / "runs").mkdir(parents=True)
+    (other / "a.py").write_text("print(1)\n")
+    main(["new", "mine", "--data-in-git", "yes"])
+    (repo / ".no-user-config.json").write_text(json.dumps({"persona": "fanalyst", "run_then_review": True}))
+    decision = gate.decide(f"nutmeg --project {other}/research/p run {other}/a.py", repo,
+                           repo / "research" / "mine", repo)
+    assert decision.decision == "ask"
+
+
+def test_broken_user_config_cannot_switch_off_signoff(project, repo):
+    (repo / ".nutmeg").mkdir()
+    (repo / ".nutmeg" / "team.json").write_text(json.dumps({"signoff": {"required": True}}))
+    (repo / ".no-user-config.json").write_text(json.dumps({"autonomy_run": "L9"}))
+    Ledger(project / "claims.jsonl").append({"kind": "definition", "statement": "x", "evidence": {"definition": "y"},
+                                             "headline": True, "author": "A"})
+    kinds = [f["kind"] for f in checks.run_checks(project)[0]]
+    assert "needs sign-off" in kinds
+
+
+def test_claim_add_cannot_keep_verification_after_an_edit(project, repo):
+    ledger = Ledger(project / "claims.jsonl")
+    ledger.append({"kind": "definition", "statement": "x", "evidence": {"definition": "y"}, "author": "A"})
+    ledger.update("C1", trusted=True, status="verified", signer="B")
+    edited = {**ledger.get("C1"), "statement": "x, quietly changed"}
+    main(["claim", "add", "--json", json.dumps(edited)])
+    latest = ledger.get("C1")
+    assert latest["status"] == "draft" and "signer" not in latest and latest["author"] == "A"
+
+
+def test_untrusted_writer_cannot_set_verified(project):
+    written = Ledger(project / "claims.jsonl").append({"kind": "definition", "statement": "x",
+                                                       "evidence": {"definition": "y"}, "status": "verified"})
+    assert written["status"] == "draft"
+
+
+def test_explicit_id_still_gets_an_author_and_cannot_self_sign(project, repo, capsys):
+    (repo / ".nutmeg").mkdir()
+    (repo / ".nutmeg" / "team.json").write_text(json.dumps({"signoff": {"required": True}}))
+    claim = {"id": "C2", "kind": "definition", "statement": "x", "evidence": {"definition": "y"}, "headline": True}
+    assert main(["claim", "add", "--json", json.dumps(claim)]) == 0
+    assert Ledger(project / "claims.jsonl").get("C2")["author"] == "Test Analyst"
+    assert main(["signoff", "C2"]) == 2
+
+
+def test_code_lines_cannot_read_outside_the_run(project, repo, capsys):
+    (project / "runs" / "R1" / "code").mkdir(parents=True)
+    (project / "runs" / "R1" / "run.json").write_text(json.dumps({"id": "R1", "file": "a.py", "status": "ok"}))
+    secret = repo / "private.txt"
+    secret.write_text("TOP SECRET LINE\n")
+    for spec in (f"{secret}:1-1", "../../../../private.txt:1-1"):
+        Ledger(project / "claims.jsonl").append({"kind": "computed", "statement": "x", "value": 1,
+                                                 "evidence": {"run_id": "R1", "code_lines": spec}})
+    for cid in ("C1", "C2"):
+        main(["why", cid])
+        assert "TOP SECRET" not in capsys.readouterr().out
+
+
+def _bundle_names(path):
+    import zipfile
+    with zipfile.ZipFile(path) as archive:
+        return {n: archive.read(n) for n in archive.namelist()}
+
+
+def test_raw_no_bundle_leaves_out_the_workspace_and_run_written_files(project, repo):
+    (project / "runs" / "R1").mkdir(parents=True)
+    (project / "runs" / "R1" / "run.json").write_text(json.dumps({
+        "id": "R1", "status": "ok",
+        "outputs": [{"path": "research/club/tables/players.csv"}, {"path": "research/club/report.md"}]}))
+    (project / "tables").mkdir()
+    (project / "tables" / "players.csv").write_text("player,salary\nX,999\n")
+    (project / "report.md").write_text("Report.\n")
+    (project / "workspace.html").write_text("<pre>sample rows</pre>")
+    main(["bundle", "--raw", "no", "--out", "out/b.zip"])
+    names = _bundle_names(repo / "out" / "b.zip")
+    assert "club/workspace.html" not in names and "club/tables/players.csv" not in names
+    assert "club/report.md" in names
+    manifest = json.loads(names["club/bundle-manifest.json"])
+    assert {"workspace.html", "tables/players.csv"} <= {o["path"] for o in manifest["raw_omitted"]}
+
+
+def test_bundle_redacts_lockfiles_and_skips_credentials(project, repo):
+    (repo / ".env").write_text("TOKEN=pkg-token-778899\n")
+    (repo / "requirements.txt").write_text("private-pkg @ https://pkg-token-778899@pypi.example.org/simple\n")
+    (project / ".env").write_text("TOKEN=pkg-token-778899\n")
+    (project / "chart.svg").write_text("<svg><!-- pkg-token-778899 --></svg>")
+    main(["bundle", "--raw", "yes", "--out", "out/b.zip"])
+    names = _bundle_names(repo / "out" / "b.zip")
+    assert "club/.env" not in names
+    assert all(b"pkg-token-778899" not in data for data in names.values())
+
+
+def test_bundle_out_must_be_inside_the_repo(project, repo, tmp_path_factory, capsys):
+    outside = tmp_path_factory.mktemp("o") / "b.zip"
+    assert main(["bundle", "--raw", "no", "--out", str(outside)]) == 2
+    assert not outside.exists()
+
+
+def test_bundle_skips_symlinks_out_of_the_project(project, repo, tmp_path_factory):
+    secret = tmp_path_factory.mktemp("s") / "secret.csv"
+    secret.write_text("very,secret\n")
+    (project / "linked.csv").symlink_to(secret)
+    main(["bundle", "--raw", "yes", "--out", "out/b.zip"])
+    names = _bundle_names(repo / "out" / "b.zip")
+    assert "club/linked.csv" not in names
+
+
+def test_chart_image_outside_repo_is_refused(project, repo, tmp_path_factory, capsys):
+    image = tmp_path_factory.mktemp("i") / "customer.png"
+    image.write_bytes(b"png")
+    (repo / "rows.csv").write_text("a\n1\n")
+    assert main(["figure", "register", "x", "--data", "rows.csv", "--source", "Opta", "--image", str(image)]) == 2
+
+
+def test_publish_keeps_paths_and_bundle_includes_chart_assets(project, repo):
+    (project / "runs" / "R1").mkdir(parents=True)
+    (project / "runs" / "R1" / "run.json").write_text(json.dumps({"id": "R1", "status": "ok"}))
+    for name in ("first", "second"):
+        (project / "reports" / name).mkdir(parents=True)
+        (project / "reports" / name / "report.md").write_text(f"{name} report\n")
+    (repo / "out").mkdir()
+    (repo / "out" / "rows.csv").write_text("a\n1\n")
+    (repo / "out" / "chart.png").write_bytes(b"png")
+    assert main(["figure", "register", "chart", "--data", "out/rows.csv", "--source", "Opta", "--image",
+                 "out/chart.png"]) == 0
+    assert main(["publish", "--to", "public"]) == 0
+    assert (repo / "public" / "reports" / "first" / "report.md").read_text() == "first report\n"
+    assert (repo / "public" / "reports" / "second" / "report.md").read_text() == "second report\n"
+    assert (repo / "public" / "assets" / "out" / "chart.png").is_file()
+    main(["bundle", "--raw", "no", "--out", "out/b.zip"])
+    assert "assets/out/chart.png" in _bundle_names(repo / "out" / "b.zip")
+
+
+def test_live_harness_grades_the_named_tool():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("run_live", PLUGIN / "evals" / "_scaffold" / "run_live.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    source = (PLUGIN / "evals" / "_scaffold" / "run_live.py").read_text()
+    assert 'grader.get("tool", "")' in source and "bash_commands" not in source
+
+
+@pytest.mark.parametrize("name", ["new\nline", "tab\there", "cr\rhere"])
+def test_session_start_json_with_control_characters(tmp_path, name):
+    root = tmp_path / name
+    (root / "hooks").mkdir(parents=True)
+    for f in ("session-start.json", "session-start.sh"):
+        shutil.copy(PLUGIN / "hooks" / f, root / "hooks" / f)
+    result = subprocess.run(["/bin/sh", str(root / "hooks" / "session-start.sh")], capture_output=True, text=True,
+                            env=dict(os.environ, CLAUDE_PLUGIN_ROOT=str(root)))
+    context = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
     assert f'python3 "{root}/core/nutmeg.py"' in context

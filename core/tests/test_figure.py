@@ -65,3 +65,13 @@ def test_snapshot_is_ignored_when_data_stays_out_of_git(project, repo):
     figures.register(project, repo, "carries", "out/carries.csv", ["Opta"], ["C1"])
     result = subprocess.run(["git", "check-ignore", "-q", "research/demo/figures/carries.data.csv"], cwd=repo)
     assert result.returncode == 0
+
+
+def test_paths_are_relative_to_the_working_directory(project, repo, monkeypatch):
+    (repo / "sub").mkdir()
+    (repo / "sub" / "rows.csv").write_text("a\n1\n")
+    (repo / "sub" / "chart.png").write_bytes(b"png")
+    monkeypatch.chdir(repo / "sub")
+    assert main(["figure", "register", "sub-fig", "--data", "rows.csv", "--source", "Opta", "--image", "chart.png"]) == 0
+    prov = json.loads((project / "figures" / "sub-fig.prov.json").read_text())
+    assert prov["image"] == "sub/chart.png" and prov["rows"] == 1

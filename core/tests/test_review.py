@@ -13,9 +13,9 @@ def project(repo):
     folder = repo / "research" / "demo"
     ledger = Ledger(folder / "claims.jsonl")
     ledger.append({"kind": "computed", "statement": "npxG 1.78", "value": 1.78, "evidence": {"run_id": "R1"},
-                   "status": "verified"})
+                   "status": "verified"}, trusted=True)
     ledger.append({"kind": "interpretation", "statement": "elite", "evidence": {"claims": ["C1"]},
-                   "status": "supported"})
+                   "status": "supported"}, trusted=True)
     return folder
 
 

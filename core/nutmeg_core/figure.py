@@ -96,6 +96,11 @@ def register(project, repo_root, name, data, sources, claims, n=None, competitio
     if run_id and not (project / "runs" / run_id / "run.json").is_file():
         raise FigureError(f"figure {name}: run {run_id} not found")
 
+    if image:
+        try:
+            image = inside_repo(image, repo_root).relative_to(repo_root.resolve()).as_posix()
+        except ValueError as exc:
+            raise FigureError(f"figure {name}: the chart file must be inside the repository ({exc})")
     figures = project / "figures"
     figures.mkdir(exist_ok=True)
     kept = figures / f"{name}.data{snapshot.suffix.lower()}"

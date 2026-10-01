@@ -15,6 +15,7 @@ import argparse
 import difflib
 import hashlib
 import json
+import os
 import re
 import shlex
 import shutil
@@ -60,8 +61,12 @@ class RaisingParser(NutmegParser):
         raise SystemExit(status)
 
 
-# Interpreter options that run code given on the command line instead of the file.
-CODE_FLAGS = {"-c", "-e", "-m", "--eval", "--command", "-cmd", "-init", "--expr", "--execute", "-x", "-f", "--file"}
+# --interpreter is one program plus, at most, these flags: none of them runs other code.
+SAFE_INTERPRETER_FLAGS = {"-u", "-B", "-I", "-E", "-s", "-S", "-q", "-O", "-OO", "--vanilla", "--no-save",
+                          "--no-restore", "--no-site-file", "--no-init-file", "--no-environ", "--quiet", "--slave",
+                          "-bail", "-batch", "-readonly"}
+INTERPRETER_REFUSED = {"sh", "bash", "zsh", "dash", "ksh", "fish", "env", "sudo", "xargs", "eval", "nohup", "time",
+                       "timeout", "uv", "uvx", "conda", "poetry", "pipenv", "npx", "node"}
 PENDING_MAX_AGE_SECONDS = 3600
 
 
@@ -242,10 +247,13 @@ def choose_interpreter(path, override=None, db=None):
             raise CardError(f"--interpreter could not be read ({exc})")
         if not argv:
             raise CardError("--interpreter is empty")
-        code_flags = [t for t in argv[1:] if t.split("=", 1)[0] in CODE_FLAGS]
-        if code_flags:
-            raise CardError(f"--interpreter must not carry code-running options ({', '.join(code_flags)}); "
-                            "put the code in the file so the card shows what runs")
+        program = os.path.basename(argv[0])
+        if program in INTERPRETER_REFUSED:
+            raise CardError(f"--interpreter {program} runs other commands; name the interpreter itself")
+        unknown = [t for t in argv[1:] if t not in SAFE_INTERPRETER_FLAGS]
+        if unknown:
+            raise CardError(f"--interpreter may only add the flags {', '.join(sorted(SAFE_INTERPRETER_FLAGS))} "
+                            f"(not {', '.join(unknown)}); put the code in the file so the card shows what runs")
         return argv + [str(path)], argv[0], None
     suffix = path.suffix.lower()
     if suffix == ".py":

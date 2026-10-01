@@ -115,7 +115,12 @@ def test_config_change_mid_session_asks_again(project, repo):
     assert decision.decision == "ask" and "Gate settings changed" in decision.reason
     kinds = [json.loads(l)["kind"] for l in (project / "receipts.jsonl").read_text().splitlines()]
     assert "gate_settings_changed" in kinds
-    assert gate.decide("nutmeg run a.py", repo, project, repo).decision == "allow"
+    # Denied and retried: still asks, because nothing was approved under the new settings.
+    assert gate.decide("nutmeg run a.py", repo, project, repo).decision == "ask"
+    if shutil.which("python3"):
+        (repo / "a.py").write_text("print(1)\n")
+        assert main(["run", "a.py"]) == 0  # the approved run acknowledges the new settings
+        assert gate.decide("nutmeg run a.py", repo, project, repo).decision == "allow"
 
 
 def test_card_names_team_approved_services(project, repo):
@@ -152,7 +157,7 @@ def test_author_cannot_sign_own_headline_claim(project, repo, capsys):
 def test_changed_claim_loses_verification(project):
     ledger = Ledger(project / "claims.jsonl")
     ledger.append({"kind": "definition", "statement": "a", "evidence": {"definition": "x"}, "status": "verified",
-                   "signer": "Ben"})
+                   "signer": "Ben"}, trusted=True)
     ledger.update("C1", statement="a, changed")
     latest = ledger.get("C1")
     assert latest["status"] == "draft" and "signer" not in latest

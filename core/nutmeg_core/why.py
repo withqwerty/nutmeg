@@ -35,8 +35,13 @@ def _code_excerpt(project, run, spec):
     if not match or run is None:
         return []
     name = match["file"] or (run.get("file") or "")
-    code_dir = Path(project) / "runs" / run["id"] / "code"
-    copy = code_dir / name
+    code_dir = (Path(project) / "runs" / str(run["id"]) / "code").resolve()
+    try:
+        copy = inside_repo(name, code_dir) if not Path(name).is_absolute() else None
+    except ValueError:
+        copy = None
+    if copy is None:
+        return [f"(code lines must name a file in run {run['id']}'s code copy, not {name})"]
     if not copy.is_file():
         # A bare file name: find the one copy with that name.
         found = [p for p in code_dir.rglob(Path(name).name) if p.is_file()] if code_dir.is_dir() else []

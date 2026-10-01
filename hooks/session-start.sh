@@ -8,6 +8,10 @@ root="${CLAUDE_PLUGIN_ROOT:-${0%/hooks/*}}"
 file="$root/hooks/session-start.json"
 
 # JSON-escape the path, one character at a time.
+newline='
+'
+tab=$(printf '\t')
+cr=$(printf '\r')
 escaped=""
 rest="$root"
 while [ -n "$rest" ]; do
@@ -16,9 +20,16 @@ while [ -n "$rest" ]; do
   case "$char" in
     \\) escaped="$escaped\\\\" ;;
     \") escaped="$escaped\\\"" ;;
+    "$newline") escaped="$escaped\\n" ;;
+    "$tab") escaped="$escaped\\t" ;;
+    "$cr") escaped="$escaped\\r" ;;
     *) escaped="$escaped$char" ;;
   esac
 done
+# Any other control character: leave the placeholder for a variable name rather than emit invalid JSON.
+case "$escaped" in
+  *[[:cntrl:]]*) escaped='$CLAUDE_PLUGIN_ROOT' ;;
+esac
 
 text=$(cat "$file") || exit 0
 out=""

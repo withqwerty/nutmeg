@@ -136,6 +136,14 @@ def effective(team, user):
     return out
 
 
+def team_signoff_required(repo_root):
+    """The team's sign-off rule, read from the team file alone (a broken user config cannot turn it off)."""
+    signoff = load_team(repo_root).get("signoff") or {}
+    if not isinstance(signoff, dict):
+        raise ConfigError(f"signoff in {TEAM_FILE} must be an object")
+    return bool(signoff.get("required", False))
+
+
 def load_effective(repo_root):
     return effective(load_team(repo_root), load_user())
 

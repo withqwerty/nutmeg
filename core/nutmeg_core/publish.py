@@ -89,12 +89,20 @@ def publish(project, repo_root, by, to=None):
     figures_dir = project / "figures"
     for fig in data["figures"]:
         if fig.get("image"):
-            image = repo_root / fig["image"] if not Path(fig["image"]).is_absolute() else Path(fig["image"])
+            try:
+                image = inside_repo(fig["image"], repo_root)
+            except ValueError as exc:
+                raise PublishError(f"figure {fig['figure']}: its chart file is outside the repository ({exc})")
             if image.is_file():
                 files.append(image)
         prov = figures_dir / f"{fig['figure']}.prov.json"
         if prov.is_file():
             files.append(prov)
+    real_repo = repo_root.resolve()
+    for f in files:
+        resolved = f.resolve()
+        if real_repo not in resolved.parents:
+            raise PublishError(f"{f} links outside the repository; nutmeg will not publish it")
     record = {
         "at": _now(),
         "by": by,
@@ -109,10 +117,18 @@ def publish(project, repo_root, by, to=None):
         except ValueError as exc:
             raise PublishError(str(exc))
         target.mkdir(parents=True, exist_ok=True)
+        project_real = project.resolve()
         for f in files:
-            if f.is_file():
-                shutil.copy2(f, target / f.name)
-        record["to"] = target.relative_to(repo_root).as_posix()
+            if not f.is_file():
+                continue
+            resolved = f.resolve()
+            # Keep each file's place, so same-named files cannot overwrite each other.
+            rel = (resolved.relative_to(project_real) if project_real in resolved.parents
+                   else Path("assets") / resolved.relative_to(real_repo))
+            destination = target / rel
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(f, destination)
+        record["to"] = target.relative_to(repo_root.resolve()).as_posix()
     history_path = project / "published.json"
     try:
         history = json.loads(history_path.read_text(encoding="utf-8")) if history_path.is_file() else []

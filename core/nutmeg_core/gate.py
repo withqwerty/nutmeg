@@ -98,15 +98,6 @@ def _nutmeg_args(tokens):
     return None
 
 
-def _skip_options(rest, with_value):
-    while rest and rest[0].startswith("-") and rest[0] != "-":
-        option = rest.pop(0)
-        if option == "--":
-            break
-        if "=" not in option and option in with_value and rest:
-            rest.pop(0)
-    return rest
-
 
 def _strip_wrappers(tokens):
     """Drop VAR=value assignments and wrappers such as `env`, `uv run` or `conda run -n x`.
@@ -121,26 +112,50 @@ def _strip_wrappers(tokens):
             name, value = word.split("=", 1)
             env[name] = value
             rest = rest[1:]
-        elif base in SIMPLE_WRAPPERS:
+        elif base in SIMPLE_WRAPPERS or base in RUNNERS:
             wrapped = True
+            options = SIMPLE_WRAPPERS.get(base, RUNNERS.get(base))
             rest = rest[1:]
-            if base == "env" and any(t in ("-S", "--split-string") or t.startswith("-S") for t in rest[:4]):
+            # A wrapper that splits a string into a command, or changes the directory, runs
+            # something the card cannot describe exactly.
+            rest, readable = _wrapper_options(rest, options)
+            if not readable:
                 return rest, env, wrapped, False
-            rest = _skip_options(rest, SIMPLE_WRAPPERS[base])
-            if base == "timeout" and rest:
-                rest = rest[1:]  # the duration
-        elif base in RUNNERS:
-            wrapped = True
-            rest = rest[1:]
-            rest = _skip_options(rest, RUNNERS[base])
-            if rest and rest[0] in ("run", "exec", "tool"):
+            if base in RUNNERS and rest and rest[0] in ("run", "exec", "tool"):
                 rest = rest[1:]
                 if rest and rest[0] == "run":  # uv tool run
                     rest = rest[1:]
-            rest = _skip_options(rest, RUNNERS[base])
+                rest, readable = _wrapper_options(rest, options)
+                if not readable:
+                    return rest, env, wrapped, False
+            if base == "timeout" and rest:
+                rest = rest[1:]  # the duration
         else:
             break
     return rest, env, wrapped, True
+
+
+# Options that make a wrapper split a string into a command or change the working directory.
+UNREADABLE_OPTIONS = ("-S", "--split-string", "-C", "--chdir", "--directory", "--cwd")
+
+
+def _wrapper_options(rest, with_value):
+    """Skip a wrapper's own options. Returns (the rest, whether nutmeg can read what runs)."""
+    rest = list(rest)
+    while rest and rest[0].startswith("-") and rest[0] != "-":
+        option = rest.pop(0)
+        if option == "--":
+            break
+        if _unreadable_option(option):
+            return rest, False
+        if "=" not in option and option in with_value and rest:
+            rest.pop(0)
+    return rest, True
+
+
+def _unreadable_option(token):
+    name = token.split("=", 1)[0]
+    return name in UNREADABLE_OPTIONS or (token.startswith("-S") and not token.startswith("--"))
 
 
 def _tokenise(text):
@@ -177,6 +192,10 @@ def parse(command):
                           reason="this command chains, redirects, substitutes or comments other commands; nothing has run yet")
         return Parsed("other", tokens=tokens)
 
+    head = os.path.basename(tokens[0]) if tokens else ""
+    if head in SHELLS and any(_mentions_gated(t) for t in tokens[1:]):
+        return Parsed("compound", tokens=tokens,
+                      reason=f"`{head}` runs a command from a string or file that nutmeg cannot inspect; nothing has run yet")
     words, env, wrapped, readable = _strip_wrappers(tokens)
     if not readable:
         return Parsed("compound", tokens=tokens, env=env,
@@ -186,10 +205,21 @@ def parse(command):
         return _parse_nutmeg(args, words, env)
     if words and _is_interpreter(words[0]):
         return Parsed("interpreter", tokens=words, env=env)
-    if wrapped and any(_is_interpreter(w) or _is_nutmeg_word(w) for w in words):
+    if any(_is_interpreter(w) or _is_nutmeg_word(w) for w in words[1:]) or (wrapped and any(_mentions_gated(w) for w in words)):
+        # For example `find . -exec python3 {} \;`, `xargs python3` or a wrapper nutmeg cannot read.
         return Parsed("compound", tokens=tokens, env=env,
-                      reason="nutmeg could not tell exactly what this wrapper runs; nothing has run yet")
+                      reason="this command starts an interpreter or nutmeg in a way nutmeg cannot inspect; nothing has run yet")
     return Parsed("other", tokens=words, env=env)
+
+
+# Commands that run other commands from a string, a file or their input.
+SHELLS = {"sh", "bash", "zsh", "dash", "ksh", "fish", "eval", "source", ".", "xargs", "parallel", "watch", "su",
+          "script", "busybox"}
+_GATED_TEXT = re.compile(r"(?<![\w.-])(python(3(\.\d+)?)?|Rscript|duckdb|sqlite3|psql|bq|nutmeg(\.py)?)(?![\w-])")
+
+
+def _mentions_gated(token):
+    return bool(_GATED_TEXT.search(token))
 
 
 def _parse_nutmeg(args, words, env):
@@ -271,6 +301,9 @@ def _decide(command, repo_root, project, cwd):
     target = _target_project(parsed, cwd, project)
     if target is None or not Path(target).is_dir():
         return Decision("ask", f"nutmeg research gate: research project not found ({target}); nutmeg will refuse this command.")
+    from .project import find_repo_root
+    # The command runs in the target project's repository, with that repository's team floor.
+    repo_root = find_repo_root(target)
     try:
         settings = config.load_effective(repo_root)
     except config.ConfigError as exc:
@@ -303,8 +336,24 @@ def _decide(command, repo_root, project, cwd):
 SEEN_FILE = ".config-seen"
 
 
+def acknowledge_settings(repo_root):
+    """Record the current config as approved. Called by run, publish and bundle, which only
+    run after the user approved the gate (or under run-then-review with unchanged settings)."""
+    from .project import ensure_research_files, research_root
+
+    ensure_research_files(repo_root)
+    try:
+        (research_root(repo_root) / SEEN_FILE).write_text(config.config_hash(repo_root) + "\n", encoding="utf-8")
+    except OSError:
+        pass
+
+
 def settings_changed(repo_root, settings):
-    """A message if the team or user config changed since the last gate, else ''. Records the change."""
+    """A message if the team or user config changed since the last approved step, else ''.
+
+    The new settings count as acknowledged only once an approved step runs, so denying the
+    prompt and retrying asks again.
+    """
     from .project import active_project, append_receipt, ensure_research_files, research_root
 
     ensure_research_files(repo_root)
@@ -316,11 +365,8 @@ def settings_changed(repo_root, settings):
         previous = ""
     if previous == current:
         return ""
-    try:
-        seen_path.write_text(current + "\n", encoding="utf-8")
-    except OSError:
-        pass
     if not previous:
+        acknowledge_settings(repo_root)
         return ""  # first gate on this machine: nothing to compare with
     levels = ", ".join(f"{stage} {settings['levels'][stage]}" for stage in config.STAGES)
     project = active_project(repo_root)

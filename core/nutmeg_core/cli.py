@@ -12,8 +12,8 @@ from pathlib import Path
 from . import __version__, card as cards, check as checks, figure as figures, project as projects, publish as publishing
 from . import bundle as bundling, review, run as runs, why as whys, workspace as workspaces
 from .config import (LEVELS, PERSONAS, STAGES, ConfigError, data_in_git_policy, load_effective, load_team,
-                     save_user, user_config_path, user_name)
-from .gate import pending_key
+                     save_user, team_signoff_required, user_config_path, user_name)
+from .gate import acknowledge_settings, pending_key
 from .ledger import KINDS, REST_TYPES, ClaimError, Ledger
 from .redact import Redactor
 
@@ -59,8 +59,8 @@ def cmd_claim_add(args):
     project = resolve_project(args)
     ledger = open_ledger(project)
     record = _read_record(args)
-    if isinstance(record, dict) and not record.get("id"):
-        record.setdefault("author", user_name(find_repo_root(project)))
+    if isinstance(record, dict) and (not record.get("id") or not ledger.history(record["id"])):
+        record["author"] = user_name(find_repo_root(project))
     try:
         written = ledger.append(record)
     except ClaimError as exc:
@@ -197,6 +197,7 @@ def cmd_run(args):
         run_id, exit_code, record = runs.execute(_run_args(args), repo, project, Path.cwd())
     except runs.RunError as exc:
         raise UsageError(f"run refused: {exc}")
+    acknowledge_settings(repo)
     note = ""
     if record["gate"]["changed_since_gate"]:
         note = f"; changed after the gate card was shown: {', '.join(record['gate']['changed_since_gate'])}"
@@ -272,9 +273,15 @@ def cmd_figure_register(args):
     repo = find_repo_root(project)
     claims = [c.strip() for c in (args.claims or "").split(",") if c.strip()]
     try:
-        prov = figures.register(project, repo, args.name, args.data, args.source, claims, n=args.n,
+        # Paths are relative to where the command runs, like every other nutmeg path argument.
+        data = str(Path.cwd() / args.data) if args.data else None
+        image = None
+        if args.image:
+            image_path = (Path.cwd() / args.image).resolve()
+            image = image_path.relative_to(repo).as_posix() if image_path.is_relative_to(repo) else args.image
+        prov = figures.register(project, repo, args.name, data, args.source, claims, n=args.n,
                                 competition_season=args.season, filters=args.filters, metric=args.metric,
-                                uncertainty=args.uncertainty, run_id=args.run, image=args.image, panels=args.panel)
+                                uncertainty=args.uncertainty, run_id=args.run, image=image, panels=args.panel)
     except figures.FigureError as exc:
         raise UsageError(str(exc))
     print(f"Footnote (put it under the chart): {prov['footnote']}")
@@ -286,9 +293,10 @@ def cmd_publish(args):
     project = resolve_project(args)
     repo = find_repo_root(project)
     try:
-        record = publishing.publish(project, repo, user_name(repo), to=args.to)
+        record = publishing.publish(project, repo, user_name(repo), to=str(Path.cwd() / args.to) if args.to else None)
     except publishing.PublishError as exc:
         raise UsageError(f"publish refused: {exc}")
+    acknowledge_settings(repo)
     where = f" and copied to {record['to']}" if record["to"] else ""
     print(f"Published {len(record['files'])} file(s) with {len(record['figures'])} figure(s){where}; "
           f"recorded in {project.relative_to(repo)}/published.json.")
@@ -299,9 +307,8 @@ def cmd_signoff(args):
     project = resolve_project(args)
     repo = find_repo_root(project)
     try:
-        settings = load_effective(repo)
         written = review.signoff(project, args.claim_id, user_name(repo), note=args.note,
-                                 signoff_required=settings["signoff_required"])
+                                 signoff_required=team_signoff_required(repo))
     except (review.ReviewError, ConfigError) as exc:
         raise UsageError(str(exc))
     print(f"{written['id']} is now {written['status']}, signed off by {written['signer']}.")
@@ -375,6 +382,7 @@ def cmd_bundle(args):
         target, manifest = bundling.bundle(project, repo, args.raw, user_name(repo), out=args.out)
     except bundling.BundleError as exc:
         raise UsageError(f"bundle refused: {exc}")
+    acknowledge_settings(repo)
     raw = "with raw data" if manifest["raw_data"] else f"without raw data ({len(manifest['raw_omitted'])} file(s) by hash)"
     shown = target.relative_to(repo) if target.is_relative_to(repo) else target
     print(f"Wrote {shown}: {len(manifest['files'])} file(s), {raw}.")

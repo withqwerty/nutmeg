@@ -71,7 +71,7 @@ def test_interpretation_cannot_be_verified(ledger):
         ledger.append(record)
     assert exc.value.field == "status"
     assert "never verified" in str(exc.value)
-    written = ledger.append({**record, "status": "supported"})
+    written = ledger.append({**record, "status": "supported"}, trusted=True)
     assert written["status"] == "supported"
 
 

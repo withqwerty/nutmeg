@@ -21,7 +21,7 @@ from pathlib import Path
 
 from . import check as checks
 from . import glossary
-from .config import ConfigError, load_effective
+from .config import ConfigError, team_signoff_required
 from .figure import load_all as load_figures
 from .ledger import Ledger
 from .project import find_repo_root, parse_choices
@@ -162,9 +162,9 @@ def build(project, repo_root=None, now=None):
     state = checks.check(project)
     failing = {f.get("claim") for f in state["open"] if f.get("claim")}
     try:
-        signoff_required = load_effective(repo_root)["signoff_required"]
+        signoff_required = team_signoff_required(repo_root)
     except ConfigError:
-        signoff_required = False
+        signoff_required = True
     meta = json.loads(_read(project / "project.json") or "{}")
     title = meta.get("title") or project.name
     generated = (now or datetime.now(timezone.utc)).strftime("%Y-%m-%d %H:%M UTC")

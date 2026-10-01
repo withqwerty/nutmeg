@@ -85,12 +85,12 @@ def run_once(name, model, keep, judge_model):
         except json.JSONDecodeError:
             continue
     trace = "\n".join(lines)
-    bash_commands, last, cost = [], "", 0.0
+    calls, last, cost = [], "", 0.0  # (tool name, JSON of its input)
     for event in events:
         if event.get("type") == "assistant":
             for block in event["message"].get("content", []):
-                if block.get("type") == "tool_use" and block.get("name") == "Bash":
-                    bash_commands.append(json.dumps(block.get("input", {})))
+                if block.get("type") == "tool_use":
+                    calls.append((block.get("name", ""), json.dumps(block.get("input", {}))))
                 if block.get("type") == "text":
                     last = block["text"]
         if event.get("type") == "result":
@@ -106,7 +106,9 @@ def run_once(name, model, keep, judge_model):
         elif kind == "tool_used":
             pattern = grader.get("input_match", "")
             pattern = pattern[1:-1] if pattern[:1] == "'" and pattern[-1:] == "'" else pattern
-            count = sum(1 for c in bash_commands if re.search(pattern.replace('\\"', '"'), c))
+            tool = grader.get("tool", "")
+            count = sum(1 for name, payload in calls
+                        if (name == tool or name.endswith("__" + tool)) and re.search(pattern.replace('\\"', '"'), payload))
             low, high = int(grader.get("min", 1)), grader.get("max")
             verdicts[gname] = count >= low and (high is None or count <= int(high))
         elif kind == "llm":
@@ -114,7 +116,8 @@ def run_once(name, model, keep, judge_model):
     if not keep:
         shutil.rmtree(work, ignore_errors=True)
     mcp.unlink(missing_ok=True)
-    return {"case": name, "verdicts": verdicts, "cost": cost, "last": last, "bash": bash_commands,
+    return {"case": name, "verdicts": verdicts, "cost": cost, "last": last,
+            "bash": [payload for tool, payload in calls if tool == "Bash"],
             "work": str(work) if keep else None}
 
 

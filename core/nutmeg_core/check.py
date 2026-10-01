@@ -23,7 +23,7 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .config import ConfigError, load_effective
+from .config import ConfigError, load_effective, team_signoff_required
 from .ledger import Ledger
 from . import glossary
 from .project import append_receipt, find_repo_root, parse_choices
@@ -199,13 +199,19 @@ def run_checks(project):
                                     f"{', '.join(sorted(set(origins.values())))}), probably after a merge; give one "
                                     "of them a new ID in claims.jsonl and in the outputs that cite it"})
 
+    repo = find_repo_root(project)
     try:
-        settings = load_effective(find_repo_root(project))
+        signoff_required = team_signoff_required(repo)
     except ConfigError as exc:
-        settings = {"signoff_required": False}
+        signoff_required = True  # fail closed
+        failures.append({"kind": "config", "id": _failure_id("config", str(exc)),
+                         "message": f"the team config cannot be read ({exc}); fix it before publishing"})
+    try:
+        load_effective(repo)
+    except ConfigError as exc:
         warnings.append(f"team or user config: {exc}")
     for cid, claim in live.items():
-        if settings.get("signoff_required") and claim.get("headline") and not claim.get("signer"):
+        if signoff_required and claim.get("headline") and not claim.get("signer"):
             failures.append({"kind": "needs sign-off", "id": _failure_id("signoff", cid, claim.get("version")),
                              "claim": cid, "message": f"{cid} ({claim['statement'][:60]}) is a headline claim; the "
                              "team requires a teammate who is not its author to run `nutmeg signoff`"})
