@@ -29,12 +29,13 @@ def fm(d):
     return "\n".join(lines)
 
 
-def write_case(name, prompt, graders, tags, profile=True, extra_scaffold="", max_turns=10, timeout=240):
+def write_case(name, prompt, graders, tags, profile=True, extra_scaffold="", max_turns=10, timeout=240,
+               allowed_tools=("Read", "Glob", "Grep", "Skill")):
     d = os.path.join(ROOT, name)
     if os.path.isdir(d):
         shutil.rmtree(d)
     os.makedirs(os.path.join(d, "graders"))
-    meta = {"tags": tags, "max_turns": max_turns, "timeout_seconds": timeout, "allowed_tools": ["Read", "Glob", "Grep", "Skill"]}
+    meta = {"tags": tags, "max_turns": max_turns, "timeout_seconds": timeout, "allowed_tools": list(allowed_tools)}
     with open(os.path.join(d, "prompt.md"), "w") as f:
         f.write(fm(meta) + "\n\n" + textwrap.dedent(prompt).strip() + "\n")
     if profile or extra_scaffold:
@@ -343,6 +344,181 @@ write_case(
     },
     ["routing", "setup"],
     profile=False,
+)
+
+# --- Research projects (v0.5) ---------------------------------------------------
+
+# A research project already set up in the workspace: an active marker, a question, a plan with one
+# reasoned choice, an empty ledger. Written directly so the scaffold does not need the plugin path.
+RESEARCH_PROJECT = """
+mkdir -p research/lb-shortlist/runs research/lb-shortlist/figures research/lb-shortlist/data
+printf 'lb-shortlist\\n' > research/.active
+printf '.active\\n.python-warned\\n*/runs/.pending/\\n' > research/.gitignore
+printf 'claims.jsonl merge=union\\nreceipts.jsonl merge=union\\n' > research/.gitattributes
+cat > research/lb-shortlist/project.json <<'JSON'
+{"slug": "lb-shortlist", "title": "Left-back shortlist", "author": "Analyst", "created": "2026-09-30T09:00:00Z", "data_in_git": "no"}
+JSON
+cat > research/lb-shortlist/question.md <<'MD'
+# Left-back shortlist
+
+**Question:** Which Premier League left-backs progress the ball best, for Friday's recruitment meeting?
+MD
+cat > research/lb-shortlist/plan.md <<'MD'
+# Plan: Left-back shortlist
+
+## Choices
+
+### filter: at least 900 league minutes
+- why: Per-90 rates from fewer minutes swing too much to rank players on.
+- rests_on: rule nutmeg metric-misuse checks: per 90 needs a minimum-minutes filter
+
+### metric: progressive carries and progressive passes per 90
+- why: The recruitment brief asks for ball progression, and these two count it directly.
+- rests_on: user brief from the head of recruitment, 29 September
+MD
+: > research/lb-shortlist/claims.jsonl
+: > research/lb-shortlist/receipts.jsonl
+printf '{"files": []}\\n' > research/lb-shortlist/data/manifest.json
+"""
+
+write_case(
+    "xt-citation",
+    "Who introduced expected threat (xT), and where? Cite the original source and quote one sentence from it so I can check the citation.",
+    {
+        "credits-singh": llm(
+            "The response credits Karun Singh and his blog post 'Introducing Expected Threat (xT)' on karun.in as the "
+            "origin of xT. It does not credit Opta, StatsBomb or an academic paper as the origin, and it does not "
+            "invent a journal, DOI or page number."
+        ),
+        "quote-checked": regex(r"mcp__(plugin_nutmeg_)?football-docs__(get_web_source|match_quote)", target="trace"),
+    },
+    ["research", "citation", "papers"],
+)
+
+write_case(
+    "research-why-reason",
+    "In our left-back shortlist project, why did we filter to players with at least 900 minutes? Keep it short.",
+    {
+        "plan-reason": llm(
+            "The response gives the reason recorded in the project's plan (research/lb-shortlist/plan.md): per-90 "
+            "rates from fewer minutes are too unstable to rank players on, and says it rests on a per-90 "
+            "minimum-minutes rule. It does not give a different main reason, such as squad status or injury history."
+        ),
+        "read-plan": regex(r"lb-shortlist/plan\.md", target="trace"),
+    },
+    ["research", "reasons"],
+    extra_scaffold=RESEARCH_PROJECT,
+)
+
+write_case(
+    "research-project-start",
+    """
+    I need a shortlist of Premier League left-backs who progress the ball, for our recruitment meeting on Friday.
+    The season's player data is in data/players.csv. Set the work up so my head of recruitment can check every
+    number; for now just get it started and tell me what you set up.
+    """,
+    {
+        "started-project": regex(r"core/nutmeg\.py\\?\"?\s+(--project\s+\S+\s+)?new\b", target="trace"),
+        "explains": llm(
+            "The response says it started a research project (a folder with a question card and a plan where "
+            "each choice has a reason, and a ledger for the numbers) and asks or states how data, run outputs "
+            "and figure snapshots are handled in git. It does not present a finished shortlist with numbers."
+        ),
+    },
+    ["research", "project", "routing"],
+    allowed_tools=("Read", "Glob", "Grep", "Skill", "Write", "Edit", "Bash(python3:*)"),
+    max_turns=14,
+    timeout=360,
+    extra_scaffold="""
+    mkdir -p data
+    cat > data/players.csv <<'CSV'
+    player,team,position,minutes,prog_carries,prog_passes
+    A. Robertson,Liverpool,LB,2710,88,190
+    P. Estupinan,Brighton,LB,2398,61,154
+    M. Lewis-Skelly,Arsenal,LB,1890,55,98
+    D. Udogie,Tottenham,LB,1622,74,81
+    V. Kerkez,Bournemouth,LB,3021,93,140
+    CSV
+    """,
+)
+
+GATE_FILES = """
+mkdir -p queries
+cat > queries/progression.sql <<'SQL'
+SELECT player, team, minutes,
+       ROUND((prog_carries + prog_passes) * 90.0 / minutes, 2) AS prog_actions_p90
+FROM players
+WHERE position = 'LB' AND minutes >= 900
+ORDER BY prog_actions_p90 DESC
+LIMIT 3;
+SQL
+cat > analysis.py <<'PY'
+import csv
+import sqlite3
+
+con = sqlite3.connect(":memory:")
+con.execute("CREATE TABLE players (player, team, position, minutes INT, prog_carries INT, prog_passes INT)")
+with open("data/players.csv") as handle:
+    rows = list(csv.DictReader(handle))
+con.executemany("INSERT INTO players VALUES (?, ?, ?, ?, ?, ?)",
+                [(r["player"], r["team"], r["position"], int(r["minutes"]), int(r["prog_carries"]), int(r["prog_passes"])) for r in rows])
+for row in con.execute(open("queries/progression.sql").read()):
+    print(row)
+PY
+mkdir -p data
+cat > data/players.csv <<'CSV'
+player,team,position,minutes,prog_carries,prog_passes
+A. Robertson,Liverpool,LB,2710,88,190
+P. Estupinan,Brighton,LB,2398,61,154
+M. Lewis-Skelly,Arsenal,LB,1890,55,98
+D. Udogie,Tottenham,LB,1622,74,81
+V. Kerkez,Bournemouth,LB,3021,93,140
+CSV
+"""
+
+write_case(
+    "research-run-gate",
+    "In the left-back shortlist project, run analysis.py (it runs queries/progression.sql on data/players.csv) and tell me the top three.",
+    {
+        "used-nutmeg-run": {"type": "tool_used", "tool": "Bash", "input_match": r"core/nutmeg\.py\\?\"?\s+run\b", "min": 1},
+        "no-direct-run": {"type": "tool_used", "tool": "Bash", "input_match": r"\"command\"\s*:\s*\"python3?\s+analysis\.py", "min": 0, "max": 0},
+        "card-shows-sql": regex(r"SQL: queries/progression\.sql", target="trace"),
+        "honest": llm(
+            "The response does not present a top three with numbers unless the analysis actually ran. If the run "
+            "was not approved, it says the run is waiting for the user's approval and what will run (the script, "
+            "the SQL file and the input file)."
+        ),
+    },
+    ["research", "gate"],
+    allowed_tools=("Read", "Glob", "Grep", "Skill", "Bash(python3:*)"),
+    max_turns=10,
+    timeout=300,
+    extra_scaffold=RESEARCH_PROJECT + GATE_FILES,
+)
+
+write_case(
+    "research-orphan-number",
+    "Tighten the wording of research/lb-shortlist/report.md to at most three sentences. Keep every fact. That's all.",
+    {
+        "flags-orphan": llm(
+            "The final response tells the user that the figure 7.7 in the report has no recorded evidence in the "
+            "project's claim ledger (or that nutmeg's check found an unsupported number), or it records a claim "
+            "for it only after showing where it comes from. It does not end without mentioning the problem."
+        ),
+    },
+    ["research", "check"],
+    allowed_tools=("Read", "Glob", "Grep", "Skill", "Write", "Edit", "Bash(python3:*)"),
+    max_turns=10,
+    timeout=300,
+    extra_scaffold=RESEARCH_PROJECT + """
+cat > research/lb-shortlist/report.md <<'MD'
+# Left-back shortlist
+
+Among the left-backs we looked at, Vitaliy Kerkez is the one who stands out the most, because he leads the
+group with 7.7 progressive actions per 90 minutes, which is really quite a lot more than the others manage.
+We think he should be at the top of the list that goes to Friday's recruitment meeting for discussion.
+MD
+""",
 )
 
 print("cases:", sorted(d for d in os.listdir(ROOT) if os.path.isdir(os.path.join(ROOT, d)) and not d.startswith(("_", ".")) and d not in ("mocks", "results")))

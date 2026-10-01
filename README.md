@@ -45,10 +45,10 @@ npx skills add withqwerty/nutmeg
 Nutmeg looks up provider facts in the football-docs MCP server, which this install does not include. Add it to your agent as well (Node.js 22.13 or newer):
 
 ```bash
-claude mcp add football-docs -- npx -y football-docs@0.15.0
+claude mcp add football-docs -- npx -y football-docs@0.16.1
 ```
 
-For other agents, add the same command (`npx -y football-docs@0.15.0`) as an MCP server in their settings. Without it, nutmeg says it cannot check provider facts, and labels anything it answers from memory as unverified.
+For other agents, add the same command (`npx -y football-docs@0.16.1`) as an MCP server in their settings. Without it, nutmeg says it cannot check provider facts, and labels anything it answers from memory as unverified.
 
 This installs the 11 skills but not the agents or MCP docs server. For the full experience (searchable provider docs, pipeline builder agent, data reviewer agent), use the plugin install above.
 
@@ -92,7 +92,7 @@ Think Context7 for football data. Provider-specific facts, including identity
 surfaces and ID-scheme quirks, should come from this index rather than from
 Nutmeg's own prompts.
 
-The server is published as the [`football-docs`](https://www.npmjs.com/package/football-docs) npm package and starts automatically when nutmeg is loaded (via `npx -y football-docs@0.15.0`; nutmeg pins the version it was tested with). No local build step is required. It needs Node.js 22.13 or newer.
+The server is published as the [`football-docs`](https://www.npmjs.com/package/football-docs) npm package and starts automatically when nutmeg is loaded (via `npx -y football-docs@0.16.1`; nutmeg pins the version it was tested with). No local build step is required. It needs Node.js 22.13 or newer.
 
 ### Adding provider docs
 
@@ -119,11 +119,13 @@ Cross-provider player, team and match IDs come from the [Reep Register](https://
 
 ## Evals
 
-`evals/` holds a behaviour suite for `claude plugin eval`: provider-fact grounding, abstention, Reep joins, common stat misuses and 2026 source changes. A replay mock stands in for the football-docs server, so runs do not depend on the live index.
+`evals/` holds a behaviour suite for `claude plugin eval`: provider-fact grounding, abstention, Reep joins, common stat misuses, 2026 source changes, citations checked with the football-docs paper tools, and research projects (project start, the run gate, unsupported numbers, reasons). A replay mock stands in for the football-docs server, so runs do not depend on the live index.
 
 ```bash
-claude plugin eval . --runs 2 --scaffold --no-publish --model sonnet --judge-model haiku
+claude plugin eval . --runs 2 --scaffold --no-publish --model sonnet --judge-model haiku --allow-tools "Bash(python3:*)"
 ```
+
+The research cases that grant Bash (`--tag gate`, `--tag check` and `research-project-start`) need the eval's Bash sandbox. If it refuses to start on your machine (for example because a credentials file points at missing files), run them live instead: `python3 evals/_scaffold/run_live.py research-run-gate research-orphan-number research-project-start`. It loads the plugin with `claude -p --plugin-dir`, uses the real football-docs server and grades the same way.
 
 `--scaffold` runs each case's `scaffold.sh`, which writes a nutmeg profile into the sandbox. To refresh the mock after football-docs changes, run `evals/_scaffold/record_football_docs.py`. Keep the agent on Sonnet so scores stay comparable; Haiku as the judge (it also runs the mock) keeps each pass of the suite (one run per case) to about $9. `evals/_scaffold/adopt_replays.py` checks a run's mock answers against the real server.
 

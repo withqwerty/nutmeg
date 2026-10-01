@@ -1,9 +1,9 @@
 ---
 type: agent
-tools: [search_docs, get_provider_docs, compare_providers, list_providers, resolve_provider_id, resolve_entity, request_update]
+tools: [search_docs, get_provider_docs, compare_providers, list_providers, resolve_provider_id, resolve_entity, request_update, search_papers, get_paper, get_web_source, read_paper, match_quote]
 ---
 
-You are a replay of the football-docs MCP server, version 0.15.0.
+You are a replay of the football-docs MCP server, version 0.16.1.
 You never write new documentation content. Every answer is one recorded response below, copied exactly.
 
 How to answer a call:
@@ -23,6 +23,12 @@ How to answer a call:
 7. request_update: return exactly
    `Request queued locally. Open this pre-filled issue to send it: https://github.com/withqwerty/football-docs/issues/new`
 8. Recordings marked `error` are tool errors: return them as an error result.
+9. get_web_source for any URL other than the karun.in xT post, and get_paper or read_paper for any ID: return
+   exactly `Could not fetch that source: the replay has no recording for it.` as an error result.
+10. match_quote on the karun.in xT post: if the quote appears word for word in recording x02, return recording
+   x03 with every copy of the recorded quote replaced by the caller's quote, and drop the lines from
+   `- **Where:**` to the end of the JSON block. Otherwise return recording x04 unchanged. match_quote on any other
+   source: return the rule 9 error.
 
 ## Routing table
 
@@ -57,6 +63,10 @@ How to answer a call:
 | r01 | resolve_entity | resolve_entity with provider transfermarkt and id 568177 (with or without namespace) |
 | r03 | resolve_entity | resolve_entity with provider fbref and id dc7f8a28 (with or without namespace) |
 | r02 | resolve_entity | resolve_entity by name (any name) |
+| x01 | search_papers | any search_papers query (expected threat, xT, possession value, EPV, VAEP, Singh) |
+| x02 | get_web_source | get_web_source for karun.in/blog/expected-threat.html (Karun Singh, Introducing Expected Threat) |
+| x03 | match_quote | match_quote on the karun.in xT post with a quote that appears word for word in recording x02 |
+| x04 | match_quote | match_quote on the karun.in xT post with a quote that does not appear in recording x02 |
 
 ## Recordings
 
@@ -133,7 +143,7 @@ charting-shot-placement for the full zone list.
 
 | ID | Name | Notes |
 |----|------|-------|
-| 1 | longBall | Intended long ball, including launches. The definition is about intent, not a fixed length: in Premier League 2025/26 data almost every pass of 32 metres or more has Q1, and some shorter passes have it too |
+| 1 | longBall | Intended long ball, including launches. F24 defines it by intent and gives no length threshold |
 | 2 | cross | Cross (Q2). Corners commonly carry Q2 + Q6; free-kick crosses commonly carry Q2 + Q5; open-play crosses are Q2 without Q5/Q6. |
 | 3 | headPass | Headed pass (Q3). Distinct from Q15, the headed shot qualifier. |
 | 4 | throughBall | Through ball (Q4). Do not confuse with Q5 free-kick delivery. |
@@ -151,26 +161,17 @@ charting-shot-placement for the full zone list.
 
 ---
 
-## [4] Shot event and result fields
-**Provider:** opta | **Category:** charting-shot-placement | **Source:** curated by football-docs contributors | **Match:** partial
+## [4] xG Qualifiers
+**Provider:** opta | **Category:** qualifiers | **Source:** curated by football-docs contributors | **Match:** partial
 
-## Shot event and result fields
+## xG Qualifiers
 
-| Event or qualifier | Meaning |
-|---|---|
-| typeId `13` | miss / off target |
-| typeId `14` | shot on post |
-| typeId `15` | attempt saved |
-| typeId `16` | goal |
-| qualifier `82` | blocked shot |
-| qualifier `102` | `GoalMouthY`, horizontal endpoint across the goal mouth |
-| qualifier `103` | `GoalMouthZ`, vertical endpoint / height |
-| qualifier `146` | X coordinate where the shot was blocked |
-| qualifier `147` | Y coordinate where the shot was blocked |
+| ID | Name | Notes |
+|----|------|-------|
+| 321 | expectedGoals | xG value (on `matchexpectedgoals` endpoint only, NOT on standard `matchevent`) |
+| 322 | expectedGoalsOnTarget | xGOT value (on `matchexpectedgoals` endpoint only) |
 
-When deriving a shot result, handle qualifier `82` before treating typeId `15` as
-a normal saved shot. Some serializers classify a shot as blocked from the qualifier
-even when the broader type branch would otherwise be "attempt saved".
+**Important:** Qualifier 213 is the pass angle, not xG. Use qualifiers 321/322 from the separate `matchexpectedgoals` endpoint for xG.
 ````
 
 ### s02 — search_docs {"query": "expected goals xG qualifier", "provider": "opta", "max_results": 4}
@@ -1116,15 +1117,18 @@ Source: [https://dataglossary.wyscout.com/challenge_intensity/](https://dataglos
 
 ---
 
-## [4] Result: 403 Forbidden
-**Provider:** sportmonks | **Category:** error-codes | **Source:** llms_txt (https://docs.sportmonks.com/football/llms-full.txt) | v3 | crawled 2026-08-31T00:17:40.848Z | **Match:** partial
+## [4] Team Name Standardization
+**Provider:** soccerdata | **Category:** usage | **Source:** curated by football-docs contributors | **Match:** partial
 
-# Result: 403 Forbidden
+## Team Name Standardization
+
+All scrapers apply `TEAMNAME_REPLACEMENTS` to normalize team names across sources. Add custom mappings in `~/soccerdata/config/teamname_replacements.json`:
+
+```json
+{
+  "StandardName": ["Alternative1", "Alternative2"]
+}
 ```
-
-**3. Accessing premium endpoints**
-
-```bash
 ````
 
 ### s11 — search_docs {"query": "post-shot xG goalkeeper goals prevented", "max_results": 4}
@@ -1363,56 +1367,54 @@ Results 1-1 match every term. Results 2-4 match only some terms.
 
 ## Event Type Reference
 
-Per-match averages count events of each type in Premier League 2025/26 match event
-data (318 matches), so they include both events of a pair. Outcome rules are from
-F24 Appendix 8 unless the note says otherwise.
+Outcome rules are from F24 Appendix 8 unless the note says otherwise.
 
-| typeId | Name | Per match avg | Outcome | Notes |
-|--------|------|---------------|---------|-------|
-| 1 | Pass | ~957 | 0=miss, 1=success | Includes open play, goal kicks, corners, free kicks played as passes |
-| 2 | Offside pass | ~3 | always 1 | Receiving player called offside |
-| 3 | Take on | ~36 | 0=fail, 1=success | Dribble past opponent |
-| 4 | Foul | ~43 | 0=committed, 1=fouled | Events come in pairs (one per team), so a match has about 22 fouls |
-| 5 | Out | ~104 | 0=put out, 1=gains possession | Ball out of play. Events come in pairs |
-| 6 | Corner awarded | ~20 | 0=conceded, 1=won | Events come in pairs |
-| 7 | Tackle | ~34 | 0=fail, 1=wins ball | Legal ground-level challenge |
-| 8 | Interception | ~17 | always 1 | Intercepts opposition pass |
-| 10 | Save | ~13 | always 1 | GK prevents goal (also outfield with qual 94) |
-| 11 | Claim | ~2 | 0=drops, 1=catches | GK catches crossed ball |
-| 12 | Clearance | ~57 | always 1 | Defensive clearance |
-| 13 | Miss | ~9 | always 1 | Shot wide or over |
-| 14 | Post | <1 | always 1 | Ball hits frame |
-| 15 | Attempt saved | ~13 | always 1 | Shot on target, saved |
-| 16 | Goal | ~2.7 | always 1 | Own goals have qualifier 28 |
-| 17 | Card | ~4 | always 1 | Yellow/second yellow/red via qualifiers 31/32/33 |
-| 18 | Player off | ~8 | always 1 | Substituted off |
-| 19 | Player on | ~8 | always 1 | Substituted on |
-| 20 | Player retired | <1 | always 1 | Player leaves the pitch, for example injured, with no substitution. Not a red card |
-| 21 | Player returns | <1 | always 1 | Player comes back on after leaving the pitch |
-| 27 | Start delay | ~5 | always 1 | Play stops for a delay. With qualifier 364, a VAR review |
-| 28 | End delay | ~5 | always 1 | The delay ends and play restarts |
-| 30 | End | ~6 | always 1 | End of a period. kloppy reads the period end time from it |
-| 32 | Start | ~4 | always 1 | Start of a period. kloppy reads the period start time from it |
-| 34 | Team set up | 2 | always 1 | Formation/lineup event |
-| 37 | Collection end | 2 | always 1 | |
-| 40 | Formation change | ~3 | always 1 | In-game formation change |
-| 41 | Punch | ~1 | always 1 in F24; the 2025/26 data has both 0 and 1 | GK punches the ball |
-| 42 | Good skill | <1 | always 1 | |
-| 43 | Deleted event | ~36 | always 1 | Opta removed this event. Drop it before analysis; kloppy does |
-| 44 | Aerial | ~64 | 0=lost, 1=won | Aerial duel. Events come in pairs |
-| 45 | Challenge | ~14 | always 0 | Unsuccessful tackle attempt |
-| 49 | Ball recovery | ~81 | always 1 | Player gathers loose ball |
-| 50 | Dispossessed | ~17 | always 1 | Loses ball via opponent tackle |
-| 51 | Error | ~2 | always 1 | Mistake losing ball |
-| 52 | Keeper pick-up | ~12 | always 1 | GK picks up ball |
-| 54 | Smother | <1 | always 1 | GK covers ball at attacker's feet |
-| 55 | Offside provoked | ~3 | always 1 | Defender's position causes offside |
-| 59 | Keeper sweeper | ~1 | 0=possession goes to the other team, 1=kept or put out of play | GK comes off line to clear/claim |
-| 61 | Ball touch | ~70 | 0=lost control, 1=ball hit the player unintentionally | Bad touch / loss of control |
-| 67 | 50/50 | 0 | 0=lost, 1=won | Two players contest loose ball. F24: not collected since 10 July 2023 |
-| 74 | Blocked pass | ~15 | always 1 | Player blocks an opponent's pass |
-| 83 | Attempted tackle | ~27 | not defined in F24; mostly 0 in the 2025/26 data | Unsuccessful tackle |
-| 84 | Deleted after review | <1 | — | An event deleted after a VAR review (from 1 March 2021). Qualifier 436 gives its typeId before deletion; a goal ruled out by VAR has 436 = `16` |
+| typeId | Name | Outcome | Notes |
+|--------|------|---------|-------|
+| 1 | Pass | 0=miss, 1=success | Includes open play, goal kicks, corners, free kicks played as passes |
+| 2 | Offside pass | always 1 | Receiving player called offside |
+| 3 | Take on | 0=fail, 1=success | Dribble past opponent |
+| 4 | Foul | 0=committed, 1=fouled | Events come in pairs (one per team) |
+| 5 | Out | 0=put out, 1=gains possession | Ball out of play |
+| 6 | Corner awarded | 0=conceded, 1=won | |
+| 7 | Tackle | 0=fail, 1=wins ball | Legal ground-level challenge |
+| 8 | Interception | always 1 | Intercepts opposition pass |
+| 10 | Save | always 1 | GK prevents goal (also outfield with qual 94) |
+| 11 | Claim | 0=drops, 1=catches | GK catches crossed ball |
+| 12 | Clearance | always 1 | Defensive clearance |
+| 13 | Miss | always 1 | Shot wide or over |
+| 14 | Post | always 1 | Ball hits frame |
+| 15 | Attempt saved | always 1 | Shot on target, saved |
+| 16 | Goal | always 1 | Own goals have qualifier 28 |
+| 17 | Card | always 1 | Yellow/second yellow/red via qualifiers 31/32/33 |
+| 18 | Player off | always 1 | Substituted off |
+| 19 | Player on | always 1 | Substituted on |
+| 20 | Player retired | always 1 | Player leaves the pitch, for example injured, with no substitution. Not a red card |
+| 21 | Player returns | always 1 | Player comes back on after leaving the pitch |
+| 27 | Start delay | always 1 | Play stops for a delay. With qualifier 364, a VAR review |
+| 28 | End delay | always 1 | The delay ends and play restarts |
+| 30 | End | always 1 | End of a period. kloppy reads the period end time from it |
+| 32 | Start | always 1 | Start of a period. kloppy reads the period start time from it |
+| 34 | Team set up | always 1 | Formation/lineup event |
+| 37 | Collection end | always 1 | |
+| 40 | Formation change | always 1 | In-game formation change |
+| 41 | Punch | always 1 | GK punches the ball |
+| 42 | Good skill | always 1 | |
+| 43 | Deleted event | always 1 | Opta removed this event. Drop it before analysis; kloppy does |
+| 44 | Aerial | 0=lost, 1=won | Aerial duel. Events come in pairs |
+| 45 | Challenge | always 0 | Unsuccessful tackle attempt |
+| 49 | Ball recovery | always 1 | Player gathers loose ball |
+| 50 | Dispossessed | always 1 | Loses ball via opponent tackle |
+| 51 | Error | always 1 | Mistake losing ball |
+| 52 | Keeper pick-up | always 1 | GK picks up ball |
+| 54 | Smother | always 1 | GK covers ball at attacker's feet |
+| 55 | Offside provoked | always 1 | Defender's position causes offside |
+| 59 | Keeper sweeper | 0=possession goes to the other team, 1=kept or put out of play | GK comes off line to clear/claim |
+| 61 | Ball touch | 0=lost control, 1=ball hit the player unintentionally | Bad touch / loss of control |
+| 67 | 50/50 | 0=lost, 1=won | Two players contest loose ball. F24: not collected since 10 July 2023 |
+| 74 | Blocked pass | always 1 | Player blocks an opponent's pass |
+| 83 | Attempted tackle | not defined in F24 | Unsuccessful tackle |
+| 84 | Deleted after review | — | An event deleted after a VAR review (from 1 March 2021). Qualifier 436 gives its typeId before deletion; a goal ruled out by VAR has 436 = `16` |
 
 A dash means the outcome has not been checked for that type.
 
@@ -1516,7 +1518,32 @@ Found 4 result(s) for "distance covered high speed running physical metrics":
 
 Results 1-3 match every term. Results 4-4 match only some terms.
 
-## [1] Physical metrics
+## [1] Base metrics
+**Provider:** skillcorner | **Category:** physical-data | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31
+
+## Base metrics
+
+| Metric stem | Meaning |
+|---|---|
+| `total_distance` | Total distance covered (m) |
+| `total_metersperminute` | Distance per minute (m/min) |
+| `running_distance` | Distance in the running speed band |
+| `hsr_distance` / `hsr_count` | High Speed Running distance / number of efforts |
+| `sprint_distance` / `sprint_count` | Sprinting distance / number of sprints |
+| `hi_distance` / `hi_count` | High Intensity distance / efforts (HSR + sprint band) |
+| `medaccel_count` / `highaccel_count` | Medium / high acceleration counts |
+| `meddecel_count` / `highdecel_count` | Medium / high deceleration counts |
+| `explacceltohsr_count` | Explosive accelerations leading into HSR |
+| `explacceltosprint_count` | Explosive accelerations leading into a sprint |
+| `timetohsr` / `timetohsr_top3` | Time to reach HSR (and top-3 average) |
+| `timetosprint` / `timetosprint_top3` | Time to reach sprint speed (and top-3 average) |
+| `psv99` / `psv99_top5` | Peak Sprint Velocity (99th percentile) and top-5 average — a max-speed proxy robust to outliers |
+
+(Speed-band thresholds — what counts as running / HSR / sprint — are defined in the SkillCorner glossary: <https://skillcorner.crunch.help/en>.)
+
+---
+
+## [2] Physical metrics
 **Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03
 
 ## Physical metrics
@@ -1541,31 +1568,6 @@ These metrics are only available for specific competitions and players with at l
 | Total Distance per 90 | Total distance covered, normalized per 90 minutes. | Advanced Search |
 
 Source: [https://dataglossary.wyscout.com/physical_metrics/](https://dataglossary.wyscout.com/physical_metrics/)
-
----
-
-## [2] Base metrics
-**Provider:** skillcorner | **Category:** physical-data | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31
-
-## Base metrics
-
-| Metric stem | Meaning |
-|---|---|
-| `total_distance` | Total distance covered (m) |
-| `total_metersperminute` | Distance per minute (m/min) |
-| `running_distance` | Distance in the running speed band |
-| `hsr_distance` / `hsr_count` | High Speed Running distance / number of efforts |
-| `sprint_distance` / `sprint_count` | Sprinting distance / number of sprints |
-| `hi_distance` / `hi_count` | High Intensity distance / efforts (HSR + sprint band) |
-| `medaccel_count` / `highaccel_count` | Medium / high acceleration counts |
-| `meddecel_count` / `highdecel_count` | Medium / high deceleration counts |
-| `explacceltohsr_count` | Explosive accelerations leading into HSR |
-| `explacceltosprint_count` | Explosive accelerations leading into a sprint |
-| `timetohsr` / `timetohsr_top3` | Time to reach HSR (and top-3 average) |
-| `timetosprint` / `timetosprint_top3` | Time to reach sprint speed (and top-3 average) |
-| `psv99` / `psv99_top5` | Peak Sprint Velocity (99th percentile) and top-5 average — a max-speed proxy robust to outliers |
-
-(Speed-band thresholds — what counts as running / HSR / sprint — are defined in the SkillCorner glossary: <https://skillcorner.crunch.help/en>.)
 
 ---
 
@@ -1631,9 +1633,45 @@ Physical metrics bucket movement by intensity: **running**, **HSR** (High Speed 
 ````text
 Found 5 result(s) for "Catapult PlayerLoad high speed running export fields":
 
+Catapult is not an indexed provider: Catapult's OpenField Connect API docs are public but not licensed for republishing, and the docs site disallows crawling (checked 2026-09-30). Impect, which Catapult owns, is indexed. Results below come from other providers and do not cover it.
+
 No indexed doc matches every term, so these are partial matches. Check that they answer the question before relying on them. No indexed doc mentions "playerload". If the question is about that, it is not indexed.
 
-## [1] Tracking-derived off-ball runs recipe
+## [1] DrillKpiV7 fields: distance in speed zones and high-speed running
+**Provider:** statsports | **Category:** drill-kpi-metrics | **Source:** curated by football-docs contributors | crawled 2026-09-30 | **Match:** partial
+
+## DrillKpiV7 fields: distance in speed zones and high-speed running
+
+High-speed running (HSR) appears as `highSpeedRunningAbs`, `highSpeedRunningRel`, `hsrAbsPerMin` and `hsrRelPerMin`. The spec gives no speed threshold for high-speed running or for any zone `Z1` to `Z6`, and no unit.
+
+| Field | Type | Format | In `DrillKpiV6` | In `DrillKpiV5` |
+|---|---|---|---|---|
+| `distanceZ1Rel` | `number` | `double` | yes | yes |
+| `distanceZ2Rel` | `number` | `double` | yes | yes |
+| `distanceZ3Rel` | `number` | `double` | yes | yes |
+| `distanceZ4Rel` | `number` | `double` | yes | yes |
+| `distanceZ5Rel` | `number` | `double` | yes | yes |
+| `distanceZ6Rel` | `number` | `double` | yes | yes |
+| `highSpeedRunningRel` | `number` | `double` | yes | yes |
+| `hsrRelPerMin` | `number` | `double` | yes | yes |
+| `distanceZ1Abs` | `number` | `double` | yes | yes |
+| `distanceZ2Abs` | `number` | `double` | yes | yes |
+| `distanceZ3Abs` | `number` | `double` | yes | yes |
+| `distanceZ4Abs` | `number` | `double` | yes | yes |
+| `distanceZ5Abs` | `number` | `double` | yes | yes |
+| `distanceZ6Abs` | `number` | `double` | yes | yes |
+| `highSpeedRunningAbs` | `number` | `double` | yes | yes |
+| `hsrAbsPerMin` | `number` | `double` | yes | yes |
+| `distanceZ2Z6Abs` | `number` | `double` | yes | yes |
+| `distanceZ2Z6Rel` | `number` | `double` | yes | yes |
+| `distanceZ3Z6Abs` | `number` | `double` | yes | yes |
+| `distanceZ3Z6Rel` | `number` | `double` | yes | yes |
+| `distanceZ4Z6Abs` | `number` | `double` | yes | yes |
+| `distanceZ4Z6Rel` | `number` | `double` | yes | yes |
+
+---
+
+## [2] Tracking-derived off-ball runs recipe
 **Provider:** kloppy | **Category:** tracking-rendering | **Source:** curated by football-docs contributors | **Match:** partial
 
 ## Tracking-derived off-ball runs recipe
@@ -1676,7 +1714,7 @@ Implementation notes:
 
 ---
 
-## [2] Physical speed bands
+## [3] Physical speed bands
 **Provider:** skillcorner | **Category:** concepts | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31 | **Match:** partial
 
 ## Physical speed bands
@@ -1685,7 +1723,7 @@ Physical metrics bucket movement by intensity: **running**, **HSR** (High Speed 
 
 ---
 
-## [3] Base metrics
+## [4] Base metrics
 **Provider:** skillcorner | **Category:** physical-data | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31 | **Match:** partial
 
 ## Base metrics
@@ -1710,7 +1748,7 @@ Physical metrics bucket movement by intensity: **running**, **HSR** (High Speed 
 
 ---
 
-## [4] Player workload table recipe
+## [5] Player workload table recipe
 **Provider:** skillcorner | **Category:** physical-data | **Source:** crawled (https://www.skillcorner.com/apidocs.json) | SkillCorner API (OpenAPI 3.1) | crawled 2026-08-31 | **Match:** partial
 
 ## Player workload table recipe
@@ -1747,40 +1785,12 @@ defined in its glossary; Wyscout exposes similar labels with km/h thresholds, an
 custom tracking pipelines often use local m/s cut-offs. When joining physical
 data to event or video views, keep `match_id`, `player_id`, `team_id`, period,
 minutes basis, units, and QC flags in the exported data.
-
----
-
-## [5] Physical metrics
-**Provider:** wyscout | **Category:** glossary-metrics-concepts | **Source:** crawled (https://dataglossary.wyscout.com/) | crawled 2026-06-03 | **Match:** partial
-
-## Physical metrics
-
-These metrics are only available for specific competitions and players with at least 60 minutes of active play across all matches.
-
-| Metric | Definition | Products |
-|---|---|---|
-| Count HI per 90 | The number of High Intensity actions: sum of Count HSR (High Speed Runs) and Count Sprint, normalized per 90 minutes. | Advanced Search |
-| Count High Acceleration per 90 | The number of Accelerations detected with a peak value greater than 3 m/s², normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
-| Count High Deceleration per 90 | The number of Decelerations detected with a peak value less than -3 m/s², normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
-| Count HSR per 90 | The number of High Speed Runs detected between 20 km/h and 25 km/h, normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
-| Count Medium Acceleration per 90 | The number of Accelerations detected with a peak value between 1.5 m/s² and 3 m/s², normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
-| Count Medium Deceleration per 90 | The number of Decelerations detected with a peak value between -1.5 m/s² and -3 m/s², normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
-| Count Sprint per 90 | The number of Sprints exceeding 25 km/h, normalized per 90 minutes. The action needs to last for at least 1 second. | Advanced Search |
-| HI Distance per 90 | High Intensity. Distance covered above 20 km/h, normalized per 90 minutes. | Advanced Search |
-| HSR Distance per 90 | High Speed Runs. Distance covered between 20 km/h and 25 km/h, normalized per 90 minutes. | Advanced Search |
-| Meter/min | Total distance covered across all actions, divided per number of minutes. | Advanced Search |
-| Max Speed (km/h) | The maximum speed recorded. | Advanced Search |
-| Running Distance per 90 | Distance covered between 15 km/h and 20 km/h, normalized per 90 minutes. | Advanced Search |
-| Sprinting Distance per 90 | Distance covered above 25 km/h, normalized per 90 minutes. | Advanced Search |
-| Total Distance per 90 | Total distance covered, normalized per 90 minutes. | Advanced Search |
-
-Source: [https://dataglossary.wyscout.com/physical_metrics/](https://dataglossary.wyscout.com/physical_metrics/)
 ````
 
 ### s04 — search_docs {"query": "Catapult", "provider": "catapult"} — error
 
 ````text
-Provider "catapult" is not indexed. Call list_providers for available provider keys, or use request_update to suggest adding it.
+Provider "catapult" is not indexed: Catapult's OpenField Connect API docs are public but not licensed for republishing, and the docs site disallows crawling (checked 2026-09-30). Impect, which Catapult owns, is indexed. Call list_providers for the providers that are.
 ````
 
 ### g01 — get_provider_docs {"provider": "opta", "topic": "big chance"}
@@ -1854,7 +1864,7 @@ charting-shot-placement for the full zone list.
 
 | ID | Name | Notes |
 |----|------|-------|
-| 1 | longBall | Intended long ball, including launches. The definition is about intent, not a fixed length: in Premier League 2025/26 data almost every pass of 32 metres or more has Q1, and some shorter passes have it too |
+| 1 | longBall | Intended long ball, including launches. F24 defines it by intent and gives no length threshold |
 | 2 | cross | Cross (Q2). Corners commonly carry Q2 + Q6; free-kick crosses commonly carry Q2 + Q5; open-play crosses are Q2 without Q5/Q6. |
 | 3 | headPass | Headed pass (Q3). Distinct from Q15, the headed shot qualifier. |
 | 4 | throughBall | Through ball (Q4). Do not confuse with Q5 free-kick delivery. |
@@ -1911,10 +1921,12 @@ Indexed providers:
 **driblab** (32 chunks): api-access (9), api-endpoints (9), data-model (12), data-provenance (2) | aliases: driblab-pro, driblab-api
 **espn** (21 chunks): api-access (5), identity-and-coverage (4), match-summary (5), scoreboard (4), teams-and-standings (3) | aliases: espn-soccer, espn-fc
 **fast-forward** (250 chunks): api (27), benchmarks (5), concepts-coordinate-systems (12), concepts-dataset (13), concepts-distributed-compute (25), concepts-filelike (7), concepts-layouts (7), concepts-orientations (15), concepts-transformations (12), getting-started (16), index (21), providers (5), providers-cdf (6), providers-gradientsports (6), providers-hawkeye (8), providers-optavision (6), providers-respovision (7), providers-scisports (6), providers-secondspectrum (6), providers-signality (6), providers-skillcorner (8), providers-sportec (6), providers-statsperform (6), providers-tracab (8), reporting-issues (6) | aliases: fastforward, fast-forward-football, unravel-fast-forward, hawkeye, hawk-eye, scisports, signality, respovision, gradientsports, optavision
-**floodlight** (144 chunks): compendium-0-compendium (1), compendium-1-data (5), compendium-2-design (1), compendium-3-time (6), compendium-4-space (4), compendium-5-identifier (4), core-code (1), core-core (1), core-definitions (1), core-events (1), core-pitch (1), core-property (1), core-teamsheet (1), core-xy (1), guides-contrib-manual (21), guides-getting-started (29), guides-tutorial-analysis (13), guides-tutorial-matchsheets (6), index (2), io-datasets (13), io-dfl (1), io-io (1), io-kinexon (1), io-opta (1), io-secondspectrum (1), io-skillcorner (1), io-sportradar (1), io-statsbomb (1), io-statsperform (1), io-tracab (1), io-utils (1), metrics-entropy (1), metrics-metrics (1), metrics-trajectory-clustering (1), metrics-zone-aggregation (1), models-geometry (1), models-kinematics (1), models-kinetics (1), models-models (1), models-space (1), transforms-filter (1), transforms-interpolation (1), transforms-permutation (1), transforms-spatial (1), transforms-temporal (1), transforms-transforms (1), utils-types (1), utils-utils (1), vis-pitches (1), vis-positions (1), vis-vis (1)
+**firstbeat** (79 chunks): api-access (8), api-endpoints (22), data-model (29), data-provenance (3), identity-surfaces (4), variables (13) | aliases: firstbeat-sports, firstbeat-cloud-api, firstbeat-sports-cloud
+**floodlight** (144 chunks): compendium-0-compendium (1), compendium-1-data (5), compendium-2-design (1), compendium-3-time (6), compendium-4-space (4), compendium-5-identifier (4), core-code (1), core-core (1), core-definitions (1), core-events (1), core-pitch (1), core-property (1), core-teamsheet (1), core-xy (1), guides-contrib-manual (21), guides-getting-started (29), guides-tutorial-analysis (13), guides-tutorial-matchsheets (6), index (2), io-datasets (13), io-dfl (1), io-io (1), io-kinexon (1), io-opta (1), io-secondspectrum (1), io-skillcorner (1), io-sportradar (1), io-statsbomb (1), io-statsperform (1), io-tracab (1), io-utils (1), metrics-entropy (1), metrics-metrics (1), metrics-trajectory-clustering (1), metrics-zone-aggregation (1), models-geometry (1), models-kinematics (1), models-kinetics (1), models-models (1), models-space (1), transforms-filter (1), transforms-interpolation (1), transforms-permutation (1), transforms-spatial (1), transforms-temporal (1), transforms-transforms (1), utils-types (1), utils-utils (1), vis-pitches (1), vis-positions (1), vis-vis (1) | aliases: kinexon
 **fmdb-pro** (37 chunks): api-access (9), api-endpoints (8), data-model (9), data-provenance (2), identity-surfaces (9) | aliases: fmdb
 **fotmob** (5 chunks): data-provenance (2), identity-surfaces (3)
 **free-sources** (60 chunks): contextual-story-joins (8), data-provenance (8), fbref (5), overview (12), understat (19), xg-timelines (8) | aliases: fbref, football-reference, understat, clubelo, club-elo, football-data, football-data-uk, football-data-co-uk, engsoccerdata, free, free-source
+**hawkin-dynamics** (69 chunks): api-access (8), api-endpoints (16), data-model (22), data-provenance (3), identity-surfaces (5), test-metrics (15) | aliases: hawkin, hawkin-connect, hawkin-force-platform
 **impect** (79 chunks): concepts (12), coordinate-system (10), data-model (17), data-provenance (2), event-types (16), identity-surfaces (9), kpi-definitions (4), overview (9)
 **kloppy** (126 chunks): data-model (23), event-derived-metrics (13), provider-mapping (15), tracking-rendering (13), usage (62) | aliases: secondspectrum, second-spectrum
 **mplsoccer** (65 chunks): overview (3), pitch-types (13), visualizations (49) | aliases: mpl-soccer
@@ -1927,13 +1939,15 @@ Indexed providers:
 **sportmonks** (568 chunks): api-access (27), api-changes (12), authentication (3), best-practices (8), changelog (38), changelog-beta (29), charting-season-stories (7), code-libraries (2), data-corrections (5), data-model (22), data-provenance (2), demo-response-files (8), differences-between-api-2-and-api-3 (2), endpoints (1), error-codes (34), event-types (23), filtering (2), filtering-and-complexity-exceptions (1), fixtures (3), get-all-fixtures (8), get-all-leagues (8), get-all-leagues-by-team-id (8), get-all-livescores (7), get-all-seasons (8), get-all-states (8), get-all-types (5), get-brackets-by-season-id (13), get-current-leagues-by-team-id (6), get-fixture-by-id (7), get-fixtures-by-date (8), get-fixtures-by-date-range (8), get-fixtures-by-date-range-for-team (7), get-fixtures-by-head-to-head (7), get-fixtures-by-multiple-ids (7), get-fixtures-by-search-by-name (8), get-inplay-livescores (6), get-latest-updated-fixtures (11), get-latest-updated-livescores (11), get-league-by-id (7), get-leagues-by-country-id (7), get-leagues-by-fixture-date (8), get-leagues-by-live (7), get-leagues-search-by-name (8), get-past-fixtures-by-tv-station-id (8), get-seasons-by-id (7), get-seasons-by-search-by-name (8), get-seasons-by-team-id (7), get-state-by-id (7), get-type-by-entity (1), get-type-by-id (5), get-upcoming-fixtures-by-market-id (8), get-upcoming-fixtures-by-tv-station-id (8), getting-started (6), identity-surfaces (4), include-exceptions (1), includes (4), leagues (13), livescores (1), making-your-first-request (9), meta-description (1), nested-includes (3), new-endpoints-and-data-features (4), ordering-and-sorting (3), other-exceptions (1), overview (1), rate-limit (2), request-options (1), seasons (3), selecting-and-filtering (1), selecting-fields (3), states (4), statistics (1), syntax (4), syntax-and-filters (6), translations-beta (5), types (1), what-can-you-do-with-sportmonks-data (10) | aliases: sport-monks
 **sportradar** (481 chunks): api-access (6), api-endpoints (6), charting-and-stories (5), data-model (8), data-provenance (2), integration-notes (5), monitoring-data-changes (13), soccer-api-vs-soccer-extended-api (7), soccer-extended-competition-info (2), soccer-extended-competition-seasons (2), soccer-extended-competitions (3), soccer-extended-competitor-mappings (2), soccer-extended-competitor-merge-mappings (2), soccer-extended-competitor-profile (7), soccer-extended-competitor-schedules (16), soccer-extended-competitor-summaries (5), soccer-extended-competitor-vs-competitor (2), soccer-extended-daily-schedules (2), soccer-extended-daily-summaries (2), soccer-extended-faq (71), soccer-extended-fifa-rankings (3), soccer-extended-league-timeline (7), soccer-extended-live-schedules (2), soccer-extended-live-summaries (2), soccer-extended-live-timelines (3), soccer-extended-live-timelines-delta (2), soccer-extended-overview (11), soccer-extended-player-mappings (2), soccer-extended-player-merge-mappings (2), soccer-extended-player-profile (4), soccer-extended-player-schedules (2), soccer-extended-player-summaries (2), soccer-extended-push-events (12), soccer-extended-push-feeds (5), soccer-extended-push-statistics (10), soccer-extended-season-competitors (2), soccer-extended-season-form-standings (4), soccer-extended-season-info (9), soccer-extended-season-leaders (4), soccer-extended-season-lineups (5), soccer-extended-season-links (3), soccer-extended-season-missing-players (4), soccer-extended-season-overunder-statistics (3), soccer-extended-season-players (2), soccer-extended-season-schedule (3), soccer-extended-season-standings (4), soccer-extended-season-summaries (2), soccer-extended-season-transfers (4), soccer-extended-season-venues (2), soccer-extended-seasonal-competitor-extended-stati (6), soccer-extended-seasonal-competitor-players (3), soccer-extended-seasonal-competitor-statistics (5), soccer-extended-seasons (2), soccer-extended-seasons-disabled (2), soccer-extended-sport-event-extended-summary (5), soccer-extended-sport-event-extended-timeline (5), soccer-extended-sport-event-fun-facts (2), soccer-extended-sport-event-insights (2), soccer-extended-sport-event-lineups (2), soccer-extended-sport-event-momentum (3), soccer-extended-sport-event-summary (2), soccer-extended-sport-event-timeline (3), soccer-extended-sport-events-created (2), soccer-extended-sport-events-removed (2), soccer-extended-sport-events-updated (2), soccer-ig-api-basics (16), soccer-ig-data-coverage-tiers (7), soccer-ig-fixtures (9), soccer-ig-historical-data (6), soccer-ig-id-handling (18), soccer-ig-live-match-retrieval (12), soccer-ig-match-status-workflow (13), soccer-ig-overview (1), soccer-ig-push (13), soccer-ig-rosters-lineups-transfers (9), soccer-ig-scenarios (1), soccer-ig-seasonal-stats (7), soccer-ig-tracking-standings (16), soccer-ig-tracking-tournaments (11), soccer-ig-update-frequencies (6) | aliases: sport-radar, sportradar-api, soccer-extended, sportradar-soccer
 **statsbomb** (244 chunks): api-access (38), api-endpoints (8), charting-lineups (6), coordinate-system (13), data-model (27), data-provenance (2), event-types (55), identity-surfaces (5), iq-metrics-glossary (14), player-mapping (6), player-match-stats (13), player-season-stats (12), team-match-stats (11), team-season-stats (11), xg-model (23) | aliases: stats-bomb, statsbomb-open-data, statsbomb-open
+**statsports** (70 chunks): api-access (8), api-endpoints (6), data-model (29), data-provenance (3), drill-kpi-metrics (20), identity-surfaces (4) | aliases: statsports-sonra, sonra, apex, statsports-apex, statsports-pro-series
 **thesportsdb** (20 chunks): api-access (6), api-endpoints (4), data-provenance (2), identity-surfaces (4), livescore (4) | aliases: tsdb, the-sports-db, the-sportsdb, sportsdb
 **transfermarkt** (5 chunks): data-provenance (2), identity-surfaces (3)
 **transferroom** (45 chunks): api-access (8), api-endpoints (12), charting-availability (5), data-model (9), data-provenance (2), identity-surfaces (9) | aliases: transfer-room
 **unravelsports** (202 chunks): additional-citations (5), additional-license (6), american-football-dataset (2), american-football-graphs (1), api-american-football (1), api-classifiers (8), api-soccer (1), api-utils (1), generated-unravel-utils-add-dummy-label-column (1), generated-unravel-utils-add-graph-id-column (1), generated-unravel-utils-dummy-graph-ids (1), generated-unravel-utils-dummy-labels (1), getting-started-concepts (17), getting-started-installation (11), getting-started-quickstart (25), index (5), soccer-dataset (4), soccer-graphs (3), soccer-models (2), tutorials-american-football (15), tutorials-formation-detection (30), tutorials-pressing-intensity (21), tutorials-soccer-gnn (30), utils-features (2), utils-helpers (5), utils-objects (3) | aliases: unravel, unravel-sports, bigdatabowl, big-data-bowl
+**vald** (318 chunks): api-access (8), api-endpoints (2), data-provenance (3), dynamo (31), forcedecks (58), forceframe (37), humantrak (30), identity-surfaces (5), nordbord (43), profiles (27), smartspeed (40), tenants (34) | aliases: vald-performance, vald-hub, forcedecks, nordbord, forceframe, smartspeed, vald-dynamo, humantrak, valdr
 **wyscout** (165 chunks): api-access (11), api-endpoints (13), charting-analysis-metrics (7), coordinate-system (6), data-model (17), data-provenance (2), event-types (6), glossary-events (79), glossary-metrics-concepts (20), identity-surfaces (4) | aliases: hudl, hudl-wyscout
 
-Data: built 2026-09-30T17:49:29.000Z from commit 4890862 (bundled).
+Data: built 2026-10-01T23:20:58.000Z from commit a9b57bc (bundled).
 ````
 
 ### p01 — resolve_provider_id {"query": "Catapult"} — error
@@ -2112,4 +2126,338 @@ Local register release: 20260926T145536Z (current).
 No Reep entity matches that query in the local register.
 
 Local register release: 20260926T145536Z (current).
+````
+
+### x01 — search_papers {"query": "\"expected threat\" soccer"}
+
+````text
+# Papers for: "expected threat" soccer
+
+## OpenAlex (10 shown of 140)
+
+1. **A framework for the fine-grained evaluation of the instantaneous expected value of soccer possessions**
+   Javier Fernández, Luke Bornn, Cervone, Daniel (2020) · arXiv (Cornell University)
+   DOI 10.1007/s10994-021-05989-6 · arXiv 2011.09426 · OpenAlex W3164404442 · cited by 90 · from OpenAlex
+   Open copy: https://arxiv.org/pdf/2011.09426 (PDF, arXiv (Cornell University), submittedVersion, licence unknown)
+   The expected possession value (EPV) of a soccer possession represents the likelihood of a team scoring or receiving the next goal at any time instance. By decomposing the EPV into a series of subcomponents that are estimated separately, we…
+
+2. **A machine learning approach for player and position adjusted expected goals in football (soccer)**
+   James H. Hewitt, Oktay Karakuş (2023) · Franklin Open
+   DOI 10.1016/j.fraope.2023.100034 · arXiv 2301.13052 · OpenAlex W4386295816 · cited by 50 · from OpenAlex
+   Open copy: https://doi.org/10.1016/j.fraope.2023.100034 (page, Franklin Open, publishedVersion, licence: CC BY-NC-ND)
+   Football is a very result-driven industry, with goals being rarer than in most sports, so having further parameters to judge the performance of teams and individuals is key. Expected Goals (xG) allow further insight than just a scoreline.…
+
+3. **un-xPass: Measuring Soccer Player's Creativity**
+   Pieter Robberechts, Maaike Van Roy, Jesse J. Davis (2023) · Proceedings of the 29th ACM SIGKDD Conference on Knowledge Discovery and Data Mining
+   DOI 10.1145/3580305.3599924 · OpenAlex W4385568073 · cited by 26 · from OpenAlex
+   Open copy: https://dl.acm.org/doi/pdf/10.1145/3580305.3599924 (PDF, Proceedings of the 29th ACM SIGKDD Conference on Knowledge Discovery and Data Mining, publishedVersion, licence unknown)
+   Creativity is highly valued in soccer players. It contributes to exciting and unpredictable play, which can help teams to overcome defensive strategies and create scoring opportunities. Consequently, evaluating the creative abilities of…
+
+4. **Towards maximizing expected possession outcome in soccer**
+   Pegah Rahimian, Jan Van Haaren, László Toka (2023) · International Journal of Sports Science & Coaching
+   DOI 10.1177/17479541231154494 · OpenAlex W4321498077 · cited by 21 · from OpenAlex
+   Open copy: https://journals.sagepub.com/doi/pdf/10.1177/17479541231154494 (PDF, International Journal of Sports Science & Coaching, publishedVersion, licence: CC BY-NC)
+   Soccer players need to make many decisions throughout a match in order to maximize their team’s chances of winning. Unfortunately, these decisions are challenging to measure and evaluate due to the low-scoring, complex, and highly dynamic…
+
+5. **VAEP: An Objective Approach to Valuing On-the-Ball Actions in Soccer (Extended Abstract)**
+   Tom Decroos, Lotte Bransen, Jan Van Haaren and 1 more (2020) · Proceedings of the Twenty-Ninth International Joint Conference on Artificial Intelligence
+   DOI 10.24963/ijcai.2020/648 · OpenAlex W3041944957 · cited by 28 · from OpenAlex
+   Open copy: https://www.ijcai.org/proceedings/2020/0648.pdf (PDF, Proceedings of the Twenty-Ninth International Joint Conference on Artificial Intelligence, publishedVersion, licence unknown)
+   Despite the fact that objectively assessing the impact of the individual actions performed by soccer players during games is a crucial task, most traditional metrics have substantial shortcomings. First, many metrics only consider rare…
+
+6. **A Bayesian Approach to In-Game Win Probability in Soccer**
+   Pieter Robberechts, Jan Van Haaren, Jesse J. Davis (2021) · Proceedings of the 27th ACM SIGKDD Conference on Knowledge Discovery & Data Mining
+   DOI 10.1145/3447548.3467194 · arXiv 1906.05029 · OpenAlex W3170246188 · cited by 18 · from OpenAlex
+   Open copy: https://arxiv.org/pdf/1906.05029 (PDF, arXiv (Cornell University), submittedVersion, licence unknown)
+   In-game win probability models, which provide a sports team's likelihood of winning at each point in a game based on historical observations, are becoming increasingly popular. In baseball, basketball and American football, they have…
+
+7. **A Markov Framework for Learning and Reasoning About Strategies in Professional Soccer**
+   Maaike Van Roy, Pieter Robberechts, Wen-Chi Yang and 2 more (2023) · Journal of Artificial Intelligence Research
+   DOI 10.1613/jair.1.13934 · OpenAlex W4381249209 · cited by 16 · from OpenAlex
+   Open copy: https://jair.org/index.php/jair/article/download/13934/26940 (PDF, Journal of Artificial Intelligence Research, publishedVersion, licence: CC BY)
+   Strategy-optimization is a fundamental element of dynamic and complex team sports such as soccer, American football, and basketball. As the amount of data that is collected from matches in these sports has increased, so has the demand for…
+
+8. **What Happened Next? Using Deep Learning to Value Defensive Actions in Football Event-Data**
+   Charbel Merhej, Ryan J. Beal, Tim Matthews and 1 more (2021) · Proceedings of the 27th ACM SIGKDD Conference on Knowledge Discovery & Data Mining
+   DOI 10.1145/3447548.3467090 · arXiv 2106.01786 · OpenAlex W3171278925 · cited by 23 · from OpenAlex
+   Open copy: https://arxiv.org/pdf/2106.01786 (PDF, arXiv (Cornell University), submittedVersion, licence unknown)
+   Objectively quantifying the value of player actions in football (soccer) is a challenging problem. To date, studies in football analytics have mainly focused on the attacking side of the game, while there has been less work on event-driven…
+
+9. **Towards optimized actions in critical situations of soccer games with deep reinforcement learning**
+   Pegah Rahimian, Afshin Oroojlooy, László Toka (2021) · 2021 IEEE 8th International Conference on Data Science and Advanced Analytics (DSAA)
+   DOI 10.1109/dsaa53316.2021.9564207 · arXiv 2109.06625 · OpenAlex W3200186663 · cited by 16 · from OpenAlex
+   Open copy: https://arxiv.org/pdf/2109.06625 (PDF, arXiv (Cornell University), submittedVersion, licence: public-domain)
+   Soccer is a sparse rewarding game: any smart or careless action in critical situations can change the result of the match. Therefore players, coaches, and scouts are all curious about the best action to be performed in critical situations,…
+
+10. **Leaving Goals on the Pitch: Evaluating Decision Making in Soccer**
+   Maaike Van Roy, Pieter Robberechts, Wen-Chi Yang and 2 more (2021) · arXiv (Cornell University)
+   DOI 10.48550/arxiv.2104.03252 · arXiv 2104.03252 · OpenAlex W3147376827 · cited by 10 · from OpenAlex
+   Open copy: https://arxiv.org/pdf/2104.03252 (PDF, arXiv (Cornell University), submittedVersion, licence unknown)
+   Analysis of the popular expected goals (xG) metric in soccer has determined that a (slightly) smaller number of high-quality attempts will likely yield more goals than a slew of low-quality ones. This observation has driven a change in…
+
+## arXiv (4 shown of 5)
+
+11. **The trade-off between model flexibility and accuracy of the Expected Threat model in football**
+   Koen W. van Arem, Jakob Söhl, Mirjam Bruinsma and 1 more (2025)
+   arXiv 2511.09457v1 · from arXiv
+   Open copy: https://arxiv.org/pdf/2511.09457v1 (PDF, arXiv, licence unknown)
+   With an average football (soccer) match recording over 3,000 on-ball events, effective use of this event data is essential for practitioners at football clubs to obtain meaningful insights. Models can extract more information from this…
+
+12. **Unveiling Hidden Pivotal Players with GoalNet: A GNN-Based Soccer Player Evaluation System**
+   Jacky Hao Jiang, Jerry Cai, Anastasios Kyrillidis (2025)
+   arXiv 2503.09737v1 · from arXiv
+   Open copy: https://arxiv.org/pdf/2503.09737v1 (PDF, arXiv, licence unknown)
+   Soccer analysis tools emphasize metrics such as expected goals, leading to an overrepresentation of attacking players' contributions and overlooking players who facilitate ball control and link attacks. Examples include Rodri from…
+
+13. **GenTac: Generative Modeling and Forecasting of Soccer Tactics**
+   Jiayuan Rao, Tianlin Gui, Haoning Wu and 2 more (2026)
+   arXiv 2604.11786v1 · from arXiv
+   Open copy: https://arxiv.org/pdf/2604.11786v1 (PDF, arXiv, licence unknown)
+   Modeling open-play soccer tactics is a formidable challenge due to the stochastic, multi-agent nature of the game. Existing computational approaches typically produce single, deterministic trajectory forecasts or focus on highly structured…
+
+14. **H-VAEP and H-xT: Valuing Offensive On-the-Ball Actions in Handball by Estimating Probabilities**
+   Julius Broermann, Oliver Müller, Michael Döring and 1 more (2026)
+   arXiv 2608.12926v1 · from arXiv
+   Open copy: https://arxiv.org/pdf/2608.12926v1 (PDF, arXiv, licence unknown)
+   Traditional player evaluation in professional handball relies on basic box-score metrics or heuristic indices, which fail to credit the multi-player build-up chain. While football (soccer) analytics has adopted Expected Threat (xT) and…
+
+## SportRxiv (0 shown of 0)
+
+No new matches.
+
+Open one with get_paper, or read it with read_paper (DOI, arXiv ID, OpenAlex ID or zotero: ID). OpenAlex matches full text, so a hit may only cite the idea.
+
+Services asked: SportRxiv (local copy from 2026-10-01, no request sent; 0 matches); arXiv (5 matches); OpenAlex (140 matches).
+````
+
+### x02 — get_web_source {"url": "https://karun.in/blog/expected-threat.html"}
+
+````text
+# Introducing Expected Threat (xT)
+
+- **URL:** https://karun.in/blog/expected-threat.html
+- **Author:** Karun Singh
+- **Published:** no date on the page
+- **Licence:** none stated on the page
+- **Earliest Wayback snapshot:** 2019-02-22 https://web.archive.org/web/20190222174641/https://karun.in/blog/expected-threat.html
+  (The page has no date. It existed by 2019-02-22, the date of this snapshot.)
+- **Latest Wayback snapshot:** 2026-09-22 https://web.archive.org/web/20260922114139/https://karun.in/blog/expected-threat.html
+
+## Text
+
+##### Before we begin...
+
+As you may have inferred from my [previous post on interactive, weighted passing networks](https://karun.in/blog/interactive-passing-networks.html), I'm a big fan of going beyond static visualizations. Quantitative analysis is great, but I believe that we can amplify the gains of such analysis by being more adventurous with presentation. This post in particular contains a _lot_ of interactivity – much of it experimental – in an effort to probe new areas of the design space and hopefully spark productive discussions.
+
+##### Credit where credit's due
+
+To motivate the rest of this post, consider Arsenal’s opening goal in a recent 3-1 win against Burnley:
+
+After some intricate passing on the right, Mesut Özil slices the Burnley defence open with a ball through to Sead Kolašinac, whose timely cutback finds Pierre-Emerick Aubameyang for the finish. Thanks to [@lastrowview](https://twitter.com/lastrowview), here's a neat top-down visualization of the same sequence of play:
+
+> Incredible vision and execution from Ozil finding Kolasinac's run, who assisted Aubameyang for the first against Burnley [#Arsenal](https://twitter.com/hashtag/Arsenal?src=hash&ref_src=twsrc%5Etfw) [pic.twitter.com/lV2tWF91hR](https://t.co/lV2tWF91hR)
+> 
+> — Last Row (@lastrowview) [December 24, 2018](https://twitter.com/lastrowview/status/1077258834698227713?ref_src=twsrc%5Etfw)
+
+Of course, on paper the assist for this goal is given to Kolašinac. But as an analyst you might (rightly) ask where Özil's credit is. Where's the metric that can capture both, Özil and Kolašinac's contributions in a proportional manner?
+
+**How should we divide up the credit between Özil and Kolašinac for creating this opportunity? Drag the slider to enter what you think!**
+
+The purpose of this exercise isn't to converge on a universally accepted answer, but rather to show that breaking down buildup play and assigning credit to individual actors is a hard problem.
+
+##### Existing approaches
+
+There are several existing quantitative frameworks you might want to use to approach this problem:
+
+-   You can look at **assists**, but then contributions such as Özil's will go unnoticed in the numbers.
+-   You can look at **xGChain**, where the xG of the final shot (= 0.13 in this case) will be equally divided amongst every player involved in the play. Kolašinac, Özil, and even Aubameyang, Maitland-Niles, and Lacazette would all be credited with the same amount of xGChain here, which is not reflective of true contribution. A related quantity, **xGBuildup**, will divide up the xG equally amongst everyone who was involved _before_ the assist (i.e. Özil, Maitland-Niles, and Lacazette), but this too suffers from the same problem.
+-   You can look at the **difference in xG** induced by each action in the buildup. This is better, but a threatening pass is not always one that goes to a good shooting position. For example, Özil's pass split the defence open, yet it wasn't received in a particularly good shooting position by Kolašinac. Rather, what makes Özil's pass special is that it puts Kolašinac in a position from where he can in turn easily create a good chance.
+
+##### Can we do better?
+
+Building off the deficiencies of existing approaches, we would like a framework that can:
+
+1.  **Reward individual player actions** (passes, dribbles) in buildup play.
+2.  Operate on **event-level data**, due to availability constraints.
+3.  Reward actions **independent of the end outcome of the possession** (i.e. Özil's reward shouldn't depend on Aubameyang shooting or scoring).
+4.  Reward moving the ball not just into high-xG shooting positions, but also into **'threatening' positions** that can in turn lead to high-xG shooting positions with high likelihood.
+
+There is of course no single solution that is 'correct' here. As always, there's a trade-off between modelling complexity and accuracy. The purpose of this post, though, is to introduce one possible modelling approach, and walk through how it can be implemented and used to analyze buildup play.
+
+Let's go through those requirements again, this time proposing and refining a solution as we go along:
+
+1.  **Reward individual player actions:** our model should assign a score to each player action (pass or dribble) based on how much it contributed to the buildup play.
+2.  **Event-level data:** we do not have access to any player tracking data; we only have a list of sequential events along with basic attributes for each event, such as the player in possession, time elapsed in the match, start location, end location, etc.
+3.  **Independence from end outcome:** each action should be assigned a score in isolation, disregarding what happened before and after it in the possession. As far as relevant input signals go, this effectively leaves us with just the start and end locations of the action. How can we assign a score based on just those? We can build off the 'difference in xG' approach and assign a value to every location on the pitch. Then, if a certain action resulted in the ball moving from A to B, the score for the action can simply be the value at B minus the value at A.
+4.  **Recognize 'threatening' positions:** while assigning a value to every location on the pitch, we must look beyond xG. The value generated by xG assumes that we will shoot in the next action. Yet there are many locations from where scoring directly is hard, but it is easy to move the ball into other higher-xG areas. While assigning values to locations, we need to recognize these high-threat locations. In other words, xG allows us only 1 action (i.e. shoot) from the current position, while to value threat we must consider the possibility of stringing together multiple actions.
+
+Having made these modelling assumptions, our problem is now more digestible: **given a repository of event-level data, can we assign a threat value to every location on the pitch?**
+
+**Note:** the idea of assigning a value to every location on the pitch, or creating a 'value surface', [isn't new](http://business-analytic.co.uk/blog/valuing-passes-and-thoughts-on-metrification/). In fact, it goes beyond much further than football analytics. For instance, there's a cool physics analogy with [electric potential](https://en.wikipedia.org/wiki/Electric_potential) fields to think about (or more generally, with any kind of [scalar field](https://en.wikipedia.org/wiki/Scalar_field)), where attributing a score to a player action is analogous to potential difference! Relatedly, it means that assigning values to actions in this manner leads to properties exhibited by [conservative forces](https://en.wikipedia.org/wiki/Conservative_force). For example, the exact path taken by a player while dribbling is irrelevant (path independence), while moving the ball in a loop results in a reward of 0. In reality, the exact dribbling path can of course be important, while moving in a loop might actually draw defenders out of position, so this is an inaccuracy we tolerate for simplicity as well as a lack of tracking data.
+
+##### When in possession...
+
+One simplified way of viewing buildup play is as follows: when a team has possession in a certain position, they can either shoot (and score with some probability), or move the ball to a different location via a pass or a dribble. This continues until the team either loses possession, or scores a goal.
+
+If we run with this simplified model of buildup play, what does the data look like? From each position, how often do players shoot (and how often do they score?), how often do they move the ball, and where do they move it to? The following visualization aggregates data over a whole season (2017-18) of Premier League games, go ahead and explore how players behave by clicking on different zones!
+
+After playing around with this view of the data, you should begin to see that every zone location \\((x, y)\\) has certain attributes:
+
+-   **Move probability \\(m\_{x,y}\\):** when a player has possession in zone \\((x, y)\\), how often do they opt to move (i.e. pass or dribble) the ball as their next action?
+-   **Shoot probability \\(s\_{x,y}\\):** when a player has possession in zone \\((x, y)\\), how often do they opt to shoot as their next action? In our simplified universe, players can only either move or shoot, so by definition \\(m\_{x,y} + s\_{x,y} = 100\\%\\).
+-   **Move transition matrix \\(T\_{x,y}\\):** in the cases where the player moves from zone \\((x, y)\\), what is the probability that they move to each of the other zones? The visualization above shows these probabilities in shades of green.
+-   **Goal probability \\(g\_{x,y}\\):** in the cases where the player shoots from zone \\((x, y)\\), what is the probability that the shot turns into a goal? Note that this quantity is essentially a very simple implementation of xG!
+
+**Note:** for the purposes of this simplified model, we consider only 'successful' moves, i.e. moves that were completed without possession being lost. You could, quite easily, consider all attempted moves as well, though at the cost of making your model slightly more complex (and harder to concisely explain in a blog post!).
+
+**Another note:** if you have a quantitative background, this might remind you of a [Markov model](https://en.wikipedia.org/wiki/Markov_model) where each grid location is a state, and passing or dribbling leads to state transitions.
+
+##### Looking beyond checkmate
+
+Now that we have some notation, let's recap what we're trying to do here. The problem with purely shot-based models like xG when it comes to analyzing buildup play is that many meaningful actions don't result in good shooting positions immediately, but rather lead to good shooting positions multiple actions later. This idea is put forth very eloquently by [Cervone et al.](https://www.lukebornn.com/papers/cervone_ssac_2014.pdf) in the context of basketball analytics (although this quote is surprisingly transferable to football).
+
+"Despite many recent innovations, most advanced metrics remain based on simple tallies relating to the terminal states of possessions like points, rebounds, and turnovers. While these have shed light on the game, they are **akin to analyzing a chess match based only on the move that resulted in checkmate, leaving unexplored the possibility that the key move occurred several turns before**. This leaves a major gap to be filled, as an understanding of how players contribute to the whole possession – not just the events that end it – can be critical in evaluating players, assessing the quality of their decision-making, and predicting the success of particular in-game tactics."
+
+So how can we look beyond checkmate given the data that we have? How can we assign values to zones that reflect not just their immediate shooting value, but the future rewards they can bring (through movements of the ball to other zones)? The key intuition here is that when you have possession in zone \\((x, y)\\), you have a choice: you can either shoot and score with some probability, or you can move the ball to a different location. Given this background, we can formulate the problem as follows.
+
+**Note:** admittedly, the next couple of sections get quite technical (though I've tried to break down the math as much as possible). Although I'd strongly recommend reading through them, if you'd prefer to skip these and jump to the results of the model, click [here](https://karun.in/blog/expected-threat.html#visualizing-xt).
+
+##### Deriving xT
+
+**Note:** for the purposes of this post, we're working with a 16x12 grid on the pitch, which gives us 192 zones. In practice, you can choose a different resolution based on how much data you have!
+
+Let \\(V\_{x,y}\\) be the 'value' that our algorithm assigns to zone \\((x, y)\\).
+
+Now imagine you have the ball at your feet in zone \\((x, y)\\). You have two choices: shoot, or move the ball.
+
+Based on past data, we know that whenever you shoot from here, you will score with probability \\(g\_{x, y}\\). Thus, if you shoot, your expected payoff is \\(g\_{x,y}\\).
+
+Or, you can opt to move the ball via a pass to a teammate or by dribbling it yourself. But there's another choice to make here: which of the 192 zones should you move it to? Say you choose to move the ball to some new zone, \\((z, w)\\). In this case, your expected payoff is the value at zone \\((z, w)\\), i.e. \\(V\_{z, w}\\). But this was just one of the 192 choices that you had; how can we compute the expected payoff for all of the 192 choices in totality? Here's where the move transition matrix \\(T\_{x,y}\\) comes in: based on past data, we know where you're likely to move the ball to whenever you're in zone \\((x, y)\\), so we can proportionally weight the payoffs from each of the 192 zones. Specifically, for each zone \\((z, w)\\), the payoff is \\(T\_{(x,y)\\rightarrow(z,w)} \\times V\_{z,w}\\), i.e. the probability of moving to that zone times the reward from that zone. To get the total expected payoff for moving the ball, we must sum this quantity over all possible zones: $$\\sum\_{z=1}^{16} \\sum\_{w=1}^{12} T\_{(x,y)\\rightarrow(z,w)} \\times V\_{z,w} $$
+
+Finally, let's piece it all together. We computed the payoff if you shoot as \\(g\_{x, y}\\), and the payoff if you move the ball as \\(\\sum\_{z=1}^{16} \\sum\_{w=1}^{12} T\_{(x,y)\\rightarrow(z,w)} \\times V\_{z,w}\\). Based on past data, we know that you tend to shoot \\(s\_{x,y}\\) percent of the time, and you opt to move the ball \\(m\_{x,y}\\) percent of the time. Therefore, let's weight these two outcomes based on the probability of each of them happening, to obtain our final value for zone \\(x, y\\): $$V\_{x,y} = (s\_{x,y} \\times g\_{x,y}) + (m\_{x,y} \\times \\sum\_{z=1}^{16} \\sum\_{w=1}^{12} T\_{(x,y)\\rightarrow(z,w)} V\_{z,w})$$ This quantity looks beyond the checkmate; it values locations based on not just the immediate shooting threat, but the potential to induce danger later in the possession sequence. It is inherently designed to capture a notion of 'threat', so **'Expected Threat' (xT)** seems like an apt name for it. Putting it all together with the updated variable name, we get the following equation: $$\\boxed{\\texttt{xT}\_{x,y} = (s\_{x,y} \\times g\_{x,y}) + (m\_{x,y} \\times \\sum\_{z=1}^{16} \\sum\_{w=1}^{12} T\_{(x,y)\\rightarrow(z,w)} \\texttt{xT}\_{z,w})}$$
+
+##### But wait, there's more...
+
+Unfortunately that formula on its own is buggy without one additional detail. If you look at the formula carefully, you'll see that it is flawed since computing the xT value for some zone \\((x, y)\\) requires that we _already_ know the xT value for all the other zones. But all the other zones also suffer from the exact same flaw, so this forms a cyclic dependency that we can't resolve easily!
+
+Fortunately, in practice there is a neat workaround. All we need to do is start off with \\(\\texttt{xT}\_{x,y} = 0\\) for all zones \\((x, y)\\), and evaluate this formula not once, but **iteratively until convergence**. During each iteration, we evaluate the new xT for each zone by using xT values from the **previous iteration**. Empirically, I found 4-5 iterations to be sufficient for reasonable convergence, though this may vary based on your dataset.
+
+Besides breaking the cyclic dependency and leading to convergence, this process comes with another added benefit: interpretability. Let's take a step back and think about what happens at iteration 1. At this point, we are using our initialization of xT = 0 for all zones. Here's what happens to our xT formulation: $$\\texttt{xT}\_{x,y} = (s\_{x,y} \\times g\_{x,y}) + (m\_{x,y} \\times \\sum\_{z=1}^{16} \\sum\_{w=1}^{12} T\_{(x,y)\\rightarrow(z,w)} \\texttt{xT}\_{z,w})$$ $$\\texttt{xT}\_{x,y} = (s\_{x,y} \\times g\_{x,y}) + (m\_{x,y} \\times \\sum\_{z=1}^{16} \\sum\_{w=1}^{12} T\_{(x,y)\\rightarrow(z,w)} \\cdot 0)$$ $$\\texttt{xT}\_{x,y} = (s\_{x,y} \\times g\_{x,y})$$ While not exactly xG, you can think of this as a value that represents how good a shooting position \\((x, y)\\) is. In other words, after iteration 1, we essentially have an xG model! An alternative way to think about this is that at iteration 1, we are only allowing the checkmate: we are valuing positions as though shooting was the only option, and passing and dribbling did not exist.
+
+Now, in the second iteration, the new xT computation will use the xT values that were computed in iteration 1. At this point, the 'move' term in the formula will no longer be 0. This effectively means that we are now considering the possibility of "move, then shoot" in addition to just "shoot". We are now looking one move before the checkmate.
+
+The same logic can be extended for multiple steps; for example, in the third iteration, we are additionally considering the possibility of "move, move, shoot" and looking up to two moves before the checkmate. This idea is powerful because it lends a very interpretable meaning to xT. Rather than being a score on an arbitrary scale, it has a very natural meaning (just like its distant cousin, xG). Specifically, \\(\\texttt{xT}\_{x,y}\\) at iteration \\(n\\) represents the probability of scoring within the next \\(n\\) actions.
+
+##### Visualizing xT
+
+Now that we have a way to find xT across the pitch, what does the end result look like? The visualization below shows a 2D as well as a 3D representation of the value surface generated by xT, using events across all the matches of the 2017/18 Premier League season. Use the slider to view the xT at different iterations within the algorithm, and hover/click to change zones on the pitch!
+
+As you step through the successive iterations, it's worth noticing some interesting things:
+
+-   At iteration 0, the map is flat since we initialize xT = 0 for all zones to begin with.
+-   At iteration 1, we have effectively computed an xG model.
+-   At each subsequent iteration, you can see the xT spread to areas further away from the goal (because, as explained above, each iteration essentially allows us to account for one more action in the buildup play).
+-   The xT values begin to converge (to a reasonable degree) after 4-5 iterations.
+
+##### Applying xT
+
+Zooming out a bit, the point of xT was to come up with a metric that can quantify threat at any location on the pitch. Now that we have xT, we can value individual player actions in buildup play by computing the difference in xT between the start and end locations. In other words, we will say that an action that moves the ball from location \\((x, y)\\) to location \\((z,w)\\) has value \\(\\texttt{xT}\_{z,w} - \\texttt{xT}\_{x,y}\\). Once again, there is a nice interpretable meaning to this: the value of an action is equal to the % change in the team's chances of scoring in the next 5 actions due to the action (note that here we're using the xT computed after 5 iterations, hence 'next _5_ actions').
+
+Now, let's try answering the Kolašinac-Özil credit assignment problem from before using the xT framework:
+
+1.  Özil's pass takes the ball from xT = 0.077 to xT = 0.158. **Difference in xT due to Özil = 0.081**.
+2.  Kolašinac's pass takes the ball from xT = 0.158 to xT = 0.171. **Difference in xT due to Kolašinac = 0.013**.
+
+Looking at these numbers, Özil is responsible for \\(0.081 / (0.081 + 0.013) = 86\\%\\) of the net change in xT, so the framework would attribute 86% of the credit to him and 14% to Kolašinac.
+
+**Note:** for simplicity, in this example I've discretized start and end locations to the grid cell that they fall in. However, if you're doing some kind of sophisticated analysis where precision matters a lot, you might want to use [bilinear interpolation](https://en.wikipedia.org/wiki/Bilinear_interpolation). You can still compute the xT map using a fixed-size grid, but when computing values for events, you can use the exact location coordinates to get more precise estimates!
+
+###### Your estimate
+
+
+
+###### xT's estimate
+
+
+
+###### Top xT creators
+
+As a sanity check, let's also look at the top xT creators during the 2017/18 Premier League season. The table below shows the top 15 players in the league whose actions created the **highest cumulative change in xT**. Note that this is not normalized by the number of actions taken – it is based on the raw sum of xT created. This is intentional, because it surfaces players who not only know how to create danger, but those who do it consistently at a high volume. The inclusion of Holebas at #3 might surprise you, but the left-back has established himself as Watford's most consistent and most dangerous creator.
+
+Rank
+
+Player
+
+Team
+
+xT Created
+
+Besides simple credit assignment in buildup play, the xT framework opens the door for a host of other applications. For example, so far I've only shown xT results using an entire season's worth of Premier League data: but of course, this means we lose team-specific information. There's no doubt that teams behave differently in possession, prioritizing different areas of the pitch and exploiting different paths to goal based on their strengths (and weaknesses). What happens if, instead of clubbing all the Premier League teams into one analysis, we **compute xT on a per-team basis**?
+
+###### Visualizing per-team xT
+
+**Note:** reminder that this is based on data from the 2017/18 season and _not_ the current season!
+
+Sure enough, we do see a lot of variance across different teams. In addition to changes in the shape of the xT curve, note the differences in height. For instance, the shape of Manchester City and Spurs' curves are similar (which means they value the ball in similar areas of the pitch), yet their xT magnitudes are very different. This tells us that given the ball in the same position, City are much more threatening than Spurs (due to their higher conversion rate of possessions into goals).
+
+While these per-team xT maps are interesting to look at, they're not very actionable on their own. That being said, the underlying data is powerful because it can give us a team-specific view into how danger is created through buildup play. For example, one useful question to answer during pre-match analysis might be: **where on the pitch do our opponents tend to create the most danger from?**
+
+To answer this, we can use our opponent's xT map to value all of their actions from past matches, and aggregate these values based on the start location of the action. In other words, for each grid location, we can look at the actions that _originated_ there, and sum the xT created by these actions. This will give us a per-location cumulative value that will highlight the amount of danger created from different areas of the pitch. Additionally, by highlighting the common end zones of actions starting in a particular zone, we can start to see our opponent's most dangerous passages of play. To make this even more useful for tactical preparation, we might want to also know _who_ are the players that are responsible for creating threat through these passages.
+
+The visualization below attempts to answer precisely these questions. The green map shows zones from where maximum xT is created. Hovering/clicking on a zone will show you the dangerous passages of play that originate there, as well as the players most responsible for them. Use the dropdown menu to switch to any other Premier League team!
+
+###### Who creates danger from where?
+
+
+
+##### Future work
+
+These were just a couple of applications of xT, and there are many more left to explore. The ability of xT to capture the on-the-ball behaviour of teams leads to several promising directions. Looking at how xT changes during the course of a possession sequence may help us, for example, in **identifying and analyzing patterns of play** such as counter-attacks. At the player level, we can assess an individual **player's decision-making** relative to how his team tends to play: "Is this player making high-reward passing choices given his team's xT profile? Would he be better off shooting rather than dribbling in certain areas?" Perhaps even more interesting is answering similar questions in the context of **player scouting**: "Can we tell if this player, who has never played for us, will fit into our system? Does he have a history of creating actions that will lead to high xT gains for us?"
+
+If there are any directions that you're particularly excited about or want to explore together, please let me know! I'll continue to explore the limits of xT and will publish relevant results on my Twitter and on this blog.
+
+##### Let's talk!
+
+I'd love to hear any thoughts or feedback you might have; please reach out to me on Twitter at [@karun1710](https://twitter.com/karun1710) or via email at [karun.singh17@gmail.com](mailto:karun.singh17@gmail.com)!
+
+Services asked: Wayback Machine; karun.in.
+````
+
+### x03 — match_quote {"source": "https://karun.in/blog/expected-threat.html", "quote": "a threatening pass is not always one that goes to a good shooting position"}
+
+````text
+# Quote check: Introducing Expected Threat (xT)
+
+- **Source:** https://karun.in/blog/expected-threat.html
+- **Wayback snapshot:** https://web.archive.org/web/20260922114139/https://karun.in/blog/expected-threat.html
+
+**Result: exact.** The quote appears word for word.
+
+- **Where:** section 2 (Existing approaches), characters 843 to 917
+- **Text quote selector** (W3C):
+
+```json
+{
+  "type": "TextQuoteSelector",
+  "exact": "a threatening pass is not always one that goes to a good shooting position",
+  "prefix": "induced by each action in the buildup. This is better, but ",
+  "suffix": ". For example, Özil's pass split the defence open, yet it"
+}
+```
+
+Services asked: Wayback Machine; karun.in.
+````
+
+### x04 — match_quote {"source": "https://karun.in/blog/expected-threat.html", "quote": "xT was first introduced by Opta in 2012 as a proprietary model"}
+
+````text
+# Quote check: Introducing Expected Threat (xT)
+
+- **Source:** https://karun.in/blog/expected-threat.html
+- **Wayback snapshot:** https://web.archive.org/web/20260922114139/https://karun.in/blog/expected-threat.html
+
+**Result: none (similarity 0.31).** The quote does not appear in the source.
+
+
+Services asked: Wayback Machine; karun.in.
 ````
