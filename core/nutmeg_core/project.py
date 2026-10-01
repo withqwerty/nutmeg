@@ -115,7 +115,8 @@ def _now():
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-RESEARCH_IGNORES = (ACTIVE_FILE, ".python-warned", ".config-seen", "*/runs/.pending/", "*/claims.jsonl.lock")
+RESEARCH_IGNORES = (ACTIVE_FILE, ".python-warned", ".config-seen", "*/runs/.pending/", "*/claims.jsonl.lock",
+                    "*/bundles/")
 RESEARCH_ATTRIBUTES = ("claims.jsonl merge=union", "receipts.jsonl merge=union")
 
 

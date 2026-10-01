@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 from . import __version__, card as cards, check as checks, figure as figures, project as projects, publish as publishing
-from . import review, run as runs, why as whys
+from . import bundle as bundling, review, run as runs, why as whys
 from .config import (LEVELS, PERSONAS, STAGES, ConfigError, data_in_git_policy, load_effective, load_team,
                      save_user, user_config_path, user_name)
 from .gate import pending_key
@@ -368,6 +368,19 @@ def cmd_queue(args):
     return 0
 
 
+def cmd_bundle(args):
+    project = resolve_project(args)
+    repo = find_repo_root(project)
+    try:
+        target, manifest = bundling.bundle(project, repo, args.raw, user_name(repo), out=args.out)
+    except bundling.BundleError as exc:
+        raise UsageError(f"bundle refused: {exc}")
+    raw = "with raw data" if manifest["raw_data"] else f"without raw data ({len(manifest['raw_omitted'])} file(s) by hash)"
+    shown = target.relative_to(repo) if target.is_relative_to(repo) else target
+    print(f"Wrote {shown}: {len(manifest['files'])} file(s), {raw}.")
+    return 0
+
+
 def build_parser(parser_class=cards.NutmegParser):
     parser = parser_class(
         prog="nutmeg",
@@ -433,6 +446,12 @@ def build_parser(parser_class=cards.NutmegParser):
     register.add_argument("--run", help="the run that produced the data")
     register.add_argument("--image", help="the chart file")
     register.set_defaults(handler=cmd_figure_register)
+
+    bundle = commands.add_parser("bundle", help="package the project for someone else to check")
+    bundle.add_argument("--raw", choices=("yes", "no"),
+                        help="include raw data (yes; check its licence) or list it by hash only (no); required")
+    bundle.add_argument("--out", help="the zip file to write (default: research/<slug>/bundles/)")
+    bundle.set_defaults(handler=cmd_bundle)
 
     publish = commands.add_parser("publish", help="publish the outputs (refuses while checks have open problems)")
     publish.add_argument("--to", help="also copy the outputs to this folder in the repository")

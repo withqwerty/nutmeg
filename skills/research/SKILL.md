@@ -151,6 +151,9 @@ says a problem is not one, record their reason:
 - `nutmeg publish` releases the outputs. The user first sees each figure's n, filters and first rows, and approves.
   It refuses while `nutmeg check` has open problems. `--to <folder>` also copies the outputs there.
 
+- To hand the project over, run `nutmeg bundle --raw no` or `--raw yes`. Ask the user which every time: raw data
+  (the project's `data/`, run outputs, figure snapshots) may be licensed.
+
 ## 8. Explain and review claims
 
 - `nutmeg why <claim>` prints a claim's value, definition, evidence (the run and code lines, the
