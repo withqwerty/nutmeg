@@ -99,11 +99,28 @@ def loop_ready(holdout, minimum=MIN_LOOP_CASES):
     return count
 
 
+def _owner_alive(link):
+    """Whether the run that made this link folder is still running (its process id is in the marker)."""
+    try:
+        pid = int((link / MARKER).read_text().split()[0])
+    except (OSError, ValueError, IndexError):
+        return False
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
 def check_link_free(root=ROOT):
-    """The link folder must be absent or one this runner left behind; never delete anything else."""
+    """The link folder must be absent or one a finished run left behind; never delete anything else."""
     link = Path(root) / LINK_DIR
     if link.is_symlink() or link.is_file() or (link.exists() and not (link / MARKER).is_file()):
         raise SuiteError(f"{link} exists and is not a folder this runner made; remove it first")
+    if link.exists() and _owner_alive(link):
+        raise SuiteError(f"another run_suites.py run is using {link}; wait for it to finish")
     return link
 
 
@@ -113,9 +130,13 @@ def linked_holdout(holdout, cases, root=ROOT):
     link = check_link_free(root)
     if link.exists():
         shutil.rmtree(link)  # left over from a run that was killed
-    link.mkdir()
     try:
-        (link / MARKER).write_text("made by evals/_scaffold/run_suites.py; safe to delete\n")
+        link.mkdir()  # fails if another run made it in the meantime
+    except FileExistsError:
+        raise SuiteError(f"another run_suites.py run is using {link}; wait for it to finish")
+    try:
+        (link / MARKER).write_text(f"{os.getpid()} made by evals/_scaffold/run_suites.py; safe to delete when "
+                                   "that process has ended\n")
         (link / "mocks").symlink_to(Path(root) / "evals" / "mocks", target_is_directory=True)
         for name in cases:
             (link / name).symlink_to(holdout / name, target_is_directory=True)
@@ -147,13 +168,19 @@ def run_plugin(eval_dir_name, name, tools, args, out, root=ROOT):
     return float(case.get("aggregates", {}).get("score") or 0.0), (errors[0] if errors else None)
 
 
-def run_live_case(eval_dir, name, args):
-    """One case through run_live; returns (score, error)."""
+def run_live_case(eval_dir, name, args, out=None, label="holdout"):
+    """One case through run_live; returns (score, error). Each run's verdicts and answer go to `out`."""
     scores = []
-    for _ in range(args.runs):
-        outcome = run_live.run_once(name, args.model, False, args.judge_model, eval_dir)
+    for n in range(args.runs):
+        outcome = run_live.run_once(name, args.model, getattr(args, "keep", False), args.judge_model, eval_dir)
         verdicts = outcome["verdicts"]
         scores.append(sum(verdicts.values()) / max(1, len(verdicts)))
+        if out is not None:
+            folder = Path(out) / label
+            folder.mkdir(parents=True, exist_ok=True)
+            (folder / f"{name}-run{n + 1}.json").write_text(json.dumps(outcome, indent=2) + "\n")
+            print(f"    run {n + 1}: " + ", ".join(f"{g} {'PASS' if ok else 'FAIL'}" for g, ok in verdicts.items())
+                  + f" · ${outcome['cost']:.2f}", flush=True)
     return sum(scores) / max(1, len(scores)), None
 
 
@@ -170,7 +197,7 @@ def score_suite(label, eval_dir, eval_dir_name, cases, args, out, root=ROOT):
         if engine == "plugin":
             score, error = run_plugin(eval_dir_name, name, allowed_tools(eval_dir, name), args, out, root)
         else:
-            score, error = run_live_case(eval_dir, name, args)
+            score, error = run_live_case(eval_dir, name, args, out, label)
         rows.append({"suite": label, "case": name, "engine": engine, "score": round(score, 3), "error": error})
         print(f"  {label:8} {name:32} {engine:6} {score:.2f}" + (f"  ({error[:80]})" if error else ""), flush=True)
     return rows
@@ -190,6 +217,7 @@ def main(argv=None, root=ROOT, environ=None):
     parser.add_argument("--judge-model", default="haiku")
     parser.add_argument("--engine", choices=["auto", "plugin", "live"], default="auto")
     parser.add_argument("--out", help="results folder, outside the repository (default: a new temporary folder)")
+    parser.add_argument("--keep", action="store_true", help="keep each live run's work folder")
     parser.add_argument("--loop", action="store_true",
                         help="hill-climbing check: refuse unless the held-out set has at least 10 cases")
     args = parser.parse_args(argv)
@@ -199,7 +227,8 @@ def main(argv=None, root=ROOT, environ=None):
             loop_ready(holdout)
         if args.suite == "holdout" and holdout is None:
             raise SuiteError("--suite holdout needs NUTMEG_HOLDOUT_DIR")
-        if holdout is not None and args.suite != "public":
+        if holdout is not None and args.suite != "public" and any(
+                engine_for(holdout, name, args.engine) == "plugin" for name in list_cases(holdout, args.case)):
             check_link_free(root)
         out = results_dir(args.out, root)
     except SuiteError as exc:
@@ -221,8 +250,11 @@ def main(argv=None, root=ROOT, environ=None):
             cases = list_cases(holdout, args.case)
             if not cases:
                 summary["notes"].append("held-out set: no case matches --case")
-            with linked_holdout(holdout, cases, root) as link:
-                rows = score_suite("holdout", link, LINK_DIR, cases, args, out, root)
+            if any(engine_for(holdout, name, args.engine) == "plugin" for name in cases):
+                with linked_holdout(holdout, cases, root) as link:
+                    rows = score_suite("holdout", link, LINK_DIR, cases, args, out, root)
+            else:  # live runs read the held-out folder where it is; nothing is linked
+                rows = score_suite("holdout", holdout, LINK_DIR, cases, args, out, root)
             summary["rows"] += rows
             summary["holdout"] = mean(rows)
 

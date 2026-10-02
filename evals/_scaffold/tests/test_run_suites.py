@@ -1,4 +1,5 @@
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -39,7 +40,7 @@ def fake_runners(monkeypatch):
         calls.append(("plugin", eval_dir_name, name, link.exists(), (link / "mocks").exists()))
         return 1.0, None
 
-    def live(eval_dir, name, args):
+    def live(eval_dir, name, args, out=None, label=None):
         calls.append(("live", str(eval_dir), name, Path(eval_dir).exists(), None))
         return 0.5, None
 
@@ -181,3 +182,49 @@ def test_plugin_runner_reads_the_case_score(tmp_path, monkeypatch):
     score, error = run_suites.run_plugin("evals", "c1", ["Read", "Bash(python3:*)", "Write"], args, tmp_path, tmp_path)
     assert (score, error) == (0.5, None)
     assert seen["cmd"][seen["cmd"].index("--allow-tools") + 1:][:2] == ["Bash(python3:*)", "Write"]
+
+
+def test_a_running_run_blocks_a_second_one(layout, fake_runners, capsys):
+    root, holdout, out = layout
+    busy = root / run_suites.LINK_DIR
+    busy.mkdir()
+    (busy / run_suites.MARKER).write_text(f"{os.getpid()} made by run_suites\n")
+    code = run_suites.main(["--suite", "holdout", "--out", str(out)], root=root,
+                           environ={"NUTMEG_HOLDOUT_DIR": str(holdout)})
+    assert code == 2
+    assert "another run_suites.py run" in capsys.readouterr().err
+    assert (busy / run_suites.MARKER).exists()
+
+
+def test_a_folder_left_by_a_dead_run_is_replaced(layout, fake_runners):
+    root, holdout, out = layout
+    stale = root / run_suites.LINK_DIR
+    stale.mkdir()
+    (stale / run_suites.MARKER).write_text("99999999 made by run_suites\n")
+    assert run_suites.main(["--suite", "holdout", "--out", str(out)], root=root,
+                           environ={"NUTMEG_HOLDOUT_DIR": str(holdout)}) == 0
+    assert not stale.exists()
+
+
+def test_live_only_holdout_runs_link_nothing(layout, fake_runners):
+    root, holdout, out = layout
+    busy = root / run_suites.LINK_DIR
+    busy.mkdir()
+    (busy / run_suites.MARKER).write_text(f"{os.getpid()} made by run_suites\n")
+    # secret-one grants Bash, so it runs live from the held-out folder, even while another run holds the link.
+    assert run_suites.main(["--suite", "holdout", "--case", "secret-one", "--out", str(out)], root=root,
+                           environ={"NUTMEG_HOLDOUT_DIR": str(holdout)}) == 0
+    assert fake_runners == [("live", str(holdout.resolve()), "secret-one", True, None)]
+
+
+def test_live_runner_saves_each_run_outside_the_repo(tmp_path, monkeypatch):
+    def fake_once(name, model, keep, judge_model, eval_dir):
+        return {"case": name, "verdicts": {"a": True, "b": False}, "judged": {}, "cost": 0.1, "last": "answer",
+                "bash": [], "work": None}
+
+    monkeypatch.setattr(run_suites.run_live, "run_once", fake_once)
+    args = type("A", (), {"runs": 2, "model": "sonnet", "judge_model": "haiku", "keep": False})()
+    score, error = run_suites.run_live_case(tmp_path / "cases", "c1", args, tmp_path / "out", "holdout")
+    assert (score, error) == (0.5, None)
+    saved = json.loads((tmp_path / "out" / "holdout" / "c1-run2.json").read_text())
+    assert saved["last"] == "answer"
