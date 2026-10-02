@@ -20,6 +20,9 @@ docs/setup-guide.md
 # Eval run output
 evals/results/
 
+# Private held-out cases, linked in by evals/_scaffold/run_suites.py for one run
+evals-holdout/
+
 # Python
 __pycache__/
 .pytest_cache/

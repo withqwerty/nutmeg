@@ -129,6 +129,8 @@ The research cases that grant Bash (`--tag gate`, `--tag check` and `research-pr
 
 `--scaffold` runs each case's `scaffold.sh`, which writes a nutmeg profile into the sandbox. To refresh the mock after football-docs changes, run `evals/_scaffold/record_football_docs.py`. Keep the agent on Sonnet so scores stay comparable; Haiku as the judge (it also runs the mock) keeps each pass of the suite (one run per case) to about $9. `evals/_scaffold/adopt_replays.py` checks a run's mock answers against the real server.
 
+To score the public suite and a private held-out set together, set `NUTMEG_HOLDOUT_DIR` to the held-out folder (it must be outside this repository) and run `python3 evals/_scaffold/run_suites.py`. It prints one score per suite, writes results to a folder outside the repository, and runs cases that grant Bash live. Without `NUTMEG_HOLDOUT_DIR` it scores only the public suite and says so. `--loop` refuses to start until the held-out set has at least 10 cases.
+
 ## License
 
 MIT

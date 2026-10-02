@@ -178,4 +178,4 @@ jobs:
       - name: Test the core package
         run: |
           python3 -m pip install --quiet pytest
-          python3 -m pytest core/tests
+          python3 -m pytest core/tests evals/_scaffold/tests
