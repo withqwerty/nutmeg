@@ -101,7 +101,7 @@ def run_once(name, model, keep, judge_model, eval_dir=EVALS):
         if event.get("type") == "result":
             last = event.get("result") or last
             cost = event.get("total_cost_usd") or 0.0
-    verdicts = {}
+    verdicts, judged = {}, {}
     for gname, grader in graders.items():
         kind = grader.get("type")
         if kind == "regex":
@@ -122,23 +122,41 @@ def run_once(name, model, keep, judge_model, eval_dir=EVALS):
             low, high = int(grader.get("min", 1)), grader.get("max")
             verdicts[gname] = count >= low and (high is None or count <= int(high))
         elif kind == "llm":
-            verdicts[gname] = judge(grader["body"], last, judge_model)
+            verdicts[gname], judged[gname] = judge_votes(grader["body"], last, judge_model)
     if not keep:
         shutil.rmtree(work, ignore_errors=True)
     mcp.unlink(missing_ok=True)
-    return {"case": name, "verdicts": verdicts, "cost": cost, "last": last,
+    return {"case": name, "verdicts": verdicts, "judged": judged, "cost": cost, "last": last,
             "bash": [payload for tool, payload in calls if tool == "Bash"],
             "work": str(work) if keep else None}
 
 
-def judge(criteria, response, model):
+JUDGE_VOTES = 3
+
+
+def judge_votes(criteria, response, model, votes=JUDGE_VOTES):
+    """Ask the judge `votes` times; return (passed by majority, the replies)."""
     prompt = ("You grade an AI assistant's final response against a criterion. Reply with exactly PASS or FAIL "
               "on the first line, then one sentence of reason.\n\nCriterion:\n" + criteria +
               "\n\nResponse:\n" + (response or "(empty)"))
-    out = subprocess.run(["claude", "-p", prompt, "--model", model, "--setting-sources", "project",
-                          "--strict-mcp-config", "--max-turns", "1"], capture_output=True, text=True,
-                         stdin=subprocess.DEVNULL, timeout=180)
-    return out.stdout.strip().upper().startswith("PASS")
+    replies, passes = [], 0
+    for _ in range(votes):
+        try:
+            out = subprocess.run(["claude", "-p", prompt, "--model", model, "--setting-sources", "project",
+                                  "--strict-mcp-config", "--max-turns", "1"], capture_output=True, text=True,
+                                 stdin=subprocess.DEVNULL, timeout=300)
+            reply = out.stdout.strip()
+        except subprocess.TimeoutExpired:
+            reply = "(judge timed out)"
+        replies.append(reply[:400])
+        # The verdict may come as PASS, **PASS**, "PASS:" ...: take the first PASS or FAIL near the start.
+        match = re.search(r"\b(PASS|FAIL)\b", reply[:80].upper())
+        passes += bool(match and match.group(1) == "PASS")
+    return passes * 2 > votes, replies
+
+
+def judge(criteria, response, model):
+    return judge_votes(criteria, response, model)[0]
 
 
 if __name__ == "__main__":
