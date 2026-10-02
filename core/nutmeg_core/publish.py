@@ -7,15 +7,15 @@ The gate hook shows the preview (each figure's n, filters and first rows)
 before publish runs.
 """
 import json
-import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
 from . import check as checks
 from .card import sha256_path
-from .figure import load_all
+from .figure import IMAGE_TYPES, load_all
 from .project import append_receipt
-from .redact import inside_repo
+from .bundle import write_redacted
+from .redact import Redactor, inside_repo
 from .why import sample_rows
 
 PREVIEW_ROWS = 3
@@ -93,21 +93,37 @@ def publish(project, repo_root, by, to=None):
                 image = inside_repo(fig["image"], repo_root)
             except ValueError as exc:
                 raise PublishError(f"figure {fig['figure']}: its chart file is outside the repository ({exc})")
+            if image.suffix.lower() not in IMAGE_TYPES:
+                raise PublishError(f"figure {fig['figure']}: {fig['image']} is not a chart file")
             if image.is_file():
                 files.append(image)
         prov = figures_dir / f"{fig['figure']}.prov.json"
         if prov.is_file():
             files.append(prov)
     real_repo = repo_root.resolve()
+    project_real = project.resolve()
     for f in files:
         resolved = f.resolve()
         if real_repo not in resolved.parents:
             raise PublishError(f"{f} links outside the repository; nutmeg will not publish it")
+    # Where each file goes: project files keep their place; files from elsewhere in the repository go
+    # under _assets/. Two files may never share a destination.
+    plan = {}
+    for f in files:
+        if not f.is_file():
+            continue
+        resolved = f.resolve()
+        rel = (resolved.relative_to(project_real) if project_real in resolved.parents
+               else Path("_assets") / resolved.relative_to(real_repo))
+        key = rel.as_posix()
+        if key in plan and plan[key] != resolved:
+            raise PublishError(f"two files would be published as {key}; rename one")
+        plan[key] = resolved
+    redactor = Redactor.for_repo(repo_root)
     record = {
         "at": _now(),
         "by": by,
-        "files": [{"path": f.relative_to(repo_root).as_posix() if f.is_relative_to(repo_root) else str(f),
-                   "sha256": sha256_path(f)} for f in files if f.is_file()],
+        "files": [],
         "figures": [{k: fig.get(k) for k in ("figure", "n", "rows", "filters", "claims")} for fig in data["figures"]],
         "to": None,
     }
@@ -117,18 +133,22 @@ def publish(project, repo_root, by, to=None):
         except ValueError as exc:
             raise PublishError(str(exc))
         target.mkdir(parents=True, exist_ok=True)
-        project_real = project.resolve()
-        for f in files:
-            if not f.is_file():
-                continue
-            resolved = f.resolve()
-            # Keep each file's place, so same-named files cannot overwrite each other.
-            rel = (resolved.relative_to(project_real) if project_real in resolved.parents
-                   else Path("assets") / resolved.relative_to(real_repo))
-            destination = target / rel
+        target_real = target.resolve()
+        for key, source in plan.items():
+            destination = target / key
             destination.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(f, destination)
-        record["to"] = target.relative_to(repo_root.resolve()).as_posix()
+            # No symlinks on the way: the file must land inside the publish folder.
+            if destination.is_symlink() or target_real not in destination.parent.resolve().parents \
+                    and destination.parent.resolve() != target_real:
+                raise PublishError(f"{destination} leads outside {to}; remove the link and publish again")
+            with open(destination, "wb") as sink:
+                write_redacted(source, sink, redactor)
+            record["files"].append({"path": key, "source": source.relative_to(real_repo).as_posix(),
+                                    "sha256": sha256_path(destination)})
+        record["to"] = target.relative_to(real_repo).as_posix()
+    else:
+        record["files"] = [{"path": key, "source": source.relative_to(real_repo).as_posix(),
+                            "sha256": sha256_path(source)} for key, source in plan.items()]
     history_path = project / "published.json"
     try:
         history = json.loads(history_path.read_text(encoding="utf-8")) if history_path.is_file() else []

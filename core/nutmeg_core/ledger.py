@@ -40,10 +40,13 @@ REST_TYPES = ("docs", "registry", "rule", "user", "paper", "claim")
 MAX_WHY_LENGTH = 240
 
 # Fields that describe one version's change and are not carried forward.
-PER_VERSION_FIELDS = ("note", "by", "previous_status", "signer")
+PER_VERSION_FIELDS = ("note", "by", "previous_status", "previous_signer", "signer")
 
 # Fields whose change makes a claim a new statement that needs checking again.
-CONTENT_FIELDS = ("kind", "statement", "value", "evidence")
+CONTENT_FIELDS = ("kind", "statement", "value", "evidence", "why", "rests_on", "headline")
+
+# Bookkeeping only the review commands (trusted callers) may write.
+SYSTEM_OWNED = ("previous_status", "previous_signer")
 
 # Fields nutmeg sets on write; callers do not supply them.
 SYSTEM_FIELDS = ("version", "at")
@@ -135,8 +138,15 @@ def _guard(record, history, trusted):
     """Apply the rules every new version must follow, whoever writes it."""
     record = dict(record)
     latest = history[-1] if history else None
-    if history and history[0].get("author"):
-        record["author"] = history[0]["author"]
+    if history:
+        # Authorship is fixed by the first version; a claim first written without one stays without one.
+        if history[0].get("author"):
+            record["author"] = history[0]["author"]
+        else:
+            record.pop("author", None)
+    if not trusted:
+        for field in SYSTEM_OWNED:
+            record.pop(field, None)
     changed = latest is not None and any(record.get(k) != latest.get(k) for k in CONTENT_FIELDS)
     if changed:
         record.pop("signer", None)

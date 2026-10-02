@@ -18,6 +18,7 @@ from .ledger import Ledger
 from .redact import inside_repo
 
 CONTRACT = "nutmeg-figure-provenance/v1"
+IMAGE_TYPES = (".png", ".jpg", ".jpeg", ".svg", ".gif", ".webp", ".pdf")
 SNAPSHOT_TYPES = (".csv", ".json")
 NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$")
 
@@ -98,9 +99,13 @@ def register(project, repo_root, name, data, sources, claims, n=None, competitio
 
     if image:
         try:
-            image = inside_repo(image, repo_root).relative_to(repo_root.resolve()).as_posix()
+            resolved = inside_repo(image, repo_root)
         except ValueError as exc:
             raise FigureError(f"figure {name}: the chart file must be inside the repository ({exc})")
+        if resolved.suffix.lower() not in IMAGE_TYPES:
+            raise FigureError(f"figure {name}: --image must be a chart file ({', '.join(IMAGE_TYPES)}), "
+                              f"not {resolved.name}")
+        image = resolved.relative_to(repo_root.resolve()).as_posix()
     figures = project / "figures"
     figures.mkdir(exist_ok=True)
     kept = figures / f"{name}.data{snapshot.suffix.lower()}"

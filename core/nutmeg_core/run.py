@@ -111,6 +111,8 @@ def execute(run_args, repo_root, project, cwd, stream=True):
         raise RunError(str(exc))
     if not script.is_file():
         raise RunError(f"{run_args['file']} does not exist")
+    if script.suffix.lower() == ".sql" and run_args["script_args"]:
+        raise RunError("a .sql run takes no arguments after --: they would be options to the SQL client")
     try:
         argv, interpreter, stdin_file = cards.choose_interpreter(script, run_args["interpreter"], run_args["db"])
     except cards.CardError as exc:

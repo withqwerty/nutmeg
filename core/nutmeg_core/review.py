@@ -6,6 +6,7 @@ new version to the ledger and a receipt.
 """
 from pathlib import Path
 
+from .ledger import CONTENT_FIELDS
 from .project import append_receipt, find_repo_root, open_ledger
 from .redact import Redactor
 
@@ -22,15 +23,15 @@ def contest(project, claim_id, note, by):
     if not note or not note.strip():
         raise ReviewError("say what is wrong with --note")
     ledger = open_ledger(project)
-    note = Redactor.for_repo(find_repo_root(project)).text(note or "")
     claim = ledger.get(claim_id)
     if claim is None:
         raise ReviewError(f"no claim {claim_id} in this project")
     target = _contested_status(claim)
     if claim.get("status") == target:
         raise ReviewError(f"{claim_id} is already {target}; add to it with `nutmeg resolve` or a new contest later")
-    written = ledger.update(claim_id, status=target, note=note.strip(), by=by,
-                            previous_status=claim.get("status", "draft"))
+    note = Redactor.for_repo(find_repo_root(project)).text(note)
+    written = ledger.update(claim_id, trusted=True, status=target, note=note.strip(), by=by,
+                            previous_status=claim.get("status", "draft"), previous_signer=claim.get("signer"))
     append_receipt(project, "contest", claim=claim_id, by=by, note=note.strip(), version=written["version"])
     return written
 
@@ -39,20 +40,25 @@ def resolve(project, claim_id, note, by):
     if not note or not note.strip():
         raise ReviewError("say how it was resolved with --note")
     ledger = open_ledger(project)
-    note = Redactor.for_repo(find_repo_root(project)).text(note or "")
     claim = ledger.get(claim_id)
     if claim is None:
         raise ReviewError(f"no claim {claim_id} in this project")
     if claim.get("status") != _contested_status(claim):
         raise ReviewError(f"{claim_id} is {claim.get('status')}, not {_contested_status(claim)}; nothing to resolve")
-    previous = "draft"
-    for version in reversed(ledger.history(claim_id)):
-        if version.get("previous_status"):
-            previous = version["previous_status"]
-            break
-    written = ledger.update(claim_id, trusted=True, status=previous, note=note.strip(), by=by,
-                            signer=claim.get("signer"))
-    append_receipt(project, "resolve", claim=claim_id, by=by, note=note.strip(), status=previous,
+    note = Redactor.for_repo(find_repo_root(project)).text(note)
+    # The version that opened the dispute holds the status and sign-off from before it. Restore them only if
+    # the claim's content has not changed since; otherwise the claim goes back to draft.
+    history = ledger.history(claim_id)
+    opened = next((v for v in reversed(history) if v.get("status") == _contested_status(claim)
+                   and "previous_status" in v), None)
+    previous, signer = "draft", None
+    if opened is not None and all(opened.get(k) == claim.get(k) for k in CONTENT_FIELDS):
+        previous, signer = opened.get("previous_status") or "draft", opened.get("previous_signer")
+    changes = {"status": previous, "note": note.strip(), "by": by}
+    if signer:
+        changes["signer"] = signer
+    written = ledger.update(claim_id, trusted=True, **changes)
+    append_receipt(project, "resolve", claim=claim_id, by=by, note=note.strip(), status=written["status"],
                    version=written["version"])
     return written
 

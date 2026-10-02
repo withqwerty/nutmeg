@@ -36,8 +36,8 @@ def test_publish_records_files_and_figures(project, repo, capsys):
     (project / "report.md").write_text("Robertson leads with 9.23 [C1].\n")
     assert main(["publish", "--to", "site/lb"]) == 0
     history = json.loads((project / "published.json").read_text())
-    paths = [f["path"] for f in history[0]["files"]]
-    assert "research/demo/report.md" in paths and "research/demo/figures/carries.prov.json" in paths
+    sources = [f["source"] for f in history[0]["files"]]
+    assert "research/demo/report.md" in sources and "research/demo/figures/carries.prov.json" in sources
     assert (repo / "site" / "lb" / "report.md").is_file()
     assert [f["figure"] for f in history[0]["figures"]] == ["carries", "panels"]
     receipt = json.loads((project / "receipts.jsonl").read_text().splitlines()[-1])

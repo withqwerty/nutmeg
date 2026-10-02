@@ -17,7 +17,7 @@ from pathlib import Path
 
 from .card import sha256_path
 from .config import ConfigError, load_effective
-from .project import append_receipt, ensure_research_files
+from .project import append_receipt, ensure_research_files, find_repo_root
 from .redact import Redactor, inside_repo
 
 LOCKFILES = ("uv.lock", "poetry.lock", "Pipfile.lock", "requirements.txt", "requirements-lock.txt",
@@ -67,7 +67,8 @@ def run_outputs(project):
 
 
 def is_raw(rel, produced=()):
-    """Whether a project-relative path is raw data (KTD13)."""
+    """Whether a project-relative path is raw data (KTD13): data/, run outputs and printed output, figure
+    snapshots, and anything a run wrote, whatever its name."""
     parts = Path(rel).parts
     if parts[:1] == ("data",) and rel != "data/manifest.json":
         return True
@@ -75,15 +76,36 @@ def is_raw(rel, produced=()):
         return True
     if parts[:1] == ("figures",) and (".data." in Path(rel).name):
         return True
-    # Anything a run wrote, except the reports and provenance files the project publishes.
-    return rel in produced and not rel.endswith((".md", ".prov.json"))
+    return rel in produced
 
 
-def collect(project):
-    """(kept, raw, skipped) project-relative paths. Symlinks out of the project and credential files are skipped."""
+def registered_images(project, repo_root):
+    """Repository paths of chart images registered with `nutmeg figure register`."""
+    from .figure import IMAGE_TYPES, load_all
+
+    repo = Path(repo_root).resolve()
+    images = set()
+    for prov in load_all(project):
+        image = prov.get("image")
+        if not image:
+            continue
+        path = (repo / image).resolve()
+        if path.is_file() and repo in path.parents and path.suffix.lower() in IMAGE_TYPES and not is_credential(image):
+            images.add(path)
+    return images
+
+
+def collect(project, repo_root=None):
+    """(kept, raw, skipped) project-relative paths.
+
+    A file is judged by its name and by what it really is (a symlink is judged by its target too): raw if
+    either is raw, a credential if either is. Symlinks out of the project are skipped. Registered chart
+    images are kept even when a run wrote them.
+    """
     project = Path(project)
     real = project.resolve()
     produced = run_outputs(project)
+    images = registered_images(project, repo_root or find_repo_root(project))
     kept, raw, skipped = [], [], []
     for path in sorted(p for p in project.rglob("*") if p.is_file()):
         rel = path.relative_to(project).as_posix()
@@ -93,33 +115,35 @@ def collect(project):
         if resolved != real and real not in resolved.parents:
             skipped.append(f"{rel} (links outside the project)")
             continue
-        if is_credential(rel):
+        target = resolved.relative_to(real).as_posix()
+        if is_credential(rel) or is_credential(target):
             skipped.append(f"{rel} (credentials)")
             continue
-        (raw if is_raw(rel, produced) else kept).append(rel)
+        if resolved in images:
+            kept.append(rel)
+        elif is_raw(rel, produced) or is_raw(target, produced) or Path(target).name in SAMPLE_PAGES and rel != target:
+            raw.append(rel)
+        else:
+            kept.append(rel)
     return kept, raw, skipped
 
 
 def chart_assets(project, repo_root):
-    """Registered chart images outside the project folder, as repository-relative paths inside the repo."""
-    from .figure import load_all
-
+    """Registered chart images outside the project folder, as repository-relative paths."""
     repo = Path(repo_root).resolve()
     project_real = Path(project).resolve()
-    assets = []
-    for prov in load_all(project):
-        image = prov.get("image")
-        if not image:
-            continue
-        path = (repo / image).resolve()
-        if path.is_file() and repo in path.parents and project_real not in path.parents:
-            assets.append(path.relative_to(repo).as_posix())
-    return sorted(set(assets))
+    return sorted(p.relative_to(repo).as_posix() for p in registered_images(project, repo_root)
+                  if project_real not in p.parents)
 
 
 def environment(repo_root):
-    """Lockfiles in the repository, or the interpreter and package list."""
-    files = [name for name in LOCKFILES if (Path(repo_root) / name).is_file()]
+    """Lockfiles in the repository (real files inside it), or the interpreter and package list."""
+    repo = Path(repo_root).resolve()
+    files = []
+    for name in LOCKFILES:
+        path = (repo / name)
+        if path.is_file() and repo in path.resolve().parents:
+            files.append(name)
     if files:
         return {"lockfiles": files}
     try:
@@ -140,7 +164,7 @@ def _licences(repo_root):
 
 def render_preview(project, repo_root, namespace, label):
     raw_choice = getattr(namespace, "raw", None)
-    kept, raw, _ = collect(project)
+    kept, raw, _ = collect(project, repo_root)
     out = [f"nutmeg bundle gate · {label} · needs approval; nothing has been written yet"]
     if raw_choice not in ("yes", "no"):
         out.append("nutmeg bundle will refuse: choose --raw yes (include raw data) or --raw no (hashes only).")
@@ -162,15 +186,17 @@ def render_preview(project, repo_root, namespace, label):
     return "\n".join(out)
 
 
-def _payload(path, redactor):
-    """File bytes with secrets masked in anything that decodes as text."""
-    data = path.read_bytes()
-    if len(data) <= 50 * 1024 * 1024:
-        try:
-            return redactor.text(data.decode("utf-8")).encode("utf-8")
-        except UnicodeDecodeError:
-            pass
-    return data
+def write_redacted(path, sink, redactor):
+    """Copy a file into a binary stream line by line, masking secrets; bytes that are not UTF-8 pass through."""
+    with open(path, "rb") as source:
+        for line in source:
+            text = line.decode("utf-8", "surrogateescape")
+            sink.write(redactor.text(text).encode("utf-8", "surrogateescape"))
+
+
+def _add(archive, arcname, path, redactor):
+    with archive.open(arcname, "w", force_zip64=True) as sink:
+        write_redacted(path, sink, redactor)
 
 
 def bundle(project, repo_root, raw_choice, by, out=None):
@@ -178,7 +204,7 @@ def bundle(project, repo_root, raw_choice, by, out=None):
     if raw_choice not in ("yes", "no"):
         raise BundleError("choose --raw yes (include raw data, check its licence) or --raw no (hashes only)")
     redactor = Redactor.for_repo(repo_root)
-    kept, raw, skipped = collect(project)
+    kept, raw, skipped = collect(project, repo_root)
     held = list(raw)
     if raw_choice == "no":
         held += [k for k in kept if Path(k).name in SAMPLE_PAGES]
@@ -200,16 +226,16 @@ def bundle(project, repo_root, raw_choice, by, out=None):
     with zipfile.ZipFile(target, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for rel in include:
             path = project / rel
-            archive.writestr(f"{project.name}/{rel}", _payload(path, redactor))
+            _add(archive, f"{project.name}/{rel}", path, redactor)
             files.append({"path": rel, "sha256": sha256_path(path), "bytes": path.stat().st_size})
         for rel in chart_assets(project, repo_root):
             path = repo_root / rel
-            archive.writestr(f"assets/{rel}", _payload(path, redactor))
+            _add(archive, f"assets/{rel}", path, redactor)
             files.append({"path": f"assets/{rel}", "sha256": sha256_path(path), "bytes": path.stat().st_size})
         for rel in (held if raw_choice == "no" else []):
             omitted.append({"path": rel, "sha256": sha256_path(project / rel)})
         for name in env.get("lockfiles", []):
-            archive.writestr(f"environment/{name}", _payload(repo_root / name, redactor))
+            _add(archive, f"environment/{name}", repo_root / name, redactor)
         manifest = redactor.obj({
             "contract": "nutmeg-bundle/v1",
             "project": project.name,

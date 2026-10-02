@@ -65,8 +65,8 @@ class RaisingParser(NutmegParser):
 SAFE_INTERPRETER_FLAGS = {"-u", "-B", "-I", "-E", "-s", "-S", "-q", "-O", "-OO", "--vanilla", "--no-save",
                           "--no-restore", "--no-site-file", "--no-init-file", "--no-environ", "--quiet", "--slave",
                           "-bail", "-batch", "-readonly"}
-INTERPRETER_REFUSED = {"sh", "bash", "zsh", "dash", "ksh", "fish", "env", "sudo", "xargs", "eval", "nohup", "time",
-                       "timeout", "uv", "uvx", "conda", "poetry", "pipenv", "npx", "node"}
+# --interpreter must name one of these programs (a path to one is fine).
+INTERPRETER_ALLOWED = r"(python|pypy)(3(\.\d+)?)?|Rscript|R|duckdb|sqlite3"
 PENDING_MAX_AGE_SECONDS = 3600
 
 
@@ -248,8 +248,8 @@ def choose_interpreter(path, override=None, db=None):
         if not argv:
             raise CardError("--interpreter is empty")
         program = os.path.basename(argv[0])
-        if program in INTERPRETER_REFUSED:
-            raise CardError(f"--interpreter {program} runs other commands; name the interpreter itself")
+        if not re.fullmatch(INTERPRETER_ALLOWED, program):
+            raise CardError(f"--interpreter must be python, pypy, Rscript, R, duckdb or sqlite3 (not {program})")
         unknown = [t for t in argv[1:] if t not in SAFE_INTERPRETER_FLAGS]
         if unknown:
             raise CardError(f"--interpreter may only add the flags {', '.join(sorted(SAFE_INTERPRETER_FLAGS))} "
@@ -368,6 +368,8 @@ def build_run_card(run_args, repo_root, project, cwd, recorded=True, command=Non
         if role == "file":
             script = resolved
             card["file"] = entry["path"]
+    if script is not None and script.suffix.lower() == ".sql" and run_args.get("script_args"):
+        card["problems"].append("a .sql run takes no arguments after --: they would be options to the SQL client")
     if script is not None:
         try:
             argv, name, stdin = choose_interpreter(script, run_args.get("interpreter"), run_args.get("db"))

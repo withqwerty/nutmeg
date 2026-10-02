@@ -48,6 +48,13 @@ def _code_excerpt(project, run, spec):
         if len(found) != 1:
             return [f"(code copy {name} not found in run {run['id']})"]
         copy = found[0]
+    # Whatever was picked, it must really be inside the run's code copy (no symlinks out of it),
+    # and the code copy must be inside the project.
+    project_real = Path(project).resolve()
+    real_copy = copy.resolve()
+    if code_dir not in real_copy.parents or project_real not in code_dir.parents:
+        return [f"(code lines must name a file in run {run['id']}'s code copy, not {name})"]
+    copy = real_copy
     lines = copy.read_text(encoding="utf-8", errors="replace").splitlines()
     start = int(match["start"])
     end = int(match["end"] or start)

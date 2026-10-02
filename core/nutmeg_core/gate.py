@@ -118,14 +118,14 @@ def _strip_wrappers(tokens):
             rest = rest[1:]
             # A wrapper that splits a string into a command, or changes the directory, runs
             # something the card cannot describe exactly.
-            rest, readable = _wrapper_options(rest, options)
+            rest, readable = _wrapper_options(rest, options, base)
             if not readable:
                 return rest, env, wrapped, False
             if base in RUNNERS and rest and rest[0] in ("run", "exec", "tool"):
                 rest = rest[1:]
                 if rest and rest[0] == "run":  # uv tool run
                     rest = rest[1:]
-                rest, readable = _wrapper_options(rest, options)
+                rest, readable = _wrapper_options(rest, options, base)
                 if not readable:
                     return rest, env, wrapped, False
             if base == "timeout" and rest:
@@ -136,26 +136,39 @@ def _strip_wrappers(tokens):
 
 
 # Options that make a wrapper split a string into a command or change the working directory.
-UNREADABLE_OPTIONS = ("-S", "--split-string", "-C", "--chdir", "--directory", "--cwd")
+UNREADABLE_BY_WRAPPER = {
+    "env": ("-S", "--split-string", "-C", "--chdir"),
+    "sudo": ("-D", "--chdir", "-s", "--shell", "-i", "--login"),
+    "uv": ("--directory",),
+    "uvx": ("--directory",),
+    "poetry": ("-C", "--directory"),
+    "conda": ("--cwd",),
+    "mamba": ("--cwd",),
+    "micromamba": ("--cwd",),
+}
 
 
-def _wrapper_options(rest, with_value):
+def _unreadable_option(token, wrapper):
+    names = UNREADABLE_BY_WRAPPER.get(wrapper, ())
+    if token.split("=", 1)[0] in names:
+        return True
+    # Attached short options: -Csub, -Spython3 ...
+    return any(len(n) == 2 and token.startswith(n) and len(token) > 2 and not token.startswith("--") for n in names)
+
+
+def _wrapper_options(rest, with_value, wrapper=""):
     """Skip a wrapper's own options. Returns (the rest, whether nutmeg can read what runs)."""
     rest = list(rest)
     while rest and rest[0].startswith("-") and rest[0] != "-":
         option = rest.pop(0)
         if option == "--":
             break
-        if _unreadable_option(option):
+        if _unreadable_option(option, wrapper):
             return rest, False
         if "=" not in option and option in with_value and rest:
             rest.pop(0)
     return rest, True
 
-
-def _unreadable_option(token):
-    name = token.split("=", 1)[0]
-    return name in UNREADABLE_OPTIONS or (token.startswith("-S") and not token.startswith("--"))
 
 
 def _tokenise(text):
@@ -176,7 +189,6 @@ def parse(command):
     if tokens[-3:] == ["2", ">&", "1"]:
         tokens = tokens[:-3]
 
-    gated_words = any(_is_interpreter(t) or _is_nutmeg_word(t) for t in tokens)
     unsafe = (
         "\n" in text
         or "`" in text
@@ -184,38 +196,86 @@ def parse(command):
         or "<(" in text
         or ">(" in text
         or any(t.startswith("#") for t in tokens)
-        or any(t in OPERATORS or (t and set(t) <= set(";&|<>()")) for t in tokens)
+        or any(_is_operator(t) for t in tokens)
     )
     if unsafe:
-        if gated_words:
+        segments = _segments(tokens)
+        if any(_executes_gated(seg) for seg in segments) or ("`" in text and any(_mentions_gated(t) for t in tokens)):
             return Parsed("compound", tokens=tokens,
                           reason="this command chains, redirects, substitutes or comments other commands; nothing has run yet")
         return Parsed("other", tokens=tokens)
 
-    head = os.path.basename(tokens[0]) if tokens else ""
-    if head in SHELLS and any(_mentions_gated(t) for t in tokens[1:]):
+    bare = _drop_assignments(tokens)
+    head = os.path.basename(bare[0]) if bare else ""
+    if (head in SHELLS or head in EXECUTORS) and any(_mentions_gated(t) for t in bare[1:]):
         return Parsed("compound", tokens=tokens,
-                      reason=f"`{head}` runs a command from a string or file that nutmeg cannot inspect; nothing has run yet")
+                      reason=f"`{head}` runs a command from a string, a file or its input that nutmeg cannot inspect; "
+                             "nothing has run yet")
     words, env, wrapped, readable = _strip_wrappers(tokens)
     if not readable:
-        return Parsed("compound", tokens=tokens, env=env,
-                      reason="nutmeg could not tell exactly what this wrapper runs; nothing has run yet")
+        splits = any(_unreadable_option(t, w) and t.lstrip("-")[:1] == "S" or t.startswith("--split-string")
+                     for t in tokens for w in ("env",))
+        if splits or any(_mentions_gated(t) for t in tokens):
+            return Parsed("compound", tokens=tokens, env=env,
+                          reason="this wrapper changes the directory or splits a string into a command, so nutmeg "
+                                 "cannot tell exactly what runs; nothing has run yet")
+        return Parsed("other", tokens=tokens, env=env)
     args = _nutmeg_args(words)
     if args is not None:
         return _parse_nutmeg(args, words, env)
     if words and _is_interpreter(words[0]):
         return Parsed("interpreter", tokens=words, env=env)
-    if any(_is_interpreter(w) or _is_nutmeg_word(w) for w in words[1:]) or (wrapped and any(_mentions_gated(w) for w in words)):
-        # For example `find . -exec python3 {} \;`, `xargs python3` or a wrapper nutmeg cannot read.
+    if wrapped and (_executes_gated(words) or any(_is_interpreter(w) or _is_nutmeg_word(w) for w in words)):
         return Parsed("compound", tokens=tokens, env=env,
                       reason="this command starts an interpreter or nutmeg in a way nutmeg cannot inspect; nothing has run yet")
     return Parsed("other", tokens=words, env=env)
 
 
 # Commands that run other commands from a string, a file or their input.
-SHELLS = {"sh", "bash", "zsh", "dash", "ksh", "fish", "eval", "source", ".", "xargs", "parallel", "watch", "su",
-          "script", "busybox"}
+SHELLS = {"sh", "bash", "zsh", "dash", "ksh", "mksh", "ash", "csh", "tcsh", "fish", "pwsh", "powershell", "eval",
+          "source", ".", "su", "script", "busybox", "expect", "osascript"}
+EXECUTORS = {"find", "xargs", "parallel", "watch", "entr", "flock", "stdbuf", "ionice", "taskset", "doas", "chronic",
+             "unbuffer"}
 _GATED_TEXT = re.compile(r"(?<![\w.-])(python(3(\.\d+)?)?|Rscript|duckdb|sqlite3|psql|bq|nutmeg(\.py)?)(?![\w-])")
+
+
+def _is_operator(token):
+    return token in OPERATORS or bool(token and set(token) <= set(";&|<>()"))
+
+
+def _segments(tokens):
+    """Split tokens into simple commands at operators."""
+    segments, current = [], []
+    for token in tokens:
+        if _is_operator(token):
+            if current:
+                segments.append(current)
+            current = []
+        else:
+            current.append(token)
+    if current:
+        segments.append(current)
+    return segments
+
+
+def _drop_assignments(tokens):
+    rest = list(tokens)
+    while rest and _ASSIGNMENT.match(rest[0]):
+        rest = rest[1:]
+    return rest
+
+
+def _executes_gated(words):
+    """Whether a simple command would start an interpreter or nutmeg (not just mention one in its arguments)."""
+    rest = _drop_assignments(words)
+    if not rest:
+        return False
+    if _is_interpreter(rest[0]) or _is_nutmeg_word(rest[0]):
+        return True
+    head = os.path.basename(rest[0])
+    if head in SHELLS or head in EXECUTORS or head in SIMPLE_WRAPPERS or head in RUNNERS:
+        return any(_mentions_gated(t) for t in rest[1:])
+    return False
 
 
 def _mentions_gated(token):
@@ -262,7 +322,8 @@ def pending_key(run_key):
 
 def _target_project(parsed, cwd, active):
     """The project the nutmeg command will use: --project, then NUTMEG_PROJECT, then the active one."""
-    chosen = getattr(parsed.namespace, "project", None) or parsed.env.get("NUTMEG_PROJECT")
+    chosen = (getattr(parsed.namespace, "project", None) or parsed.env.get("NUTMEG_PROJECT")
+              or os.environ.get("NUTMEG_PROJECT"))
     if chosen:
         return (Path(cwd) / Path(chosen).expanduser()).resolve()
     return active

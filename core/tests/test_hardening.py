@@ -338,17 +338,24 @@ def test_raw_no_bundle_leaves_out_the_workspace_and_run_written_files(project, r
     (project / "runs" / "R1").mkdir(parents=True)
     (project / "runs" / "R1" / "run.json").write_text(json.dumps({
         "id": "R1", "status": "ok",
-        "outputs": [{"path": "research/club/tables/players.csv"}, {"path": "research/club/report.md"}]}))
+        "outputs": [{"path": "research/club/tables/players.csv"}, {"path": "research/club/dump.prov.json"},
+                    {"path": "research/club/table.md"}]}))
     (project / "tables").mkdir()
     (project / "tables" / "players.csv").write_text("player,salary\nX,999\n")
+    (project / "dump.prov.json").write_text('{"rows": [["X", 999]]}')
+    (project / "table.md").write_text("| X | 999 |\n")
     (project / "report.md").write_text("Report.\n")
     (project / "workspace.html").write_text("<pre>sample rows</pre>")
+    (project / "data").mkdir(exist_ok=True)
+    (project / "data" / "private.csv").write_text("secret,row\n")
+    (project / "alias.csv").symlink_to(project / "data" / "private.csv")
     main(["bundle", "--raw", "no", "--out", "out/b.zip"])
     names = _bundle_names(repo / "out" / "b.zip")
-    assert "club/workspace.html" not in names and "club/tables/players.csv" not in names
-    assert "club/report.md" in names
+    for raw in ("workspace.html", "tables/players.csv", "dump.prov.json", "table.md", "alias.csv"):
+        assert f"club/{raw}" not in names, raw
+    assert "club/report.md" in names  # written by hand, not by a run
     manifest = json.loads(names["club/bundle-manifest.json"])
-    assert {"workspace.html", "tables/players.csv"} <= {o["path"] for o in manifest["raw_omitted"]}
+    assert {"workspace.html", "tables/players.csv", "alias.csv"} <= {o["path"] for o in manifest["raw_omitted"]}
 
 
 def test_bundle_redacts_lockfiles_and_skips_credentials(project, repo):
@@ -398,7 +405,7 @@ def test_publish_keeps_paths_and_bundle_includes_chart_assets(project, repo):
     assert main(["publish", "--to", "public"]) == 0
     assert (repo / "public" / "reports" / "first" / "report.md").read_text() == "first report\n"
     assert (repo / "public" / "reports" / "second" / "report.md").read_text() == "second report\n"
-    assert (repo / "public" / "assets" / "out" / "chart.png").is_file()
+    assert (repo / "public" / "_assets" / "out" / "chart.png").is_file()
     main(["bundle", "--raw", "no", "--out", "out/b.zip"])
     assert "assets/out/chart.png" in _bundle_names(repo / "out" / "b.zip")
 
@@ -422,3 +429,168 @@ def test_session_start_json_with_control_characters(tmp_path, name):
                             env=dict(os.environ, CLAUDE_PLUGIN_ROOT=str(root)))
     context = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
     assert f'python3 "{root}/core/nutmeg.py"' in context
+
+
+# --- third review --------------------------------------------------------------------------
+
+@pytest.mark.parametrize("command", [
+    "sh -c 'python3 a.py' > log", "X=1 bash -c 'python3 a.py'", "tcsh -c 'python3 a.py'", "csh -c 'nutmeg run a.py'",
+    "env -Csub nutmeg run a.py", "sudo -D sub nutmeg run a.py", "git status && sh -c 'python3 a.py'",
+])
+def test_third_review_wrapper_variants_ask(command):
+    assert gate.parse(command).kind == "compound", command
+
+
+@pytest.mark.parametrize("command", [
+    'git commit -m "python3"', 'git commit -m "fix core/nutmeg.py"', "env -C sub make test", "make test", "pytest",
+    'git commit -m "python3 fix" && git push',
+])
+def test_ordinary_commands_do_not_ask(command):
+    assert gate.parse(command).kind == "other", command
+
+
+@pytest.mark.parametrize("interpreter", ["csh", "tcsh", "perl", "node"])
+def test_interpreter_allowlist(project, repo, interpreter):
+    assert "PROBLEM" in gate.decide(f"nutmeg run a.py --interpreter {interpreter}", repo, project, repo).reason
+
+
+@pytest.mark.skipif(shutil.which("sqlite3") is None and shutil.which("duckdb") is None, reason="needs a SQL client")
+def test_sql_run_refuses_client_options(project, repo, capsys):
+    (repo / "safe.sql").write_text("select 1;\n")
+    assert main(["run", "safe.sql", "--", "-cmd", "select 'EXTRA';"]) == 2
+    assert "EXTRA" not in capsys.readouterr().out
+
+
+def test_inherited_nutmeg_project_uses_that_repositorys_floor(repo, tmp_path_factory, monkeypatch):
+    other = tmp_path_factory.mktemp("other")
+    subprocess.run(["git", "init", "-q", str(other)], check=True)
+    (other / ".nutmeg").mkdir()
+    (other / ".nutmeg" / "team.json").write_text(json.dumps({"max_autonomy": {"run": "L2"}}))
+    (other / "research" / "p" / "runs").mkdir(parents=True)
+    (other / "a.py").write_text("print(1)\n")
+    main(["new", "mine", "--data-in-git", "yes"])
+    (repo / ".no-user-config.json").write_text(json.dumps({"persona": "fanalyst", "run_then_review": True}))
+    monkeypatch.setenv("NUTMEG_PROJECT", str(other / "research" / "p"))
+    decision = gate.decide(f"nutmeg run {other}/a.py", repo, repo / "research" / "mine", repo)
+    assert decision.decision == "ask"
+
+
+def test_forged_previous_status_cannot_become_verified(project):
+    ledger = Ledger(project / "claims.jsonl")
+    ledger.append({"kind": "definition", "statement": "x", "evidence": {"definition": "y"}, "status": "disputed",
+                   "previous_status": "verified", "previous_signer": "Boss"})
+    main(["resolve", "C1", "--note", "fine"])
+    latest = ledger.get("C1")
+    assert latest["status"] == "draft" and not latest.get("signer")
+
+
+def test_contest_then_resolve_keeps_the_sign_off_when_unchanged(project):
+    ledger = Ledger(project / "claims.jsonl")
+    ledger.append({"kind": "definition", "statement": "x", "evidence": {"definition": "y"}, "author": "A"})
+    ledger.update("C1", trusted=True, status="verified", signer="B")
+    main(["contest", "C1", "--note", "really?"])
+    main(["resolve", "C1", "--note", "yes"])
+    latest = ledger.get("C1")
+    assert latest["status"] == "verified" and latest["signer"] == "B"
+
+
+def test_edit_during_dispute_resolves_to_draft(project):
+    ledger = Ledger(project / "claims.jsonl")
+    ledger.append({"kind": "definition", "statement": "x", "evidence": {"definition": "y"}, "author": "A"})
+    ledger.update("C1", trusted=True, status="verified", signer="B")
+    main(["contest", "C1", "--note", "really?"])
+    ledger.update("C1", statement="x, edited")
+    main(["resolve", "C1", "--note", "edited"])
+    assert ledger.get("C1")["status"] == "draft"
+
+
+def test_reason_change_clears_verification(project):
+    ledger = Ledger(project / "claims.jsonl")
+    ledger.append({"kind": "definition", "statement": "x", "evidence": {"definition": "y"}, "author": "A",
+                   "why": "first reason"})
+    ledger.update("C1", trusted=True, status="verified", signer="B")
+    main(["claim", "add", "--json", json.dumps({**ledger.get("C1"), "why": "a different reason"})])
+    assert ledger.get("C1")["status"] == "draft"
+
+
+def test_authorless_legacy_claim_stays_authorless(project):
+    path = project / "claims.jsonl"
+    path.write_text(json.dumps({"id": "C1", "kind": "definition", "statement": "x", "evidence": {"definition": "y"},
+                                "status": "draft", "version": 1, "at": "2026-01-01T00:00:00Z"}) + "\n")
+    Ledger(path).append({**Ledger(path).get("C1"), "author": "B"})
+    assert "author" not in Ledger(path).get("C1")
+
+
+@pytest.mark.parametrize("signoff", [[], {"required": []}, ["x"], {"required": "yes"}])
+def test_malformed_team_signoff_is_a_failure_not_a_pass(project, repo, signoff):
+    (repo / ".nutmeg").mkdir(exist_ok=True)
+    (repo / ".nutmeg" / "team.json").write_text(json.dumps({"signoff": signoff}))
+    failures, _ = checks.run_checks(project)
+    assert any(f["kind"] == "config" for f in failures)
+
+
+def test_why_fallback_does_not_follow_symlinks_out(project, repo, tmp_path_factory, capsys):
+    secret = tmp_path_factory.mktemp("s") / "leak.txt"
+    secret.write_text("EXTERNAL SECRET\n")
+    code = project / "runs" / "R1" / "code" / "sub"
+    code.mkdir(parents=True)
+    (code / "leak.txt").symlink_to(secret)
+    (project / "runs" / "R1" / "run.json").write_text(json.dumps({"id": "R1", "file": "a.py", "status": "ok"}))
+    Ledger(project / "claims.jsonl").append({"kind": "computed", "statement": "x", "value": 1,
+                                             "evidence": {"run_id": "R1", "code_lines": "leak.txt:1"}})
+    main(["why", "C1"])
+    assert "EXTERNAL SECRET" not in capsys.readouterr().out
+
+
+def test_image_must_be_a_chart_file(project, repo, capsys):
+    (repo / "rows.csv").write_text("a\n1\n")
+    (repo / "data").mkdir()
+    (repo / "data" / "private.csv").write_text("x\n")
+    assert main(["figure", "register", "x", "--data", "rows.csv", "--source", "O", "--image", "data/private.csv"]) == 2
+
+
+def test_lockfile_symlink_out_of_repo_is_not_bundled(project, repo, tmp_path_factory):
+    secret = tmp_path_factory.mktemp("s") / "reqs.txt"
+    secret.write_text("internal-only-package==1.0\n")
+    (repo / "requirements.txt").symlink_to(secret)
+    main(["bundle", "--raw", "no", "--out", "out/b.zip"])
+    names = _bundle_names(repo / "out" / "b.zip")
+    assert not any(b"internal-only-package" in data for data in names.values())
+
+
+def test_large_text_is_still_redacted(project, repo, monkeypatch):
+    from nutmeg_core import bundle as bundling
+    (repo / ".env").write_text("TOKEN=big-secret-123456\n")
+    (project / "notes.txt").write_text(("filler line\n" * 1000) + "big-secret-123456\n")
+    main(["bundle", "--raw", "no", "--out", "out/b.zip"])
+    assert b"big-secret-123456" not in _bundle_names(repo / "out" / "b.zip")["club/notes.txt"]
+    assert "50 * 1024" not in (PLUGIN / "core" / "nutmeg_core" / "bundle.py").read_text()
+
+
+def test_publish_redacts_and_refuses_symlinked_destinations(project, repo, tmp_path_factory, capsys):
+    (repo / ".env").write_text("TOKEN=pub-secret-445566\n")
+    (project / "report.md").write_text("Report made with pub-secret-445566.\n")
+    assert main(["publish", "--to", "public"]) == 0
+    assert "pub-secret-445566" not in (repo / "public" / "report.md").read_text()
+    outside = tmp_path_factory.mktemp("outside")
+    (repo / "public2").mkdir()
+    (repo / "public2" / "reports").symlink_to(outside)
+    (project / "reports").mkdir()
+    (project / "reports" / "r.md").write_text("hello\n")
+    assert main(["publish", "--to", "public2"]) == 2
+    assert not list(outside.iterdir())
+
+
+def test_publish_refuses_colliding_destinations(project, repo, capsys):
+    (project / "runs" / "R1").mkdir(parents=True, exist_ok=True)
+    (repo / "out").mkdir()
+    (repo / "out" / "rows.csv").write_text("a\n1\n")
+    (repo / "out" / "chart.png").write_bytes(b"one")
+    (project / "_assets" / "out").mkdir(parents=True)
+    (project / "_assets" / "out" / "chart.md").write_text("caption\n")
+    main(["figure", "register", "c1", "--data", "out/rows.csv", "--source", "O", "--image", "out/chart.png"])
+    (project / "_assets" / "out" / "chart.png").write_bytes(b"two")
+    main(["figure", "register", "c2", "--data", "out/rows.csv", "--source", "O", "--image",
+          "research/club/_assets/out/chart.png"])
+    assert main(["publish", "--to", "public"]) == 2
+    assert "two files would be published" in capsys.readouterr().err

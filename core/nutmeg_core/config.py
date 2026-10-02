@@ -49,11 +49,32 @@ def _read_json(path, label):
 
 
 def load_team(repo_root):
-    """The team config as a dict, or {} when the repo has none."""
+    """The team config as a dict, or {} when the repo has none. Raises ConfigError for a bad file."""
     path = Path(repo_root) / TEAM_FILE
     if not path.exists():
         return {}
-    return _read_json(path, TEAM_FILE)
+    team = _read_json(path, TEAM_FILE)
+    validate_team(team)
+    return team
+
+
+TEAM_TYPES = {
+    "max_autonomy": dict, "allow_run_then_review": bool, "persona_default": str, "approved_services": list,
+    "approved_ai_providers": list, "licences": dict, "data_in_git": str, "signoff": dict,
+}
+
+
+def validate_team(team):
+    """Check every known key has the right type, so a malformed value never silently weakens a rule."""
+    for key, kind in TEAM_TYPES.items():
+        if key in team and not isinstance(team[key], kind):
+            raise ConfigError(f"{key} in {TEAM_FILE} must be a {kind.__name__}")
+    signoff = team.get("signoff", {})
+    if "required" in signoff and not isinstance(signoff["required"], bool):
+        raise ConfigError(f"signoff.required in {TEAM_FILE} must be true or false")
+    for key in ("approved_services", "approved_ai_providers"):
+        if not all(isinstance(v, str) for v in team.get(key, [])):
+            raise ConfigError(f"{key} in {TEAM_FILE} must list strings")
 
 
 def user_config_path():
@@ -138,10 +159,7 @@ def effective(team, user):
 
 def team_signoff_required(repo_root):
     """The team's sign-off rule, read from the team file alone (a broken user config cannot turn it off)."""
-    signoff = load_team(repo_root).get("signoff") or {}
-    if not isinstance(signoff, dict):
-        raise ConfigError(f"signoff in {TEAM_FILE} must be an object")
-    return bool(signoff.get("required", False))
+    return bool(load_team(repo_root).get("signoff", {}).get("required", False))
 
 
 def load_effective(repo_root):
