@@ -36,6 +36,22 @@ def contest(project, claim_id, note, by):
     return written
 
 
+def withdraw(project, claim_id, note, by):
+    """Take a claim out of use (for example one replaced by finer claims). Outputs that cite it then fail the check."""
+    if not note or not note.strip():
+        raise ReviewError("say why it is withdrawn with --note, for example 'replaced by C23-C26'")
+    ledger = open_ledger(project)
+    claim = ledger.get(claim_id)
+    if claim is None:
+        raise ReviewError(f"no claim {claim_id} in this project")
+    if claim.get("status") == "withdrawn":
+        raise ReviewError(f"{claim_id} is already withdrawn")
+    note = Redactor.for_repo(find_repo_root(project)).text(note)
+    written = ledger.update(claim_id, status="withdrawn", note=note.strip(), by=by)
+    append_receipt(project, "withdraw", claim=claim_id, by=by, note=note.strip(), version=written["version"])
+    return written
+
+
 def resolve(project, claim_id, note, by):
     if not note or not note.strip():
         raise ReviewError("say how it was resolved with --note")

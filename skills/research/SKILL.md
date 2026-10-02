@@ -133,6 +133,10 @@ Each kind needs its evidence:
 - An interpretation is never "verified". It is `supported` or `contested`.
 - Put the claim ID next to the number in reports and captions, for example `0.41 [C3]`.
 - Never write a number in an output that is not in the ledger.
+- Record one number per claim. A statement such as "7 shots, 3 key passes and 2 goals" with one `value`
+  leaves the other numbers without evidence; make one claim for each.
+- When a claim is replaced, withdraw the old one with a reason:
+  `nutmeg claim withdraw C4 --note "replaced by C23-C26"`. Outputs that still cite it then fail the check.
 - `nutmeg claim list` shows the ledger and any bad lines.
 
 ## 6. Write outputs and check them

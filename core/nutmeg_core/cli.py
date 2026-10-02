@@ -258,6 +258,17 @@ def cmd_contest(args):
     return 0
 
 
+def cmd_claim_withdraw(args):
+    project = resolve_project(args)
+    try:
+        written = review.withdraw(project, args.claim_id, args.note, user_name(find_repo_root(project)))
+    except review.ReviewError as exc:
+        raise UsageError(str(exc))
+    print(f"{written['id']} is now withdrawn ({written['by']}: {written['note']}); "
+          "outputs that still cite it will fail `nutmeg check`")
+    return 0
+
+
 def cmd_resolve(args):
     project = resolve_project(args)
     try:
@@ -512,7 +523,7 @@ def build_parser(parser_class=cards.NutmegParser):
     setter.add_argument("--name", help="your name for sign-offs and notes (default: git user.name)")
     setter.set_defaults(handler=cmd_config_set)
 
-    claim = commands.add_parser("claim", help="add, list or show ledger claims")
+    claim = commands.add_parser("claim", help="add, list, show or withdraw ledger claims")
     claim_commands = claim.add_subparsers(dest="claim_command", metavar="<action>")
 
     add = claim_commands.add_parser("add", help="append a claim (JSON from --json or stdin)")
@@ -527,6 +538,11 @@ def build_parser(parser_class=cards.NutmegParser):
     show = claim_commands.add_parser("show", help="print one claim as JSON")
     show.add_argument("claim_id")
     show.set_defaults(handler=cmd_claim_show)
+
+    withdraw = claim_commands.add_parser("withdraw", help="take a claim out of use, with a note")
+    withdraw.add_argument("claim_id")
+    withdraw.add_argument("--note", required=True, help="why, for example 'replaced by C23-C26'")
+    withdraw.set_defaults(handler=cmd_claim_withdraw)
 
     return parser
 

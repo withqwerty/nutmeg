@@ -52,3 +52,27 @@ def test_note_does_not_carry_to_later_versions(project):
 
 def test_contest_unknown_claim(project, capsys):
     assert main(["contest", "C9", "--note", "x"]) == 2
+
+
+def test_withdraw_takes_a_claim_out_of_use(project, capsys):
+    from nutmeg_core import check as checks
+    (project / "runs" / "R1").mkdir(parents=True)
+    (project / "runs" / "R1" / "run.json").write_text(json.dumps({"id": "R1", "status": "ok", "exit_code": 0}))
+    (project / "report.md").write_text("Penalty-free xG was 1.78 [C1].\n")
+    assert checks.run_checks(project)[0] == []
+    assert main(["claim", "withdraw", "C1", "--note", "replaced by per-match claims"]) == 0
+    claim = Ledger(project / "claims.jsonl").get("C1")
+    assert claim["status"] == "withdrawn" and claim["by"] == "Test Analyst" and "signer" not in claim
+    assert "outputs that still cite it" in capsys.readouterr().out
+    # The report still cites C1, so the check now fails for it.
+    assert checks.run_checks(project)[0]
+    kinds = [json.loads(l)["kind"] for l in (project / "receipts.jsonl").read_text().splitlines()]
+    assert kinds[-1] == "withdraw"
+
+
+def test_withdraw_needs_a_note_and_a_live_claim(project):
+    with pytest.raises(SystemExit):
+        main(["claim", "withdraw", "C1"])
+    assert main(["claim", "withdraw", "C9", "--note", "x"]) != 0
+    assert main(["claim", "withdraw", "C1", "--note", "dropped"]) == 0
+    assert main(["claim", "withdraw", "C1", "--note", "again"]) != 0

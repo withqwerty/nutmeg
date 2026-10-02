@@ -152,3 +152,29 @@ def test_stop_without_project_exits_before_python(repo):
 
 def test_stop_with_no_outputs_does_nothing(project, repo):
     assert _stop(repo).stdout == ""
+
+
+def _plan_metric(project, choice):
+    assert main(["plan", "choose", "--kind", "metric", "--choice", choice, "--why", "the brief asks for it",
+                 "--rests-type", "user", "--rests-ref", "brief"]) == 0
+
+
+def test_plan_metric_without_a_definition_warns(project):
+    _plan_metric(project, "left-foot pass share: passes with the left foot over all foot passes")
+    warnings = checks.run_checks(project)[1]
+    assert any('plan metric "left-foot pass share" has no glossary entry' in w for w in warnings)
+
+
+def test_definition_claim_with_the_term_clears_the_warning(project):
+    _plan_metric(project, "left-foot pass share: passes with the left foot over all foot passes")
+    add(project, kind="definition", statement="The share of foot passes made with the left foot",
+        evidence={"definition": "left-foot passes / foot passes", "term": "left-foot pass share"})
+    assert not any("left-foot pass share" in w for w in checks.run_checks(project)[1])
+
+
+def test_long_metric_text_asks_for_a_short_name(project):
+    _plan_metric(project, "minutes played from starting xi, substitution events and each match's last event")
+    warnings = [w for w in checks.run_checks(project)[1] if w.startswith("plan metric")]
+    assert len(warnings) == 1
+    assert "has no short name" in warnings[0] and "### metric: minutes played:" in warnings[0]
+    assert "each match's last event" not in warnings[0]

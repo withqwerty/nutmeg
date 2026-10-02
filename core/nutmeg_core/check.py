@@ -145,6 +145,9 @@ def _failure_id(*parts):
     return "F-" + hashlib.sha256("|".join(str(p) for p in parts).encode("utf-8")).hexdigest()[:8]
 
 
+SHORT_TERM_WORDS = 6
+
+
 def metric_term(choice):
     """The term a plan metric choice defines: its words before ':', '=', ';' or '('."""
     return re.split(r"[:=;(]", choice, maxsplit=1)[0].strip().lower()
@@ -178,6 +181,13 @@ def run_checks(project):
             continue
         term = metric_term(choice["choice"])
         if not any(_defines(c, term) for c in definitions):
+            if len(term.split()) > SHORT_TERM_WORDS:
+                short = " ".join(term.split()[:SHORT_TERM_WORDS])
+                warnings.append(f"plan metric \"{short} ...\" has no short name and no definition claim; start its "
+                                "plan heading with a short name, then ':' and the details (for example "
+                                "`### metric: minutes played: from line-ups and substitutions`), and add a "
+                                "definition claim whose evidence.term is that name")
+                continue
             warnings.append(f"plan metric \"{term}\" has no glossary entry or definition claim; add a definition "
                             f"claim whose statement names \"{term}\" (or whose evidence.term is \"{term}\")")
 
