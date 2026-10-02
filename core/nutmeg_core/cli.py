@@ -341,6 +341,8 @@ def cmd_config_show(args):
     if settings["approved_services"]:
         print(f"Team-approved services: {', '.join(settings['approved_services'])}")
     print(f"User config: {user_config_path()}")
+    for warning in settings.get("warnings", []):
+        print(f"warning: {warning}")
     return 0
 
 

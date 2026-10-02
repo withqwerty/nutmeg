@@ -64,6 +64,22 @@ TEAM_TYPES = {
 }
 
 
+USER_KEYS = ("persona", "autonomy_plan", "autonomy_run", "autonomy_publish", "run_then_review", "name")
+
+
+def unknown_keys(team, user):
+    """Keys nutmeg does not read, so a typo never passes silently. Returns warning strings."""
+    out = []
+    for key in sorted(set(team) - set(TEAM_TYPES)):
+        out.append(f"{TEAM_FILE} has an unknown key \"{key}\"; nutmeg ignores it "
+                   f"(known keys: {', '.join(TEAM_TYPES)})")
+    for key in sorted(set(user) - set(USER_KEYS)):
+        hint = (" (use autonomy_plan, autonomy_run and autonomy_publish)" if key == "autonomy"
+                else f" (known keys: {', '.join(USER_KEYS)})")
+        out.append(f"the user config has an unknown key \"{key}\"; nutmeg ignores it{hint}")
+    return out
+
+
 def validate_team(team):
     """Check every known key has the right type, so a malformed value never silently weakens a rule."""
     for key, kind in TEAM_TYPES.items():
@@ -133,12 +149,14 @@ def effective(team, user):
         raise ConfigError(f"max_autonomy in {TEAM_FILE} must map stages to levels")
     out = {"persona": persona, "levels": {}, "reasons": {}}
     for stage in STAGES:
-        chosen = _level(user.get(f"autonomy_{stage}"), f"autonomy_{stage} in the user config") or PERSONAS[persona][stage]
+        own = _level(user.get(f"autonomy_{stage}"), f"autonomy_{stage} in the user config")
+        chosen = own or PERSONAS[persona][stage]
         floor = _level(team_max.get(stage), f"max_autonomy.{stage} in {TEAM_FILE}")
         level = _stricter(chosen, floor)
         out["levels"][stage] = level
         out["reasons"][stage] = (f"team limit {floor} applies (you chose {chosen})"
-                                 if floor and level == floor and floor != chosen else f"{level} ({persona} setting)")
+                                 if floor and level == floor and floor != chosen
+                                 else "your setting" if own else f"{persona} default")
     team_allows = team.get("allow_run_then_review", True)
     wants = bool(user.get("run_then_review", False))
     out["run_then_review"] = wants and bool(team_allows) and out["levels"]["run"] == "L3"
@@ -163,7 +181,10 @@ def team_signoff_required(repo_root):
 
 
 def load_effective(repo_root):
-    return effective(load_team(repo_root), load_user())
+    team, user = load_team(repo_root), load_user()
+    settings = effective(team, user)
+    settings["warnings"] = unknown_keys(team, user)
+    return settings
 
 
 def config_hash(repo_root):

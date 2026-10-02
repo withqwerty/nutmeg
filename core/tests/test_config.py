@@ -168,3 +168,23 @@ def test_config_set_records_a_receipt(project, repo, capsys):
     assert "run-then-review: on" in capsys.readouterr().out
     receipt = json.loads((project / "receipts.jsonl").read_text().splitlines()[-1])
     assert receipt["kind"] == "config_changed"
+
+
+def test_unknown_config_keys_are_reported(repo, capsys):
+    # Found while building a held-out case: a nested "autonomy" key was ignored without a word.
+    team(repo, signof={"required": True})
+    user(repo, persona="club", autonomy={"run": "L3"})
+    settings = config.load_effective(repo)
+    assert settings["levels"]["run"] == "L2"
+    assert any('unknown key "signof"' in w for w in settings["warnings"])
+    assert any('unknown key "autonomy"' in w and "autonomy_run" in w for w in settings["warnings"])
+    assert main(["config", "show"]) == 0
+    out = capsys.readouterr().out
+    assert 'warning: .nutmeg/team.json has an unknown key "signof"' in out
+
+
+def test_reasons_say_whose_setting_it_is(repo):
+    user(repo, persona="club", autonomy_run="L3")
+    reasons = config.load_effective(repo)["reasons"]
+    assert reasons["run"] == "your setting" and reasons["plan"] == "club default"
+    assert config.load_effective(repo)["warnings"] == []
