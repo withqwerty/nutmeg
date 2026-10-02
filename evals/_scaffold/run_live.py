@@ -10,8 +10,9 @@ this machine (for example, its Bash sandbox refuses to start when a
 credentials file points at missing files). Each run gets a fresh git
 repository with the case's scaffold, loads this plugin with only the
 football-docs MCP server, and allows the case's `allowed_tools`. Graders:
-regex (target trace or last message) and tool_used run locally; llm graders
-ask the judge model for PASS or FAIL. The real football-docs server is used,
+regex (target trace, last message or file:<glob>) and tool_used run locally;
+llm graders ask the judge model for PASS or FAIL about the last message, plus
+the files a `target: file:<glob>` names. The real football-docs server is used,
 not the replay mock. Hooks run, so a gate "ask" is denied (no user), as in a
 headless session.
 """
@@ -122,7 +123,8 @@ def run_once(name, model, keep, judge_model, eval_dir=EVALS):
             low, high = int(grader.get("min", 1)), grader.get("max")
             verdicts[gname] = count >= low and (high is None or count <= int(high))
         elif kind == "llm":
-            verdicts[gname], judged[gname] = judge_votes(grader["body"], last, judge_model)
+            response = judge_input(last, grader.get("target", ""), work)
+            verdicts[gname], judged[gname] = judge_votes(grader["body"], response, judge_model)
     if not keep:
         shutil.rmtree(work, ignore_errors=True)
     mcp.unlink(missing_ok=True)
@@ -132,6 +134,16 @@ def run_once(name, model, keep, judge_model, eval_dir=EVALS):
 
 
 JUDGE_VOTES = 3
+FILE_CHARS = 20000
+
+
+def judge_input(last, where, work):
+    """The last message, plus the files a `file:<glob>` target names (the judge sees what the run wrote)."""
+    if not where.startswith("file:"):
+        return last
+    files = [p for p in sorted(Path(work).glob(where[5:])) if p.is_file()]
+    return last + "".join(f"\n\n--- {p.relative_to(work)} ---\n" + p.read_text(errors="replace")[:FILE_CHARS]
+                          for p in files)
 
 
 def judge_votes(criteria, response, model, votes=JUDGE_VOTES):
