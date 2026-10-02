@@ -594,3 +594,30 @@ def test_publish_refuses_colliding_destinations(project, repo, capsys):
           "research/club/_assets/out/chart.png"])
     assert main(["publish", "--to", "public"]) == 2
     assert "two files would be published" in capsys.readouterr().err
+
+
+# --- fourth review ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("command", [
+    "git status\npython3 analysis.py", "if true; then python3 analysis.py; fi",
+    "for f in *.py; do python3 \"$f\"; done", "! python3 a.py", "{ nutmeg run a.py; }",
+])
+def test_newlines_and_shell_keywords_do_not_hide_runs(command):
+    assert gate.parse(command).kind in ("compound", "interpreter"), command
+
+
+def test_publish_into_the_project_folder_is_refused(project, repo, capsys):
+    (project / "report.md").write_text("Report.\n")
+    assert main(["publish", "--to", "research/club"]) == 2
+    assert (project / "report.md").read_text() == "Report.\n"
+
+
+def test_multiline_secret_is_redacted_in_bundles_and_publish(project, repo, monkeypatch):
+    monkeypatch.setenv("API_SECRET", "first-secret-line\nsecond-secret-line")
+    (project / "report.md").write_text("Header\nfirst-secret-line\nsecond-secret-line\nFooter\n")
+    main(["bundle", "--raw", "no", "--out", "out/b.zip"])
+    data = _bundle_names(repo / "out" / "b.zip")["club/report.md"]
+    assert b"first-secret-line" not in data and b"second-secret-line" not in data
+    assert main(["publish", "--to", "public"]) == 0
+    text = (repo / "public" / "report.md").read_text()
+    assert "first-secret-line" not in text and "second-secret-line" not in text

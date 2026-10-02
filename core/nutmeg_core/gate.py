@@ -199,12 +199,20 @@ def parse(command):
         or any(_is_operator(t) for t in tokens)
     )
     if unsafe:
-        segments = _segments(tokens)
+        segments = []
+        for line in text.splitlines() or [text]:
+            try:
+                segments += _segments(_tokenise(line))
+            except ValueError:
+                segments.append(tokens)  # a quote spans lines: judge the whole command
+        segments = segments or _segments(tokens)
         if any(_executes_gated(seg) for seg in segments) or ("`" in text and any(_mentions_gated(t) for t in tokens)):
             return Parsed("compound", tokens=tokens,
                           reason="this command chains, redirects, substitutes or comments other commands; nothing has run yet")
         return Parsed("other", tokens=tokens)
 
+    while tokens and tokens[0] in SHELL_KEYWORDS:  # "! python3 a.py" runs python3
+        tokens = tokens[1:]
     bare = _drop_assignments(tokens)
     head = os.path.basename(bare[0]) if bare else ""
     if (head in SHELLS or head in EXECUTORS) and any(_mentions_gated(t) for t in bare[1:]):
@@ -258,9 +266,14 @@ def _segments(tokens):
     return segments
 
 
+# Shell words that can come before the command itself: if true; then python3 a.py; fi
+SHELL_KEYWORDS = {"if", "then", "else", "elif", "do", "while", "until", "!", "{", "}", "time", "coproc", "fi",
+                  "done", "esac"}
+
+
 def _drop_assignments(tokens):
     rest = list(tokens)
-    while rest and _ASSIGNMENT.match(rest[0]):
+    while rest and (_ASSIGNMENT.match(rest[0]) or rest[0] in SHELL_KEYWORDS):
         rest = rest[1:]
     return rest
 

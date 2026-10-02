@@ -14,7 +14,7 @@ from . import check as checks
 from .card import sha256_path
 from .figure import IMAGE_TYPES, load_all
 from .project import append_receipt
-from .bundle import write_redacted
+from .bundle import RedactionError, write_redacted
 from .redact import Redactor, inside_repo
 from .why import sample_rows
 
@@ -132,8 +132,14 @@ def publish(project, repo_root, by, to=None):
             target = inside_repo(to, repo_root)
         except ValueError as exc:
             raise PublishError(str(exc))
-        target.mkdir(parents=True, exist_ok=True)
         target_real = target.resolve()
+        # Never write over what is being published: the folder must not be, or hold, any source file.
+        for key, source in plan.items():
+            destination = (target / key)
+            if source == target_real or target_real in source.parents or (
+                    destination.exists() and destination.resolve() == source):
+                raise PublishError(f"--to {to} holds the files being published ({key}); choose a folder outside them")
+        target.mkdir(parents=True, exist_ok=True)
         for key, source in plan.items():
             destination = target / key
             destination.parent.mkdir(parents=True, exist_ok=True)
@@ -141,8 +147,12 @@ def publish(project, repo_root, by, to=None):
             if destination.is_symlink() or target_real not in destination.parent.resolve().parents \
                     and destination.parent.resolve() != target_real:
                 raise PublishError(f"{destination} leads outside {to}; remove the link and publish again")
-            with open(destination, "wb") as sink:
-                write_redacted(source, sink, redactor)
+            try:
+                with open(destination, "wb") as sink:
+                    write_redacted(source, sink, redactor)
+            except RedactionError as exc:
+                destination.unlink(missing_ok=True)
+                raise PublishError(str(exc))
             record["files"].append({"path": key, "source": source.relative_to(real_repo).as_posix(),
                                     "sha256": sha256_path(destination)})
         record["to"] = target.relative_to(real_repo).as_posix()

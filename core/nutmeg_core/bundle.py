@@ -186,8 +186,26 @@ def render_preview(project, repo_root, namespace, label):
     return "\n".join(out)
 
 
+WHOLE_FILE_LIMIT = 256 * 1024 * 1024
+
+
+class RedactionError(ValueError):
+    pass
+
+
 def write_redacted(path, sink, redactor):
-    """Copy a file into a binary stream line by line, masking secrets; bytes that are not UTF-8 pass through."""
+    """Copy a file into a binary stream with secrets masked; bytes that are not UTF-8 pass through.
+
+    Files up to 256 MB are redacted whole, so a secret that spans lines is still found. A larger file is
+    streamed line by line, which is safe only when no known secret spans a line; otherwise it is refused.
+    """
+    size = Path(path).stat().st_size
+    if size <= WHOLE_FILE_LIMIT:
+        text = Path(path).read_bytes().decode("utf-8", "surrogateescape")
+        sink.write(redactor.text(text).encode("utf-8", "surrogateescape"))
+        return
+    if any("\n" in secret or "\r" in secret for secret in redactor.secrets):
+        raise RedactionError(f"{path} is too large to check for a secret that spans lines; leave it out")
     with open(path, "rb") as source:
         for line in source:
             text = line.decode("utf-8", "surrogateescape")
@@ -221,8 +239,16 @@ def bundle(project, repo_root, raw_choice, by, out=None):
     target.parent.mkdir(parents=True, exist_ok=True)
     ensure_research_files(repo_root)
 
-    files, omitted = [], []
     env = redactor.obj(environment(repo_root))
+    try:
+        return _write_bundle(project, repo_root, raw_choice, by, target, include, held, skipped, env, redactor)
+    except RedactionError as exc:
+        target.unlink(missing_ok=True)
+        raise BundleError(str(exc))
+
+
+def _write_bundle(project, repo_root, raw_choice, by, target, include, held, skipped, env, redactor):
+    files, omitted = [], []
     with zipfile.ZipFile(target, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for rel in include:
             path = project / rel
