@@ -88,6 +88,10 @@ questions and the data, but not the answers. Compare.
 Look for: numbers that differ, and whether nutmeg says when it cannot reproduce something, rather than forcing a
 match.
 
+Would you donate this task as a test case? If the analysis is unpublished and uses open data, we can keep the
+questions, the data references and your numbers in a private test set (never published) that measures every
+future nutmeg version. Say so on the feedback form, and send the questions and your answers.
+
 ### Task 5. Team rules (two people, or one person playing two roles)
 
 Add `.nutmeg/team.json` with `"signoff": {"required": true}` and `"max_autonomy": {"run": "L2"}`
@@ -122,6 +126,7 @@ Wrong or unsupported numbers you saw (claim id if any):
 Gate cards: clear / unclear (what was missing):
 Would you trust the output enough to share it? 1 (no) to 5 (yes), and why:
 Bugs (what you did, what happened, what you expected):
+Task 4 only: may we keep it as a private test case? yes / no
 Anything else:
 ```
 
