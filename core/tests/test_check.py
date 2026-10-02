@@ -178,3 +178,20 @@ def test_long_metric_text_asks_for_a_short_name(project):
     assert len(warnings) == 1
     assert "has no short name" in warnings[0] and "### metric: minutes played:" in warnings[0]
     assert "each match's last event" not in warnings[0]
+
+
+@pytest.mark.parametrize("value", [0.2054, 0.1987, 1.2010])
+def test_decimal_digits_that_look_like_a_year_are_read_whole(project, value):
+    # Found by the held-out Cruyff run: the year mask ate "2054" in "0.2054", leaving a bare "0".
+    computed(project, value)
+    (project / "report.md").write_text(f"xG: East Germany {value:.4f} [C1].\n")
+    assert checks.run_checks(project)[0] == []
+    rows = checks.shown_numbers(f"xG: East Germany {value:.4f}.")
+    assert [r[1] for r in rows] == [f"{value:.4f}"]
+
+
+def test_years_and_seasons_are_still_masked(project):
+    computed(project, 31)
+    (project / "report.md").write_text("In 2019 he scored 31 [C1] goals; the 2015/16 season and May 2019 were quieter.\n")
+    assert checks.run_checks(project)[0] == []
+    assert [r[1] for r in checks.shown_numbers("A count of 1999.5 metres.")] == ["1999.5"]

@@ -48,7 +48,7 @@ _SKIP_SPANS = [
     re.compile(r"\]\([^)]*\)"),                                  # link targets
     re.compile(r"https?://\S+"),                                 # bare URLs
     re.compile(r"\[C\d+(?:\s*,\s*C\d+)*\]"),                     # claim references
-    re.compile(r"\b(?:18|19|20|21)\d{2}\s*[/–-]\s*\d{2}(?:\d{2})?\b"),  # seasons 2025/26, 2025-2026
+    re.compile(r"(?<![\d.,])\b(?:18|19|20|21)\d{2}\s*[/–-]\s*\d{2}(?:\d{2})?\b(?![.,]\d)"),  # seasons 2025/26, 2025-2026
     re.compile(r"\b\d{4}-\d{2}-\d{2}\b"),                        # ISO dates
     re.compile(r"\b\d{1,2}/\d{1,2}/\d{2,4}\b"),                  # 12/03/2025
     re.compile(r"\b\d{1,2}(?:st|nd|rd|th)?\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?(?:\s+\d{4})?\b", re.I),
@@ -59,7 +59,8 @@ _SKIP_SPANS = [
     re.compile(r"\b(?:top|bottom|last|first|next)\s+\d+\b", re.I),  # top 5
     re.compile(r"\b\d+(?:st|nd|rd|th)\b"),                        # ordinals
     # years, but not counts such as "2010 minutes"
-    re.compile(r"\b(?:18|19|20|21)\d{2}\b(?!\s+(?:" + "|".join(UNITS) + r")\b)", re.I),
+    # (never the digits of a decimal such as 0.2054 or 1999.5)
+    re.compile(r"(?<![\d.,])\b(?:18|19|20|21)\d{2}\b(?![.,]\d)(?!\s+(?:" + "|".join(UNITS) + r")\b)", re.I),
 ]
 _LIST_MARKER = re.compile(r"^\s*(?:\d+[.)]\s+|#+\s+\d+(?:\.\d+)*\.?\s)")
 _FENCE = re.compile(r"^\s*(```|~~~)")
