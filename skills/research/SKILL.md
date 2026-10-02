@@ -166,7 +166,8 @@ says a problem is not one, record their reason:
   with each claim's evidence, report, figures, runs and the glossary entries it links. Regenerate it after changes
   and tell the user where it is. It is view-only; approvals happen here in Claude Code.
 - Use terms from `${CLAUDE_PLUGIN_ROOT}/docs/glossary.md` for metrics where you can. For a metric that is not in it,
-  add a `definition` claim so readers know what it means.
+  add a `definition` claim so readers know what it means: name the metric's term in its statement, or set
+  `evidence.term` to it, so `nutmeg check` links the two.
 - A teammate who doubts a claim runs `nutmeg contest <claim> --note "<what is wrong>"`; the claim
   becomes disputed (an interpretation becomes contested). `nutmeg resolve <claim> --note "<how>"`
   returns it to its earlier status. Both record the person's name.

@@ -116,3 +116,12 @@ def test_claim_references_link_to_rows_and_italics_render(project, repo):
     assert '[<a class="claim" href="#C1">C1</a>]' in html
     assert '<a class="claim" href="#C2">C2</a>]' in html
     assert "<em>(placeholder)</em>" in html and "snake_case_name" in html
+
+
+def test_definition_claim_links_to_a_long_plan_metric(project):
+    main(["plan", "choose", "--kind", "metric", "--choice", "Dribbles: type=Dribble events; completed = outcome Complete",
+          "--why", "The brief asks for dribbles.", "--rests-type", "user", "--rests-ref", "brief"])
+    assert any("\"dribbles\"" in w for w in checks.run_checks(project)[1])
+    Ledger(project / "claims.jsonl").append({"kind": "definition", "statement": "Dribbles counted from Dribble events",
+                                             "evidence": {"definition": "a completed dribble has outcome Complete"}})
+    assert not any("dribbles" in w for w in checks.run_checks(project)[1])

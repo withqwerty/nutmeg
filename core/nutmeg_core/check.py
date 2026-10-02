@@ -145,6 +145,20 @@ def _failure_id(*parts):
     return "F-" + hashlib.sha256("|".join(str(p) for p in parts).encode("utf-8")).hexdigest()[:8]
 
 
+def metric_term(choice):
+    """The term a plan metric choice defines: its words before ':', '=', ';' or '('."""
+    return re.split(r"[:=;(]", choice, maxsplit=1)[0].strip().lower()
+
+
+def _defines(claim, term):
+    evidence = claim.get("evidence") or {}
+    if str(evidence.get("term", "")).strip().lower() == term:
+        return True
+    words = re.findall(r"[a-z0-9%+-]+", term)
+    text = (claim["statement"] + " " + str(evidence.get("definition", ""))).lower()
+    return bool(words) and all(re.search(r"(?<![a-z0-9])" + re.escape(w) + r"(?![a-z0-9])", text) for w in words)
+
+
 def run_checks(project):
     """Return (failures, warnings). Each failure is a dict with an `id`."""
     project = Path(project)
@@ -155,15 +169,17 @@ def run_checks(project):
     for lineno, message in problems:
         warnings.append(f"claims.jsonl line {lineno}: {message}")
 
-    # A metric in the plan should link to a meaning: a glossary entry or a definition claim.
-    definitions = " ".join(c["statement"] + " " + str((c.get("evidence") or {}).get("definition", ""))
-                           for c in live.values() if c["kind"] == "definition").lower()
+    # A metric in the plan should link to a meaning: a glossary entry or a definition claim
+    # that names the metric's term (its words before ":", "=" or "(") or sets evidence.term to it.
+    definitions = [c for c in live.values() if c["kind"] == "definition"]
     plan_text = (project / "plan.md").read_text(encoding="utf-8") if (project / "plan.md").is_file() else ""
     for choice in parse_choices(plan_text):
-        if choice["kind"] == "metric" and not glossary.find(choice["choice"]) \
-                and choice["choice"].lower() not in definitions:
-            warnings.append(f"plan metric \"{choice['choice']}\" has no glossary entry or definition claim; "
-                            "add a definition claim so readers know what it means")
+        if choice["kind"] != "metric" or glossary.find(choice["choice"]):
+            continue
+        term = metric_term(choice["choice"])
+        if not any(_defines(c, term) for c in definitions):
+            warnings.append(f"plan metric \"{term}\" has no glossary entry or definition claim; add a definition "
+                            f"claim whose statement names \"{term}\" (or whose evidence.term is \"{term}\")")
 
     for path in output_files(project):
         rel = path.relative_to(project).as_posix()

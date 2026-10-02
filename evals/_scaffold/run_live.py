@@ -47,8 +47,8 @@ def frontmatter(text):
     return meta, body.lstrip("\n")
 
 
-def load_case(name):
-    folder = EVALS / name
+def load_case(name, eval_dir=EVALS):
+    folder = (Path(eval_dir) / name).resolve()  # the scaffold runs in a temporary folder
     meta, prompt = frontmatter((folder / "prompt.md").read_text())
     graders = {}
     for path in sorted((folder / "graders").glob("*.md")):
@@ -58,8 +58,8 @@ def load_case(name):
     return folder, meta, prompt.strip(), graders
 
 
-def run_once(name, model, keep, judge_model):
-    folder, meta, prompt, graders = load_case(name)
+def run_once(name, model, keep, judge_model, eval_dir=EVALS):
+    folder, meta, prompt, graders = load_case(name, eval_dir)
     work = Path(tempfile.mkdtemp(prefix=f"nutmeg-live-{name}-"))
     subprocess.run(["git", "init", "-q"], cwd=work, check=True)
     subprocess.run(["git", "config", "user.name", "Eval Analyst"], cwd=work, check=True)
@@ -72,9 +72,14 @@ def run_once(name, model, keep, judge_model):
     cmd = ["claude", "-p", prompt, "--plugin-dir", str(ROOT), "--model", model, "--setting-sources", "project",
            "--strict-mcp-config", "--mcp-config", str(mcp), "--allowedTools", ",".join(allowed),
            "--max-turns", str(meta.get("max_turns", 10)), "--output-format", "stream-json", "--verbose"]
+    if meta.get("disallowed_tools"):
+        cmd += ["--disallowedTools", ",".join(meta["disallowed_tools"])]
+    # Each run gets its own nutmeg user config (the scaffold may write it), never the operator's.
+    env = dict(os.environ, NUTMEG_USER_CONFIG=str(work / ".nutmeg-user.json"))
     timeout = int(meta.get("timeout_seconds", 300))
     try:
-        result = subprocess.run(cmd, cwd=work, capture_output=True, text=True, timeout=timeout, stdin=subprocess.DEVNULL)
+        result = subprocess.run(cmd, cwd=work, capture_output=True, text=True, timeout=timeout,
+                                stdin=subprocess.DEVNULL, env=env)
         lines = result.stdout.splitlines()
     except subprocess.TimeoutExpired as exc:
         lines = (exc.stdout or b"").decode(errors="replace").splitlines() if isinstance(exc.stdout, bytes) else (exc.stdout or "").splitlines()
@@ -100,7 +105,12 @@ def run_once(name, model, keep, judge_model):
     for gname, grader in graders.items():
         kind = grader.get("type")
         if kind == "regex":
-            target = trace if grader.get("target") == "trace" else last
+            where = grader.get("target", "")
+            if where.startswith("file:"):
+                # The contents of the files the run left behind, for example file:research/*/claims.jsonl
+                target = "\n".join(p.read_text(errors="replace") for p in sorted(work.glob(where[5:])) if p.is_file())
+            else:
+                target = trace if where == "trace" else last
             hit = re.search(grader["body"], target, re.I if grader.get("flags") == "i" else 0) is not None
             verdicts[gname] = hit if grader.get("match", "contains") == "contains" else not hit
         elif kind == "tool_used":
@@ -139,11 +149,13 @@ if __name__ == "__main__":
     parser.add_argument("--runs", type=int, default=1)
     parser.add_argument("--keep", action="store_true", help="keep the work folders")
     parser.add_argument("--json", help="write the results here")
+    parser.add_argument("--eval-dir", default=str(EVALS),
+                        help="folder that holds the cases (for example a private held-out set)")
     args = parser.parse_args()
     results = []
     for name in args.cases:
         for _ in range(args.runs):
-            outcome = run_once(name, args.model, args.keep, args.judge_model)
+            outcome = run_once(name, args.model, args.keep, args.judge_model, args.eval_dir)
             results.append(outcome)
             passed = sum(outcome["verdicts"].values())
             print(f"{name}: {passed}/{len(outcome['verdicts'])} graders pass · ${outcome['cost']:.2f}")
