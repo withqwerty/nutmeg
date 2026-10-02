@@ -44,6 +44,9 @@ cross?"), a code fix or a lookup.
 
 The project lives in `research/<slug>/` and becomes the active project. `nutmeg status` shows it.
 
+4. Run `nutmeg config show` and note the user's levels for plan, run and publish (section 9). They
+   decide where you stop for approval.
+
 ## 2. Write the question card
 
 Fill in `research/<slug>/question.md`: the question, the decision or output it informs, the data
@@ -73,8 +76,11 @@ nutmeg plan choose --kind metric --choice "npxG per 90" \
 - Never invent a source. If nothing supports a choice, say so in the reason and use `user` only
   when the user asked for it.
 
-Run `nutmeg plan check`, fix what it reports, then show the user the plan and ask them to approve
-or change it before you fetch or compute anything.
+Run `nutmeg plan check` and fix what it reports. Then follow the user's plan level:
+- L1 or L2: show the user the plan and ask them to approve or change it before you fetch or compute
+  anything.
+- L3: show the plan with its reasons and carry on; the user can stop you at any time, and every run
+  still goes through the gate.
 
 ## 4. Run the analysis through the gate
 
