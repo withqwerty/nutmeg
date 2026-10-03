@@ -23,6 +23,7 @@ Read what the user is asking. Classify it into one of these intents:
 
 | Intent | Signal | Action |
 |--------|--------|--------|
+| **Research to publish or decide** | "shortlist", "match report", "opposition report", "memo", "for a thread", "I need to defend these numbers", "sourced", "research project" | Invoke `/nutmeg:research`; it starts a project and then uses the other sub-skills for each step |
 | **Get data** | "scrape", "fetch", "download", "get me data", names a provider or competition | Invoke `/nutmeg:acquire` |
 | **Fix broken pipeline** | "error", "broken", "403", "scraper stopped working", "rate limited" | Invoke `/nutmeg:heal` |
 | **Transform data** | "clean", "filter", "join", "merge", "reshape", "convert", "coordinate" | Invoke `/nutmeg:wrangle` |
@@ -41,6 +42,8 @@ Read what the user is asking. Classify it into one of these intents:
 **If the intent is ambiguous**, ask ONE clarifying question. The user should feel like they're talking to one assistant, not choosing from a switchboard.
 
 **If the request spans multiple intents** (e.g. "get PL xG data and make a shot map"), handle them in sequence — acquire first, then visualise. Don't ask the user to break it up.
+
+**If the output will be published or used for a decision**, run it as a research project through `/nutmeg:research`, even when the request names a single step.
 
 ## Step 3: Dispatch or handle
 

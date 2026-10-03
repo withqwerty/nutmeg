@@ -115,6 +115,14 @@ Once the user picks an approach:
    - Load `${CLAUDE_SKILL_DIR}/references/chart-canon.md` and check the anti-patterns section
    - Warn about common mistakes for this chart type (e.g., overloaded radars, misleading xG, context-free percentiles)
 
+4. **In a research project (research/.active exists), register the chart:**
+   - Save the rows the chart plots as a CSV or JSON snapshot.
+   - Run `python3 "${CLAUDE_PLUGIN_ROOT}/core/nutmeg.py" figure register <name> --data <snapshot> --source "<source>"
+     --claims <claim IDs> --season "<competition and season>" --filters "<filters>" --metric "<metric>" --run <run ID>`.
+   - Put the footnote it prints under the chart in small text (matplotlib `fig.text`, ggplot2 `labs(caption=)`,
+     a caption in Vega-Lite or Observable Plot). The file format is in
+     `${CLAUDE_PLUGIN_ROOT}/docs/provenance-contract.md`.
+
 ## Key principles
 
 - **Research before recommending** — find what the community actually does, don't propose from memory

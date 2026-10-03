@@ -19,55 +19,11 @@ Read `.nutmeg.user.md`. If it doesn't exist, continue with sensible defaults (Py
 
 ## Glossary of core concepts
 
-### Chance quality metrics
-
-| Metric | What it means | Intuition |
-|--------|--------------|-----------|
-| xG (Expected Goals) | Probability a shot results in a goal (0-1) | "How good was the chance?" |
-| xGOT (xG on Target) | xG adjusted for shot placement in the goal | "How good was the finish?" |
-| xA (Expected Assists) | xG of the shot that resulted from a pass | "How good was the chance created?" |
-| xT (Expected Threat) | Value added by moving the ball to a more dangerous area | "How much did this pass/carry increase goal threat?" |
-| PSxG (Post-Shot xG) | Same as xGOT. StatsBomb terminology. |
-
-### Possession and pressing
-
-| Metric | What it means |
-|--------|--------------|
-| PPDA | Passes allowed per defensive action. Lower = more pressing |
-| High press | Defensive actions in the opponent's defensive third |
-| Counterpressure | Immediate defensive reaction after losing the ball |
-| Build-up | How a team progresses the ball from defence to attack |
-| Possession value | How much each action contributes to scoring probability |
-
-### Passing
-
-| Metric | What it means |
-|--------|--------------|
-| Progressive pass | Pass that moves the ball significantly toward the opponent's goal |
-| Key pass | Pass directly leading to a shot |
-| Assist | Pass directly leading to a goal |
-| Through ball | Pass played into space behind the defence |
-| Switch of play | Long pass crossing the centre of the pitch |
-| Pass completion % | Successful passes / total passes (misleading in isolation) |
-
-### Shooting
-
-| Metric | What it means |
-|--------|--------------|
-| Shots per 90 | Shot volume normalised by playing time |
-| Conversion rate | Goals / shots (noisy, small sample issues) |
-| Big chance | A chance an analyst judges the player should reasonably score. It is a coded label, not an xG threshold; check the provider's definition with `search_docs` |
-| Shot on target % | Shots on target / total shots |
-
-### Defensive
-
-| Metric | What it means |
-|--------|--------------|
-| Tackles won | Successful tackle attempts |
-| Interceptions | Reading and intercepting opponent passes |
-| Clearances | Defensive clearances (often under pressure) |
-| Blocks | Blocking shots or passes |
-| Aerial duels won | Headers contested and won |
+The glossary is in `${CLAUDE_PLUGIN_ROOT}/docs/glossary.md`: chance quality (xG, npxG, xGOT, xA, xT), possession and
+pressing (PPDA, high press, counterpressure, build-up, possession value), passing, shooting and defensive terms,
+and per 90. Read it when the user asks what a term means, and explain at their level. The research workspace page
+links the same entries. For a provider's own definition of a metric or event, use `search_docs`; the glossary
+gives the general meaning only.
 
 ### Per-90 normalisation
 

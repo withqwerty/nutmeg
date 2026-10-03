@@ -105,6 +105,18 @@ project/
 | Kaggle Datasets | Community sharing, discoverable, free |
 | HuggingFace Datasets | ML-focused, versioned, free |
 
+### Handing over a research project
+
+In a research project (`research/.active` exists), package the work for a teammate, a reviewer or a client with
+`python3 "${CLAUDE_PLUGIN_ROOT}/core/nutmeg.py" bundle --raw no` (or `--raw yes`). Always ask the user which, every
+time:
+- `--raw no` keeps raw data (the project's `data/`, run outputs and figure snapshots) out and lists it by hash.
+  Safe for licensed provider or club data.
+- `--raw yes` includes it. Only when the user has the right to share the data; the gate shows the team's licence notes.
+
+The bundle always holds the question, plan, ledger, receipts, outputs, run records with their code, the data
+manifest and the environment (lockfiles, or the Python version and package list).
+
 ### Social media / content
 
 | Output | Tool | Notes |

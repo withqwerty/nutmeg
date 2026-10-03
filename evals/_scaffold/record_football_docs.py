@@ -16,6 +16,9 @@ import json
 import os
 import subprocess
 
+XT_URL = "https://karun.in/blog/expected-threat.html"
+XT_QUOTE = "a threatening pass is not always one that goes to a good shooting position"
+
 # key -> (tool, arguments, keywords that route a call to this recording)
 RECORDINGS = {
     "s01": ("search_docs", {"query": "big chance qualifier", "provider": "opta", "max_results": 4},
@@ -68,6 +71,14 @@ RECORDINGS = {
             "resolve_entity with provider fbref and id dc7f8a28 (with or without namespace)"),
     "r02": ("resolve_entity", {"name": "Cole Palmer", "type": "player"},
             "resolve_entity by name (any name)"),
+    "x01": ("search_papers", {"query": "\"expected threat\" soccer"},
+            "any search_papers query (expected threat, xT, possession value, EPV, VAEP, Singh)"),
+    "x02": ("get_web_source", {"url": XT_URL},
+            "get_web_source for karun.in/blog/expected-threat.html (Karun Singh, Introducing Expected Threat)"),
+    "x03": ("match_quote", {"source": XT_URL, "quote": XT_QUOTE},
+            "match_quote on the karun.in xT post with a quote that appears word for word in recording x02"),
+    "x04": ("match_quote", {"source": XT_URL, "quote": "xT was first introduced by Opta in 2012 as a proprietary model"},
+            "match_quote on the karun.in xT post with a quote that does not appear in recording x02"),
 }
 
 FALLBACK_SEARCH = "s03"
@@ -92,6 +103,12 @@ How to answer a call:
 7. request_update: return exactly
    `Request queued locally. Open this pre-filled issue to send it: https://github.com/withqwerty/football-docs/issues/new`
 8. Recordings marked `error` are tool errors: return them as an error result.
+9. get_web_source for any URL other than the karun.in xT post, and get_paper or read_paper for any ID: return
+   exactly `Could not fetch that source: the replay has no recording for it.` as an error result.
+10. match_quote on the karun.in xT post: if the quote appears word for word in recording x02, return recording
+   x03 with every copy of the recorded quote replaced by the caller's quote, and drop the lines from
+   `- **Where:**` to the end of the JSON block. Otherwise return recording x04 unchanged. match_quote on any other
+   source: return the rule 9 error.
 """
 
 
@@ -130,7 +147,8 @@ def record(server, reep):
 def build(version, tools, recorded, mock_dir):
     lines = ["---", "type: agent",
              "tools: [search_docs, get_provider_docs, compare_providers, list_providers, "
-             "resolve_provider_id, resolve_entity, request_update]",
+             "resolve_provider_id, resolve_entity, request_update, search_papers, get_paper, "
+             "get_web_source, read_paper, match_quote]",
              "---", "", RULES.format(version=version),
              "## Routing table", "", "| Recording | Tool | Keywords |", "| --- | --- | --- |"]
     for key, (tool, _, keywords) in RECORDINGS.items():

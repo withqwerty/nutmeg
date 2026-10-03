@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="{{csp}}">
+<meta name="referrer" content="no-referrer">
+<title>{{title}} · nutmeg workspace</title>
+<style>
+  :root {
+    --bg: #fbfaf7; --fg: #1d2420; --muted: #5c665f; --line: #dcdfd8; --panel: #ffffff;
+    --accent: #1f6f4a; --warn: #9a3412; --warn-bg: #fff4ed; --code: #f1f3ef;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141815; --fg: #e6ebe7; --muted: #9aa59d; --line: #2c332e; --panel: #1b201c;
+      --accent: #6fcf9f; --warn: #fdba74; --warn-bg: #2a1d14; --code: #232a25;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 64px; }
+  header { border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 20px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  h2 { font-size: 1.15rem; margin: 32px 0 10px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+  .meta { color: var(--muted); font-size: 0.9rem; }
+  .meta strong { color: var(--fg); }
+  section.queue { background: var(--warn-bg); border: 1px solid var(--line); border-left: 4px solid var(--warn); padding: 4px 16px; border-radius: 6px; }
+  .empty { color: var(--muted); font-style: italic; }
+  table { width: 100%; border-collapse: collapse; background: var(--panel); font-size: 0.92rem; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .table-wrap { overflow-x: auto; }
+  .status { font-weight: 600; }
+  tr.status-disputed .status, tr.status-contested .status { color: var(--warn); }
+  tr.status-verified .status, tr.status-supported .status { color: var(--accent); }
+  .tag { display: inline-block; font-size: 0.75rem; padding: 0 6px; border: 1px solid var(--line); border-radius: 4px; color: var(--muted); }
+  details summary { cursor: pointer; color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+  pre { background: var(--code); padding: 10px 12px; border-radius: 6px; overflow-x: auto; font-size: 0.82rem; white-space: pre-wrap; }
+  code { background: var(--code); padding: 0 4px; border-radius: 3px; font-size: 0.88em; }
+  a { color: var(--accent); }
+  a.term { text-decoration: underline dotted; }
+  a.claim { font-variant-numeric: tabular-nums; }
+  tr:target { outline: 2px solid var(--accent); outline-offset: -2px; }
+  figure { margin: 0 0 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px; }
+  figure img { max-width: 100%; height: auto; display: block; margin-bottom: 8px; }
+  figcaption { font-size: 0.85rem; color: var(--muted); }
+  dl dt { font-weight: 600; margin-top: 10px; }
+  dl dd { margin: 2px 0 0 0; color: var(--muted); }
+  footer { margin-top: 40px; color: var(--muted); font-size: 0.8rem; }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>{{title}}</h1>
+  <div class="meta">Generated <strong>{{generated}}</strong> · ledger: <strong>{{claim_count}}</strong> claims in <strong>{{line_count}}</strong> lines · open problems: <strong>{{open_count}}</strong> · view only; approve in Claude Code</div>
+</header>
+
+<h2 id="queue">Review queue</h2>
+<section class="queue">{{queue}}</section>
+
+<h2 id="question">Question</h2>
+{{question}}
+
+<h2 id="plan">Plan and reasons</h2>
+<div class="table-wrap">{{plan}}</div>
+
+<h2 id="ledger">Ledger</h2>
+<div class="table-wrap">{{ledger}}</div>
+
+<h2 id="report">Report</h2>
+{{report}}
+
+<h2 id="figures">Figures</h2>
+{{figures}}
+
+<h2 id="runs">Runs</h2>
+<div class="table-wrap">{{runs}}</div>
+
+<h2 id="glossary">Glossary</h2>
+{{glossary}}
+
+<footer>Made by nutmeg from the project files. Regenerate with <code>nutmeg workspace</code>; it does not update itself.</footer>
+</main>
+</body>
+</html>

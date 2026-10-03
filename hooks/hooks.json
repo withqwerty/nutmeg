@@ -1,12 +1,35 @@
 {
-  "description": "Adds nutmeg's core football-data rules to each session, so they apply even when no nutmeg skill loads.",
+  "description": "Adds nutmeg's core football-data and research-project rules to each session. Inside an active research project, shows a gate card before runs and checks outputs against the claim ledger before a step ends.",
   "hooks": {
     "SessionStart": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "cat \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.json\""
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\" gate_hook.py",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\" stop_check.py",
+            "timeout": 60
           }
         ]
       }
