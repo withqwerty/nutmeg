@@ -195,3 +195,27 @@ def test_years_and_seasons_are_still_masked(project):
     (project / "report.md").write_text("In 2019 he scored 31 [C1] goals; the 2015/16 season and May 2019 were quieter.\n")
     assert checks.run_checks(project)[0] == []
     assert [r[1] for r in checks.shown_numbers("A count of 1999.5 metres.")] == ["1999.5"]
+
+
+def test_year_lists_are_still_masked(project):
+    # Codex review 5: "2023,2024" must stay two years, not an orphan count.
+    (project / "report.md").write_text("Years covered: 2023,2024 and 2019, 2020.\n")
+    assert checks.run_checks(project)[0] == []
+
+
+def test_a_withdrawn_claim_cited_without_a_number_fails(project):
+    # Codex review 5: a fact cited with no number next to it must not pass once its claim is withdrawn.
+    add(project, kind="provider_fact", statement="Coordinates use yards", evidence={"provider": "statsbomb",
+                                                                                    "source": "football-docs"})
+    (project / "report.md").write_text("Coordinates use yards [C1].\n\n```\nnot checked [C9]\n```\n")
+    assert checks.run_checks(project)[0] == []
+    Ledger(project / "claims.jsonl").update("C1", status="withdrawn", note="replaced")
+    failures = checks.run_checks(project)[0]
+    assert [(f["kind"], f["line"]) for f in failures] == [("broken link", 1)]
+    assert "C1" in failures[0]["message"]
+
+
+def test_a_missing_claim_next_to_a_number_is_reported_once(project):
+    (project / "report.md").write_text("It was 7 [C4].\n")
+    failures = checks.run_checks(project)[0]
+    assert [f["kind"] for f in failures] == ["broken link"]

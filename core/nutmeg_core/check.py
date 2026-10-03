@@ -48,7 +48,7 @@ _SKIP_SPANS = [
     re.compile(r"\]\([^)]*\)"),                                  # link targets
     re.compile(r"https?://\S+"),                                 # bare URLs
     re.compile(r"\[C\d+(?:\s*,\s*C\d+)*\]"),                     # claim references
-    re.compile(r"(?<![\d.,])\b(?:18|19|20|21)\d{2}\s*[/–-]\s*\d{2}(?:\d{2})?\b(?![.,]\d)"),  # seasons 2025/26, 2025-2026
+    re.compile(r"(?<!\d)(?<!\d\.)\b(?:18|19|20|21)\d{2}\s*[/–-]\s*\d{2}(?:\d{2})?\b(?!\.\d)"),  # seasons 2025/26, 2025-2026
     re.compile(r"\b\d{4}-\d{2}-\d{2}\b"),                        # ISO dates
     re.compile(r"\b\d{1,2}/\d{1,2}/\d{2,4}\b"),                  # 12/03/2025
     re.compile(r"\b\d{1,2}(?:st|nd|rd|th)?\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?(?:\s+\d{4})?\b", re.I),
@@ -60,7 +60,7 @@ _SKIP_SPANS = [
     re.compile(r"\b\d+(?:st|nd|rd|th)\b"),                        # ordinals
     # years, but not counts such as "2010 minutes"
     # (never the digits of a decimal such as 0.2054 or 1999.5)
-    re.compile(r"(?<![\d.,])\b(?:18|19|20|21)\d{2}\b(?![.,]\d)(?!\s+(?:" + "|".join(UNITS) + r")\b)", re.I),
+    re.compile(r"(?<!\d)(?<!\d\.)\b(?:18|19|20|21)\d{2}\b(?!\.\d)(?!\s+(?:" + "|".join(UNITS) + r")\b)", re.I),
 ]
 _LIST_MARKER = re.compile(r"^\s*(?:\d+[.)]\s+|#+\s+\d+(?:\.\d+)*\.?\s)")
 _FENCE = re.compile(r"^\s*(```|~~~)")
@@ -219,6 +219,25 @@ def run_checks(project):
             else:
                 failures.append({**where, "kind": "ambiguous", "id": _failure_id("ambiguous", rel, raw, context[:80]),
                                  "message": f"{raw} matches {', '.join(hits)}; name the claim next to it, for example {raw} [{hits[0]}]"})
+
+        # Every claim reference must resolve, also where no number sits next to it (a provider fact, a citation).
+        reported = {(f["line"], cid) for f in failures if f.get("file") == rel and f["kind"] == "broken link"
+                    for cid in re.findall(r"C\d+", f["message"].split(" cites ", 1)[-1])}
+        in_fence = False
+        for lineno, line in enumerate(text.splitlines(), start=1):
+            if _FENCE.match(line):
+                in_fence = not in_fence
+                continue
+            if in_fence:
+                continue
+            for ref in _CLAIM_REF.finditer(re.sub(r"`[^`]*`", "", line)):
+                for cid in _CLAIM_IDS.findall(ref.group(0)):
+                    if cid not in live and (lineno, cid) not in reported:
+                        reported.add((lineno, cid))
+                        failures.append({"file": rel, "line": lineno, "shown": f"[{cid}]", "context": line[:160],
+                                         "kind": "broken link", "id": _failure_id("ref", rel, line[:80], cid),
+                                         "message": f"line {lineno} cites {cid}, which is not in the ledger or is "
+                                                    "withdrawn"})
 
     for cid, origins in Ledger(project / "claims.jsonl").conflicts().items():
         failures.append({"kind": "id clash", "id": _failure_id("clash", cid, *sorted(origins)), "claim": cid,
