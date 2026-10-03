@@ -3,7 +3,7 @@ type: agent
 tools: [search_docs, get_provider_docs, compare_providers, list_providers, resolve_provider_id, resolve_entity, request_update, search_papers, get_paper, get_web_source, read_paper, match_quote]
 ---
 
-You are a replay of the football-docs MCP server, version 0.16.1.
+You are a replay of the football-docs MCP server, version 0.16.2.
 You never write new documentation content. Every answer is one recorded response below, copied exactly.
 
 How to answer a call:
@@ -1947,7 +1947,7 @@ Indexed providers:
 **vald** (318 chunks): api-access (8), api-endpoints (2), data-provenance (3), dynamo (31), forcedecks (58), forceframe (37), humantrak (30), identity-surfaces (5), nordbord (43), profiles (27), smartspeed (40), tenants (34) | aliases: vald-performance, vald-hub, forcedecks, nordbord, forceframe, smartspeed, vald-dynamo, humantrak, valdr
 **wyscout** (165 chunks): api-access (11), api-endpoints (13), charting-analysis-metrics (7), coordinate-system (6), data-model (17), data-provenance (2), event-types (6), glossary-events (79), glossary-metrics-concepts (20), identity-surfaces (4) | aliases: hudl, hudl-wyscout
 
-Data: built 2026-10-01T23:20:58.000Z from commit a9b57bc (bundled).
+Data: built 2026-10-02T09:20:30.000Z from commit 4783426 (bundled).
 ````
 
 ### p01 — resolve_provider_id {"query": "Catapult"} — error
@@ -2137,7 +2137,7 @@ Local register release: 20260926T145536Z (current).
 
 1. **A framework for the fine-grained evaluation of the instantaneous expected value of soccer possessions**
    Javier Fernández, Luke Bornn, Cervone, Daniel (2020) · arXiv (Cornell University)
-   DOI 10.1007/s10994-021-05989-6 · arXiv 2011.09426 · OpenAlex W3164404442 · cited by 90 · from OpenAlex
+   DOI 10.1007/s10994-021-05989-6 · arXiv 2011.09426 · OpenAlex W3164404442 · cited by 91 · from OpenAlex
    Open copy: https://arxiv.org/pdf/2011.09426 (PDF, arXiv (Cornell University), submittedVersion, licence unknown)
    The expected possession value (EPV) of a soccer possession represents the likelihood of a team scoring or receiving the next goal at any time instance. By decomposing the EPV into a series of subcomponents that are estimated separately, we…
 
@@ -2171,17 +2171,17 @@ Local register release: 20260926T145536Z (current).
    Open copy: https://arxiv.org/pdf/1906.05029 (PDF, arXiv (Cornell University), submittedVersion, licence unknown)
    In-game win probability models, which provide a sports team's likelihood of winning at each point in a game based on historical observations, are becoming increasingly popular. In baseball, basketball and American football, they have…
 
-7. **A Markov Framework for Learning and Reasoning About Strategies in Professional Soccer**
-   Maaike Van Roy, Pieter Robberechts, Wen-Chi Yang and 2 more (2023) · Journal of Artificial Intelligence Research
-   DOI 10.1613/jair.1.13934 · OpenAlex W4381249209 · cited by 16 · from OpenAlex
-   Open copy: https://jair.org/index.php/jair/article/download/13934/26940 (PDF, Journal of Artificial Intelligence Research, publishedVersion, licence: CC BY)
-   Strategy-optimization is a fundamental element of dynamic and complex team sports such as soccer, American football, and basketball. As the amount of data that is collected from matches in these sports has increased, so has the demand for…
-
-8. **What Happened Next? Using Deep Learning to Value Defensive Actions in Football Event-Data**
+7. **What Happened Next? Using Deep Learning to Value Defensive Actions in Football Event-Data**
    Charbel Merhej, Ryan J. Beal, Tim Matthews and 1 more (2021) · Proceedings of the 27th ACM SIGKDD Conference on Knowledge Discovery & Data Mining
    DOI 10.1145/3447548.3467090 · arXiv 2106.01786 · OpenAlex W3171278925 · cited by 23 · from OpenAlex
    Open copy: https://arxiv.org/pdf/2106.01786 (PDF, arXiv (Cornell University), submittedVersion, licence unknown)
    Objectively quantifying the value of player actions in football (soccer) is a challenging problem. To date, studies in football analytics have mainly focused on the attacking side of the game, while there has been less work on event-driven…
+
+8. **A Markov Framework for Learning and Reasoning About Strategies in Professional Soccer**
+   Maaike Van Roy, Pieter Robberechts, Wen-Chi Yang and 2 more (2023) · Journal of Artificial Intelligence Research
+   DOI 10.1613/jair.1.13934 · OpenAlex W4381249209 · cited by 16 · from OpenAlex
+   Open copy: https://jair.org/index.php/jair/article/download/13934/26940 (PDF, Journal of Artificial Intelligence Research, publishedVersion, licence: CC BY)
+   Strategy-optimization is a fundamental element of dynamic and complex team sports such as soccer, American football, and basketball. As the amount of data that is collected from matches in these sports has increased, so has the demand for…
 
 9. **Towards optimized actions in critical situations of soccer games with deep reinforcement learning**
    Pegah Rahimian, Afshin Oroojlooy, László Toka (2021) · 2021 IEEE 8th International Conference on Data Science and Advanced Analytics (DSAA)
@@ -2227,7 +2227,7 @@ No new matches.
 
 Open one with get_paper, or read it with read_paper (DOI, arXiv ID, OpenAlex ID or zotero: ID). OpenAlex matches full text, so a hit may only cite the idea.
 
-Services asked: SportRxiv (local copy from 2026-10-01, no request sent; 0 matches); arXiv (5 matches); OpenAlex (140 matches).
+Services asked: SportRxiv (local copy from 2026-10-01, no request sent; 0 matches); OpenAlex (140 matches); arXiv (5 matches).
 ````
 
 ### x02 — get_web_source {"url": "https://karun.in/blog/expected-threat.html"}
