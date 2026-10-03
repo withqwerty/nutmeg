@@ -168,6 +168,10 @@ def test_a_glob_that_matches_nothing_says_so(layout, fake_runners, capsys):
     assert "held-out set: no case matches --case" in capsys.readouterr().out
 
 
+def _completed(code=0):
+    return type("Done", (), {"returncode": code, "stdout": "", "stderr": "boom" if code else ""})()
+
+
 def test_plugin_runner_reads_the_case_score(tmp_path, monkeypatch):
     seen = {}
 
@@ -176,6 +180,7 @@ def test_plugin_runner_reads_the_case_score(tmp_path, monkeypatch):
         out = Path(cmd[cmd.index("--output-dir") + 1])
         (out / "aggregate-result.json").write_text(json.dumps({"cases": [
             {"name": "c1", "aggregates": {"score": 0.5}, "arms": {"with": [{"error": None}]}}]}))
+        return _completed()
 
     monkeypatch.setattr(run_suites.subprocess, "run", fake_run)
     args = type("A", (), {"runs": 1, "model": "sonnet", "judge_model": "haiku"})()
@@ -184,23 +189,54 @@ def test_plugin_runner_reads_the_case_score(tmp_path, monkeypatch):
     assert seen["cmd"][seen["cmd"].index("--allow-tools") + 1:][:2] == ["Bash(python3:*)", "Write"]
 
 
+def test_a_failed_plugin_call_never_reads_an_earlier_result(tmp_path, monkeypatch):
+    # Codex review 5: the second call fails before writing, and must not report the first call's 1.0.
+    calls = []
+
+    def fake_run(cmd, **kwargs):
+        out = Path(cmd[cmd.index("--output-dir") + 1])
+        calls.append(out)
+        if len(calls) == 1:
+            (out / "aggregate-result.json").write_text(json.dumps({"cases": [
+                {"name": "c1", "aggregates": {"score": 1.0}, "arms": {"with": [{}]}}]}))
+            return _completed()
+        return _completed(1)
+
+    monkeypatch.setattr(run_suites.subprocess, "run", fake_run)
+    args = type("A", (), {"runs": 1, "model": "sonnet", "judge_model": "haiku"})()
+    assert run_suites.run_plugin("evals", "c1", [], args, tmp_path, tmp_path) == (1.0, None)
+    score, error = run_suites.run_plugin("evals", "c1", [], args, tmp_path, tmp_path)
+    assert score == 0.0 and "exited 1" in error
+    assert calls[0] != calls[1]
+
+
+def test_a_temporary_folder_inside_the_repo_is_refused(layout, fake_runners, monkeypatch, capsys):
+    # Codex review 5: TMPDIR inside the repo would put results and held-out answers there.
+    root, holdout, _ = layout
+    inside = root / ".tmp"
+    inside.mkdir()
+    monkeypatch.setattr(run_suites.tempfile, "gettempdir", lambda: str(inside))
+    code = run_suites.main(["--suite", "holdout"], root=root, environ={"NUTMEG_HOLDOUT_DIR": str(holdout)})
+    assert code == 2 and "inside the repository" in capsys.readouterr().err
+    assert fake_runners == [] and list(inside.iterdir()) == []
+
+
 def test_a_running_run_blocks_a_second_one(layout, fake_runners, capsys):
     root, holdout, out = layout
-    busy = root / run_suites.LINK_DIR
-    busy.mkdir()
-    (busy / run_suites.MARKER).write_text(f"{os.getpid()} made by run_suites\n")
-    code = run_suites.main(["--suite", "holdout", "--out", str(out)], root=root,
-                           environ={"NUTMEG_HOLDOUT_DIR": str(holdout)})
-    assert code == 2
-    assert "another run_suites.py run" in capsys.readouterr().err
-    assert (busy / run_suites.MARKER).exists()
+    with run_suites.linked_holdout(holdout, ["secret-two"], root) as link:
+        code = run_suites.main(["--suite", "holdout", "--out", str(out)], root=root,
+                               environ={"NUTMEG_HOLDOUT_DIR": str(holdout)})
+        assert code == 2
+        assert "another run_suites.py run" in capsys.readouterr().err
+        assert (link / "secret-two").exists()
+    assert not (root / run_suites.LINK_DIR).exists()
 
 
 def test_a_folder_left_by_a_dead_run_is_replaced(layout, fake_runners):
     root, holdout, out = layout
     stale = root / run_suites.LINK_DIR
     stale.mkdir()
-    (stale / run_suites.MARKER).write_text("99999999 made by run_suites\n")
+    (stale / run_suites.MARKER).write_text("made by run_suites\n")
     assert run_suites.main(["--suite", "holdout", "--out", str(out)], root=root,
                            environ={"NUTMEG_HOLDOUT_DIR": str(holdout)}) == 0
     assert not stale.exists()
@@ -208,12 +244,10 @@ def test_a_folder_left_by_a_dead_run_is_replaced(layout, fake_runners):
 
 def test_live_only_holdout_runs_link_nothing(layout, fake_runners):
     root, holdout, out = layout
-    busy = root / run_suites.LINK_DIR
-    busy.mkdir()
-    (busy / run_suites.MARKER).write_text(f"{os.getpid()} made by run_suites\n")
-    # secret-one grants Bash, so it runs live from the held-out folder, even while another run holds the link.
-    assert run_suites.main(["--suite", "holdout", "--case", "secret-one", "--out", str(out)], root=root,
-                           environ={"NUTMEG_HOLDOUT_DIR": str(holdout)}) == 0
+    with run_suites.linked_holdout(holdout, ["secret-two"], root):
+        # secret-one grants Bash, so it runs live from the held-out folder, even while another run holds the link.
+        assert run_suites.main(["--suite", "holdout", "--case", "secret-one", "--out", str(out)], root=root,
+                               environ={"NUTMEG_HOLDOUT_DIR": str(holdout)}) == 0
     assert fake_runners == [("live", str(holdout.resolve()), "secret-one", True, None)]
 
 

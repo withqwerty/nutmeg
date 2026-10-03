@@ -18,6 +18,7 @@ plugin eval refuses them on some machines, and `plugin` for the rest.
 `--loop` is the hill-climbing check: it refuses to start unless the held-out set has at least 10 cases.
 """
 import argparse
+import fcntl
 import fnmatch
 import json
 import os
@@ -99,56 +100,63 @@ def loop_ready(holdout, minimum=MIN_LOOP_CASES):
     return count
 
 
-def _owner_alive(link):
-    """Whether the run that made this link folder is still running (its process id is in the marker)."""
-    try:
-        pid = int((link / MARKER).read_text().split()[0])
-    except (OSError, ValueError, IndexError):
-        return False
-    try:
-        os.kill(pid, 0)
-    except ProcessLookupError:
-        return False
-    except PermissionError:
-        return True
-    return True
+LOCK_FILE = ".evals-holdout.lock"
 
 
 def check_link_free(root=ROOT):
-    """The link folder must be absent or one a finished run left behind; never delete anything else."""
+    """The link folder must be absent or one this runner made; never delete anything else."""
     link = Path(root) / LINK_DIR
     if link.is_symlink() or link.is_file() or (link.exists() and not (link / MARKER).is_file()):
         raise SuiteError(f"{link} exists and is not a folder this runner made; remove it first")
-    if link.exists() and _owner_alive(link):
-        raise SuiteError(f"another run_suites.py run is using {link}; wait for it to finish")
     return link
 
 
 @contextmanager
 def linked_holdout(holdout, cases, root=ROOT):
-    """Link the held-out cases and the replay mocks below the plugin; always remove the links."""
-    link = check_link_free(root)
-    if link.exists():
-        shutil.rmtree(link)  # left over from a run that was killed
+    """Link the held-out cases and the replay mocks below the plugin; always remove the links.
+
+    An exclusive lock, held from the stale-folder cleanup to the final removal, keeps two runs apart: the second
+    one refuses instead of deleting the first one's links.
+    """
+    lock = open(Path(root) / LOCK_FILE, "a")
     try:
-        link.mkdir()  # fails if another run made it in the meantime
-    except FileExistsError:
-        raise SuiteError(f"another run_suites.py run is using {link}; wait for it to finish")
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        lock.close()
+        raise SuiteError(f"another run_suites.py run is using {Path(root) / LINK_DIR}; wait for it to finish")
     try:
-        (link / MARKER).write_text(f"{os.getpid()} made by evals/_scaffold/run_suites.py; safe to delete when "
-                                   "that process has ended\n")
-        (link / "mocks").symlink_to(Path(root) / "evals" / "mocks", target_is_directory=True)
-        for name in cases:
-            (link / name).symlink_to(holdout / name, target_is_directory=True)
-        yield link
+        link = check_link_free(root)
+        if link.exists():
+            shutil.rmtree(link)  # left over from a run that was killed (the lock shows nobody is using it)
+        link.mkdir()
+        try:
+            (link / MARKER).write_text("made by evals/_scaffold/run_suites.py; safe to delete when no run holds "
+                                       f"{LOCK_FILE}\n")
+            (link / "mocks").symlink_to(Path(root) / "evals" / "mocks", target_is_directory=True)
+            for name in cases:
+                (link / name).symlink_to(holdout / name, target_is_directory=True)
+            yield link
+        finally:
+            shutil.rmtree(link, ignore_errors=True)
     finally:
-        shutil.rmtree(link, ignore_errors=True)
+        fcntl.flock(lock, fcntl.LOCK_UN)
+        lock.close()
+
+
+def check_temp_outside(root=ROOT):
+    """Results and live work folders default to the temporary folder; it must not be inside the repository."""
+    temp = Path(tempfile.gettempdir()).resolve()
+    if _inside(temp, root):
+        raise SuiteError(f"the temporary folder ({temp}) is inside the repository; set TMPDIR to a folder outside "
+                         "it, so no run output or held-out answer lands here")
+    return temp
 
 
 def run_plugin(eval_dir_name, name, tools, args, out, root=ROOT):
     """One case through `claude plugin eval`; returns (score, error)."""
-    case_out = out / eval_dir_name / name
-    case_out.mkdir(parents=True, exist_ok=True)
+    # A new folder for every call, so a failed call can never read an earlier call's result.
+    (out / eval_dir_name).mkdir(parents=True, exist_ok=True)
+    case_out = Path(tempfile.mkdtemp(prefix=f"{name}-", dir=out / eval_dir_name))
     cmd = ["claude", "plugin", "eval", str(root), "--eval-dir", eval_dir_name, "--case", name,
            "--runs", str(args.runs), "--ablation", "none", "--scaffold", "--no-publish", "--trust-plugin",
            "--threshold", "0", "--model", args.model, "--judge-model", args.judge_model,
@@ -156,7 +164,9 @@ def run_plugin(eval_dir_name, name, tools, args, out, root=ROOT):
     grants = [t for t in tools if t.startswith(GATED)]
     if grants:
         cmd += ["--allow-tools", *grants]
-    subprocess.run(cmd, cwd=root, stdin=subprocess.DEVNULL, capture_output=True, text=True)
+    done = subprocess.run(cmd, cwd=root, stdin=subprocess.DEVNULL, capture_output=True, text=True)
+    if done.returncode != 0:
+        return 0.0, f"plugin eval exited {done.returncode}: {(done.stderr or done.stdout).strip()[-200:]}"
     result = case_out / "aggregate-result.json"
     if not result.is_file():
         return 0.0, "plugin eval wrote no result"
@@ -230,6 +240,7 @@ def main(argv=None, root=ROOT, environ=None):
         if holdout is not None and args.suite != "public" and any(
                 engine_for(holdout, name, args.engine) == "plugin" for name in list_cases(holdout, args.case)):
             check_link_free(root)
+        check_temp_outside(root)
         out = results_dir(args.out, root)
     except SuiteError as exc:
         print(f"run_suites: {exc}", file=sys.stderr)
@@ -251,8 +262,12 @@ def main(argv=None, root=ROOT, environ=None):
             if not cases:
                 summary["notes"].append("held-out set: no case matches --case")
             if any(engine_for(holdout, name, args.engine) == "plugin" for name in cases):
-                with linked_holdout(holdout, cases, root) as link:
-                    rows = score_suite("holdout", link, LINK_DIR, cases, args, out, root)
+                try:
+                    with linked_holdout(holdout, cases, root) as link:
+                        rows = score_suite("holdout", link, LINK_DIR, cases, args, out, root)
+                except SuiteError as exc:
+                    print(f"run_suites: {exc}", file=sys.stderr)
+                    return 2
             else:  # live runs read the held-out folder where it is; nothing is linked
                 rows = score_suite("holdout", holdout, LINK_DIR, cases, args, out, root)
             summary["rows"] += rows

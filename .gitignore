@@ -22,6 +22,7 @@ evals/results/
 
 # Private held-out cases, linked in by evals/_scaffold/run_suites.py for one run
 evals-holdout/
+.evals-holdout.lock
 
 # Python
 __pycache__/
