@@ -62,6 +62,14 @@ _SKIP_SPANS = [
     # (never the digits of a decimal such as 0.2054 or 1999.5)
     re.compile(r"(?<!\d)(?<!\d\.)\b(?:18|19|20|21)\d{2}\b(?!\.\d)(?!\s+(?:" + "|".join(UNITS) + r")\b)", re.I),
 ]
+# Parts of a Markdown line a reader does not see as text: code spans (any backtick run), link targets, bare URLs.
+_HIDDEN = re.compile(r"(`+).+?\1|\]\([^)]*\)|https?://\S+")
+
+
+def _visible_text(line):
+    return _HIDDEN.sub(lambda m: "]" if m.group(0).startswith("](") else " ", line)
+
+
 _LIST_MARKER = re.compile(r"^\s*(?:\d+[.)]\s+|#+\s+\d+(?:\.\d+)*\.?\s)")
 _FENCE = re.compile(r"^\s*(```|~~~)")
 
@@ -230,7 +238,7 @@ def run_checks(project):
                 continue
             if in_fence:
                 continue
-            for ref in _CLAIM_REF.finditer(re.sub(r"`[^`]*`", "", line)):
+            for ref in _CLAIM_REF.finditer(_visible_text(line)):
                 for cid in _CLAIM_IDS.findall(ref.group(0)):
                     if cid not in live and (lineno, cid) not in reported:
                         reported.add((lineno, cid))

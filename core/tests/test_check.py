@@ -219,3 +219,19 @@ def test_a_missing_claim_next_to_a_number_is_reported_once(project):
     (project / "report.md").write_text("It was 7 [C4].\n")
     failures = checks.run_checks(project)[0]
     assert [f["kind"] for f in failures] == ["broken link"]
+
+
+@pytest.mark.parametrize("line", [
+    "See [source](https://example.com/query?filter=[C9]).",
+    "Use ``[C9] `code` `` as the reference syntax.",
+    "Bare https://example.com/[C9] link.",
+])
+def test_references_in_link_targets_and_code_are_not_citations(project, line):
+    # Codex review 6: only visible citations count.
+    (project / "report.md").write_text(line + "\n")
+    assert checks.run_checks(project)[0] == []
+
+
+def test_a_visible_citation_in_a_link_label_or_table_still_counts(project):
+    (project / "report.md").write_text("| fact | [see C9] [C9] |\n\n[label [C8]](https://example.com)\n")
+    assert sorted(f["message"].split(" cites ")[1][:2] for f in checks.run_checks(project)[0]) == ["C8", "C9"]
