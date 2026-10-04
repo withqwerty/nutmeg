@@ -22,8 +22,8 @@ def project(repo):
 
 
 def test_register_writes_provenance_and_footnote(project, repo, capsys):
-    assert main(["figure", "register", "carries", "--data", "out/carries.csv", "--source", "Opta via FBref",
-                 "--claims", "C1,C2", "--n", "214", "--season", "Premier League 2025/26", "--filters", "min 900 minutes",
+    assert main(["figure", "register", "carries", "--data", "out/carries.csv", "--source", "StatsBomb open data",
+                 "--claims", "C1,C2", "--n", "214", "--season", "Premier League 2015/16", "--filters", "min 900 minutes",
                  "--metric", "progressive actions per 90", "--uncertainty", "none shown", "--run", "R1",
                  "--image", "out/carries.png"]) == 0
     out = capsys.readouterr().out
@@ -31,7 +31,7 @@ def test_register_writes_provenance_and_footnote(project, repo, capsys):
     assert prov["contract"] == "nutmeg-figure-provenance/v1"
     assert prov["rows"] == 3 and prov["n"] == 214 and prov["claims"] == ["C1", "C2"]
     assert prov["data_snapshot"] == "research/demo/figures/carries.data.csv"
-    for part in ("Source: Opta via FBref", "Premier League 2025/26", "min 900 minutes", "n = 214", "C1, C2"):
+    for part in ("Source: StatsBomb open data", "Premier League 2015/16", "min 900 minutes", "n = 214", "C1, C2"):
         assert part in prov["footnote"] and part in out
     assert "Sample: n = 214; 3 rows" in prov["footnote_long"]
 

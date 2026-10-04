@@ -21,8 +21,10 @@ xG adjusted for where the shot went in the goal. Intuition: how good was the fin
 StatsBomb's terms.
 
 ## xA (expected assists)
-Aliases: xA, expected assists
-The xG of the shot that a pass led to. Intuition: how good was the chance created?
+Aliases: xA, expected assists, xAG, xG assisted
+Two different metrics share this name. Opta's xA is a pass-level model: the chance that a pass becomes an assist,
+whether or not a shot follows. Understat, Wyscout and American Soccer Analysis use "xA" for the xG of the shot a
+pass led to (FBref called that xAG). Intuition: how good was the chance created? Say which one you mean.
 
 ## xT (expected threat)
 Aliases: xT, expected threat

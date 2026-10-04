@@ -12,7 +12,7 @@ campos) read it. This page defines the file so other tools can read and write it
 | `contract` | string | Always `nutmeg-figure-provenance/v1`. |
 | `figure` | string | The figure name (letters, digits, `.`, `-`, `_`). Also the file name stem. |
 | `image` | string or null | Path of the chart file, relative to the repository root. |
-| `sources` | list | One object per data source: `{"name": "Opta via FBref", "panel": "left"}`. `panel` is optional; use it for multi-panel figures. |
+| `sources` | list | One object per data source: `{"name": "StatsBomb open data", "panel": "left"}`. `panel` is optional; use it for multi-panel figures. |
 | `competition_season` | string or null | For example `Premier League 2025/26`. |
 | `filters` | string or null | The filters on the plotted rows, for example `min 900 minutes`. |
 | `n` | integer | The sample size the chart shows. Defaults to the snapshot's row count. |
@@ -38,7 +38,7 @@ Source: <sources joined with " + "> · <competition and season> · <filters> · 
 Example:
 
 ```
-Source: Opta via FBref · Premier League 2025/26 · min 900 minutes · n = 214 · progressive actions per 90 · no uncertainty shown · 2026-10-02 · C1, C2
+Source: StatsBomb open data · Premier League 2015/16 · min 900 minutes · n = 214 · progressive actions per 90 · no uncertainty shown · 2026-10-02 · C1, C2
 ```
 
 Put it under the chart in small text. In matplotlib, use `fig.text(0.01, 0.01, footnote, fontsize=7, ha="left")`;

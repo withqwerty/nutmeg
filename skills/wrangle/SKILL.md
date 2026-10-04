@@ -34,7 +34,7 @@ Common filtering patterns for football event data:
 **By event type:**
 - Shots: filter for shot/miss/goal/saved event types
 - Passes in final third: filter passes in the last third of the provider's x range (for a 0-100 pitch, x > 66.7)
-- Defensive actions: tackles + interceptions + ball recoveries
+- Defensive actions: tackles + interceptions, plus fouls, challenges, blocks or recoveries depending on the definition (name yours)
 
 **By match state:**
 - Open play only: exclude set pieces (corners, free kicks, throw-ins, penalties)

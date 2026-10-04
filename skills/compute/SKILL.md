@@ -43,15 +43,17 @@ Read `.nutmeg.user.md`. If it doesn't exist, continue with sensible defaults (Py
 
 **What it measures:** Pressing intensity. Lower PPDA = more aggressive pressing.
 
-**Calculation:**
+**Calculation (general shape):**
 ```
-PPDA = opponent_passes_in_own_half / (tackles + interceptions + fouls_committed + ball_recoveries)_in_opponent_half
+PPDA = opponent passes in the pressing zone / defensive actions in that zone
 ```
 
-Variations:
-- Some definitions use opponent's defensive third only (stricter)
-- Some exclude fouls from defensive actions
-- Say which definition you used, because values from different definitions are not comparable
+There is no single PPDA. Published variants differ in the pressing zone (for example the opponent's own half, or a
+larger share of the pitch) and in which defensive actions count, and the same match can give very different values
+across them.
+- Look up the variant before computing: `search_docs(query="PPDA definition defensive actions")` (and the
+  football-docs metric card for PPDA once it exists).
+- Name the variant you used, and never compare values from different variants.
 
 ### Passing Networks
 
