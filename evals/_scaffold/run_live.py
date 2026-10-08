@@ -11,6 +11,8 @@ credentials file points at missing files). Each run gets a fresh git
 repository with the case's scaffold, loads this plugin with only the
 football-docs MCP server, and allows the case's `allowed_tools`. Graders:
 regex (target trace, last message or file:<glob>) and tool_used run locally;
+exec graders run a trusted check script from the case's graders/ folder against a
+copy of the work folder (it may change the data and rerun the agent's code);
 llm graders ask the judge model for PASS or FAIL about the last message, plus
 the files a `target: file:<glob>` names. The real football-docs server is used,
 not the replay mock. Hooks run, so a gate "ask" is denied (no user), as in a
@@ -57,6 +59,29 @@ def load_case(name, eval_dir=EVALS):
         gmeta["body"] = body.strip()
         graders[path.stem] = gmeta
     return folder, meta, prompt.strip(), graders
+
+
+def exec_grade(folder, grader, work, timeout=180):
+    """Run a trusted check script from the case's graders/ folder against a copy of the run's work folder.
+
+    The script gets the copy's path, so it can change the data and rerun the agent's code without touching the run
+    itself. The grader passes when the script exits 0; its last output lines are kept as the reason."""
+    graders_dir = (Path(folder) / "graders").resolve()
+    script = (graders_dir / str(grader.get("script", ""))).resolve()
+    if not script.is_file() or graders_dir not in script.parents:
+        return False, [f"FAIL exec grader script not found in graders/: {grader.get('script')}"]
+    scratch = Path(tempfile.mkdtemp(prefix="nutmeg-exec-"))
+    copy = scratch / "work"
+    try:
+        shutil.copytree(work, copy, symlinks=True, ignore=shutil.ignore_patterns(".git"))
+        result = subprocess.run([sys.executable, str(script), str(copy)], capture_output=True, text=True,
+                                timeout=timeout, stdin=subprocess.DEVNULL, env=dict(os.environ, PIP_REQUIRE_VIRTUALENV="1"))
+        tail = (result.stdout + result.stderr).strip()[-600:]
+        return result.returncode == 0, [("PASS " if result.returncode == 0 else "FAIL ") + tail]
+    except subprocess.TimeoutExpired:
+        return False, ["FAIL exec grader timed out"]
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
 
 
 def agent_env(work):
@@ -127,6 +152,8 @@ def run_once(name, model, keep, judge_model, eval_dir=EVALS):
                         if (name == tool or name.endswith("__" + tool)) and re.search(pattern.replace('\\"', '"'), payload))
             low, high = int(grader.get("min", 1)), grader.get("max")
             verdicts[gname] = count >= low and (high is None or count <= int(high))
+        elif kind == "exec":
+            verdicts[gname], judged[gname] = exec_grade(folder, grader, work)
         elif kind == "llm":
             response = judge_input(last, grader.get("target", ""), work)
             verdicts[gname], judged[gname] = judge_votes(grader["body"], response, judge_model)
