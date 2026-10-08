@@ -20,3 +20,9 @@ def test_judge_input_adds_the_named_files(tmp_path):
 
 def test_judge_input_with_no_matching_file_is_the_last_message(tmp_path):
     assert run_live.judge_input("answer", "file:research/*/report.md", tmp_path) == "answer"
+
+
+def test_agent_env_isolates_the_user_config_and_blocks_pip_outside_a_venv(tmp_path):
+    env = run_live.agent_env(tmp_path)
+    assert env["NUTMEG_USER_CONFIG"] == str(tmp_path / ".nutmeg-user.json")
+    assert env["PIP_REQUIRE_VIRTUALENV"] == "1"

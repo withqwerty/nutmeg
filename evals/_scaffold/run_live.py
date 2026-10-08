@@ -59,6 +59,12 @@ def load_case(name, eval_dir=EVALS):
     return folder, meta, prompt.strip(), graders
 
 
+def agent_env(work):
+    """Each run gets its own nutmeg user config (the scaffold may write it), never the operator's. pip refuses to
+    install outside a virtual environment, so a run that tries to change the machine's Python is recorded, not done."""
+    return dict(os.environ, NUTMEG_USER_CONFIG=str(Path(work) / ".nutmeg-user.json"), PIP_REQUIRE_VIRTUALENV="1")
+
+
 def run_once(name, model, keep, judge_model, eval_dir=EVALS):
     folder, meta, prompt, graders = load_case(name, eval_dir)
     work = Path(tempfile.mkdtemp(prefix=f"nutmeg-live-{name}-"))
@@ -75,8 +81,7 @@ def run_once(name, model, keep, judge_model, eval_dir=EVALS):
            "--max-turns", str(meta.get("max_turns", 10)), "--output-format", "stream-json", "--verbose"]
     if meta.get("disallowed_tools"):
         cmd += ["--disallowedTools", ",".join(meta["disallowed_tools"])]
-    # Each run gets its own nutmeg user config (the scaffold may write it), never the operator's.
-    env = dict(os.environ, NUTMEG_USER_CONFIG=str(work / ".nutmeg-user.json"))
+    env = agent_env(work)
     timeout = int(meta.get("timeout_seconds", 300))
     try:
         result = subprocess.run(cmd, cwd=work, capture_output=True, text=True, timeout=timeout,
