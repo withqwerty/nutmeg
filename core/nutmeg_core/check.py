@@ -181,12 +181,14 @@ def run_checks(project):
     for lineno, message in problems:
         warnings.append(f"claims.jsonl line {lineno}: {message}")
 
-    # A metric in the plan should link to a meaning: a glossary entry or a definition claim
-    # that names the metric's term (its words before ":", "=" or "(") or sets evidence.term to it.
+    # A metric in the plan should link to a meaning: a glossary entry, a football-docs metric card it rests on,
+    # or a definition claim that names the metric's term (its words before ":", "=" or "(") or sets evidence.term to it.
     definitions = [c for c in live.values() if c["kind"] == "definition"]
     plan_text = (project / "plan.md").read_text(encoding="utf-8") if (project / "plan.md").is_file() else ""
     for choice in parse_choices(plan_text):
         if choice["kind"] != "metric" or glossary.find(choice["choice"]):
+            continue
+        if (choice.get("rests_on") or "").split(None, 1)[0:1] == ["metric"]:
             continue
         term = metric_term(choice["choice"])
         if not any(_defines(c, term) for c in definitions):

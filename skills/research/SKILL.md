@@ -2,7 +2,7 @@
 name: nutmeg-research
 description: "Run a football analysis as a research project that shows its work: a question card, a plan where every choice has a reason, and a claim ledger that ties every number, provider fact, ID and citation to its evidence. Use when the user wants analysis to publish or to decide on (a recruitment shortlist, a match or opposition report, a club memo, a chart or thread for social media), asks for sourced or checkable numbers, or says 'research project'. Quick questions stay outside projects."
 argument-hint: "[the question to research]"
-allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "AskUserQuestion", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs", "mcp__plugin_nutmeg_football-docs__resolve_entity", "mcp__football-docs__resolve_entity", "mcp__plugin_nutmeg_football-docs__get_provider_docs", "mcp__football-docs__get_provider_docs"]
+allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "AskUserQuestion", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs", "mcp__plugin_nutmeg_football-docs__resolve_entity", "mcp__football-docs__resolve_entity", "mcp__plugin_nutmeg_football-docs__get_provider_docs", "mcp__football-docs__get_provider_docs", "mcp__plugin_nutmeg_football-docs__get_metric", "mcp__football-docs__get_metric", "mcp__plugin_nutmeg_football-docs__list_metrics", "mcp__football-docs__list_metrics"]
 ---
 
 # Research
@@ -68,6 +68,9 @@ nutmeg plan choose --kind metric --choice "npxG per 90" \
   other one.
 - `--rests-type` and `--rests-ref` say what the reason rests on:
   - `docs`: a football-docs result (name the provider and the doc you used);
+  - `metric`: a football-docs metric card variant, by its ID from `get_metric` (for example
+    `--rests-type metric --rests-ref ppda.statsbomb-hudl`); use it for any metric that has a card, so readers see
+    exactly which definition a number uses;
   - `registry`: a Reep Register record;
   - `rule`: a practitioner rule, such as `${CLAUDE_PLUGIN_ROOT}/docs/metric-misuse.md`;
   - `paper`: a paper or post;

@@ -20,6 +20,12 @@ Football data providers change their APIs, schemas, event types, qualifier IDs, 
 - Cite a specific version number or release date from memory
 - State a rate limit or pricing tier without verification
 
+**For metric definitions:**
+- Use the football-docs metric cards: `list_metrics` shows them and `get_metric("<card or variant>")` reads one.
+- Name the variant ID you use (for example `npxg.statsbomb-hudl`). Values from different variants are not comparable;
+  when two sources disagree, check whether they use different variants before calling either wrong.
+- For a metric without a card, use `search_docs`, and say which definition you chose.
+
 **When search_docs returns no results, or says a term is not indexed:**
 - Tell the user the information is not in the docs index
 - Suggest they check the provider's official documentation directly
@@ -32,7 +38,7 @@ Football data providers change their APIs, schemas, event types, qualifier IDs, 
 - Older football-docs versions do not mark partial matches. Read each result's **Provider** line and content: if no result is from the provider or about the topic the user asked about, treat the topic as not indexed. Use `resolve_provider_id` to check whether a provider is covered at all.
 
 **When the football-docs tools are missing or fail:**
-- If no football-docs tool is available (for example a skills-only install), tell the user that provider facts cannot be checked, and give the install line: `claude mcp add football-docs -- npx -y football-docs@0.16.2` (or the equivalent MCP setting in their agent). It needs Node.js 22.13 or newer.
+- If no football-docs tool is available (for example a skills-only install), tell the user that provider facts cannot be checked, and give the install line: `claude mcp add football-docs -- npx -y football-docs@0.17.0` (or the equivalent MCP setting in their agent). It needs Node.js 22.13 or newer.
 - If a football-docs tool returns an error or does not start, say so and point to the football-docs README for the fix.
 - By default, do not answer provider-specific questions from training knowledge. Say what you would have looked up.
 - If the user asks you to go on without the docs, you may answer, but label every provider fact "unverified (from memory)" and suggest checking it against the provider's documentation.

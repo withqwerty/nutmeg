@@ -2,7 +2,7 @@
 name: nutmeg-learn
 description: "Learn about football analytics concepts and explore provider documentation. Use when the user asks what a metric means (xG, PPDA, expected threat, xT), wants learning resources, papers, or courses, is new to football analytics, or wants a learning path. Also use when the user asks about data provider documentation — qualifier IDs, coordinate systems, event types, API schemas, field mappings, identity surfaces, provider ID schemes — or wants to compare providers, look something up in the docs, or find out what data a provider offers."
 argument-hint: "[concept, 'getting started', or provider query]"
-allowed-tools: ["Read", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs", "mcp__plugin_nutmeg_football-docs__list_providers", "mcp__football-docs__list_providers", "mcp__plugin_nutmeg_football-docs__compare_providers", "mcp__football-docs__compare_providers", "mcp__plugin_nutmeg_football-docs__resolve_entity", "mcp__football-docs__resolve_entity", "mcp__plugin_nutmeg_football-docs__get_provider_docs", "mcp__football-docs__get_provider_docs", "mcp__plugin_nutmeg_football-docs__resolve_provider_id", "mcp__football-docs__resolve_provider_id"]
+allowed-tools: ["Read", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs", "mcp__plugin_nutmeg_football-docs__list_providers", "mcp__football-docs__list_providers", "mcp__plugin_nutmeg_football-docs__compare_providers", "mcp__football-docs__compare_providers", "mcp__plugin_nutmeg_football-docs__resolve_entity", "mcp__football-docs__resolve_entity", "mcp__plugin_nutmeg_football-docs__get_provider_docs", "mcp__football-docs__get_provider_docs", "mcp__plugin_nutmeg_football-docs__resolve_provider_id", "mcp__football-docs__resolve_provider_id", "mcp__plugin_nutmeg_football-docs__get_metric", "mcp__football-docs__get_metric", "mcp__plugin_nutmeg_football-docs__list_metrics", "mcp__football-docs__list_metrics"]
 ---
 
 # Learn
@@ -12,6 +12,8 @@ Teach football analytics concepts, recommend resources, provide a learning path,
 ## Accuracy
 
 Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
+
+When the user asks what a metric means, read its football-docs metric card with `get_metric` (`list_metrics` shows the cards) and explain that variants exist, naming their IDs; use `search_docs` for metrics without a card.
 
 ## First: check profile
 

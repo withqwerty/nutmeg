@@ -2,7 +2,7 @@
 name: nutmeg-wrangle
 description: "Transform, filter, reshape, join, and manipulate football data. Use when the user needs to clean data, merge datasets, convert between formats, handle missing values, work with large datasets, or do any data manipulation task on football data."
 argument-hint: "[what to do with the data]"
-allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs"]
+allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs", "mcp__plugin_nutmeg_football-docs__get_metric", "mcp__football-docs__get_metric", "mcp__plugin_nutmeg_football-docs__list_metrics", "mcp__football-docs__list_metrics"]
 ---
 
 # Wrangle

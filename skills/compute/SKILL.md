@@ -2,7 +2,7 @@
 name: nutmeg-compute
 description: "Calculate derived football metrics and models. Use when the user wants to compute xG, xGOT, PPDA, passing networks, expected threat, possession value, pressing intensity, or any derived football statistic from raw data."
 argument-hint: "[metric to compute]"
-allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs"]
+allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs", "mcp__plugin_nutmeg_football-docs__get_metric", "mcp__football-docs__get_metric", "mcp__plugin_nutmeg_football-docs__list_metrics", "mcp__football-docs__list_metrics"]
 ---
 
 # Compute
@@ -17,6 +17,15 @@ Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answer
 Read `.nutmeg.user.md`. If it doesn't exist, continue with sensible defaults (Python and pandas, intermediate level) and suggest running `/nutmeg` setup at the end.
 
 ## Metric reference
+
+Before computing a metric that has a football-docs metric card (`list_metrics` shows them: xG, npxG, xA, xG
+assisted, PPDA, progressive passes and carries, xT, VAEP, field tilt, pass completion), read it with
+`get_metric("<card>")`:
+- Pick one variant and name its ID (for example `ppda.statsbomb-hudl`) in the code, the output and any chart. Values
+  from different variants are not comparable.
+- If the variant has reference code with test values on StatsBomb open data, check your implementation against them.
+- In a research project, the plan choice rests on the card: `--rests-type metric --rests-ref <variant-id>`.
+- For a metric without a card, use `search_docs` and say which definition you chose.
 
 ### Expected Goals (xG)
 
@@ -51,9 +60,9 @@ PPDA = opponent passes in the pressing zone / defensive actions in that zone
 There is no single PPDA. Published variants differ in the pressing zone (for example the opponent's own half, or a
 larger share of the pitch) and in which defensive actions count, and the same match can give very different values
 across them.
-- Look up the variant before computing: `search_docs(query="PPDA definition defensive actions")` (and the
-  football-docs metric card for PPDA once it exists).
-- Name the variant you used, and never compare values from different variants.
+- Read the card before computing: `get_metric("ppda")` lists each published variant with its zone, counted actions
+  and source.
+- Name the variant ID you used (for example `ppda.trainor-2014`), and never compare values from different variants.
 
 ### Passing Networks
 

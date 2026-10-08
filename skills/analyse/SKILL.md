@@ -2,7 +2,7 @@
 name: nutmeg-analyse
 description: "Explore, interpret, and draw conclusions from football data, including judging players or teams from stats (rankings, comparisons, headlines, social posts). Use when the user wants to analyse match events, compare teams or players, understand tactical patterns, build visualisations, or needs guidance on what questions to ask of their data. Adapts to the user's experience level."
 argument-hint: "[analysis question or topic]"
-allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs"]
+allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs", "mcp__plugin_nutmeg_football-docs__get_metric", "mcp__football-docs__get_metric", "mcp__plugin_nutmeg_football-docs__list_metrics", "mcp__football-docs__list_metrics"]
 ---
 
 # Analyse
@@ -12,6 +12,8 @@ Help the user explore and interpret football data. Adapt depth and approach to t
 ## Accuracy
 
 Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
+
+When you report or compare a metric that has a football-docs metric card (`list_metrics`), read it with `get_metric` and name the variant ID; do not compare values from different variants, and say so when two sources disagree because they use different variants.
 ## First: check profile
 
 Read `.nutmeg.user.md`. If it doesn't exist, continue with sensible defaults (Python and pandas, intermediate level) and suggest running `/nutmeg` setup at the end.

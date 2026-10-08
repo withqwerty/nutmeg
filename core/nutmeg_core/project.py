@@ -20,7 +20,7 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .ledger import REST_TYPES, MAX_WHY_LENGTH
+from .ledger import METRIC_REF, REST_TYPES, MAX_WHY_LENGTH
 
 RESEARCH_DIR = "research"
 ACTIVE_FILE = ".active"
@@ -234,6 +234,9 @@ def check_choices(choices):
             problems.append(f"{name}: no `rests_on` line; name a docs page, rule, paper, claim or the user's words")
         elif rests[0] not in REST_TYPES or len(rests) < 2:
             problems.append(f"{name}: rests_on must be `<type> <reference>` with type one of {', '.join(REST_TYPES)}")
+        elif rests[0] == "metric" and not METRIC_REF.match(rests[1].strip()):
+            problems.append(f"{name}: a metric reference is a football-docs metric card or variant ID from "
+                            "list_metrics, for example ppda.statsbomb-hudl")
     return problems
 
 

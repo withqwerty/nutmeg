@@ -142,3 +142,14 @@ def test_append_redacts_secrets(tmp_path):
     written = ledger.append(computed(note="fetched with key sk-live-abcdef123456"))
     assert "sk-live" not in ledger.path.read_text()
     assert written["note"] == "fetched with key [REDACTED]"
+
+
+def test_rests_on_accepts_a_metric_card_variant(ledger):
+    ledger.append(computed(rests_on={"type": "metric", "ref": "ppda.statsbomb-hudl"}))
+
+
+@pytest.mark.parametrize("ref", ["PPDA (StatsBomb)", "ppda statsbomb", "https://example.com/ppda", ".ppda"])
+def test_rests_on_metric_needs_a_card_or_variant_id(ledger, ref):
+    with pytest.raises(ClaimError) as exc:
+        ledger.append(computed(rests_on={"type": "metric", "ref": ref}))
+    assert exc.value.field == "rests_on" and "list_metrics" in exc.value.args[-1]

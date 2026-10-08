@@ -235,3 +235,15 @@ def test_references_in_link_targets_and_code_are_not_citations(project, line):
 def test_a_visible_citation_in_a_link_label_or_table_still_counts(project):
     (project / "report.md").write_text("| fact | [see C9] [C9] |\n\n[label [C8]](https://example.com)\n")
     assert sorted(f["message"].split(" cites ")[1][:2] for f in checks.run_checks(project)[0]) == ["C8", "C9"]
+
+
+def test_plan_metric_resting_on_a_metric_card_needs_no_definition_claim(project):
+    assert main(["plan", "choose", "--kind", "metric", "--choice", "pressing intensity: PPDA",
+                 "--why", "The card names the variant, so values are comparable only within it.",
+                 "--rests-type", "metric", "--rests-ref", "ppda.statsbomb-hudl"]) == 0
+    assert not any("pressing intensity" in w for w in checks.run_checks(project)[1])
+
+
+def test_plan_metric_with_a_bad_metric_reference_is_refused(project):
+    assert main(["plan", "choose", "--kind", "metric", "--choice", "pressing intensity: PPDA",
+                 "--why", "The brief asks for it.", "--rests-type", "metric", "--rests-ref", "PPDA (StatsBomb)"]) == 2

@@ -71,6 +71,19 @@ RECORDINGS = {
             "resolve_entity with provider fbref and id dc7f8a28 (with or without namespace)"),
     "r02": ("resolve_entity", {"name": "Cole Palmer", "type": "player"},
             "resolve_entity by name (any name)"),
+    "r00": ("resolve_entity", {"provider": "transfermarkt", "namespace": "spieler", "id": "0"},
+            "resolve_entity with a provider and id not in this table (see rule 6)"),
+    "m01": ("list_metrics", {}, "list_metrics"),
+    "m02": ("get_metric", {"id": "ppda"},
+            "ppda, PPDA, passes per defensive action, passes allowed per defensive action, pressing intensity"),
+    "m03": ("get_metric", {"id": "ppda.statsbomb-hudl"}, "ppda.statsbomb-hudl, StatsBomb PPDA, Hudl PPDA"),
+    "m04": ("get_metric", {"id": "ppda.trainor-2014"}, "ppda.trainor-2014, Trainor PPDA, original PPDA"),
+    "m05": ("get_metric", {"id": "xa"}, "xa, xA, expected assists, pass-level expected assists"),
+    "m06": ("get_metric", {"id": "xg_assisted"}, "xg_assisted, xAG, expected assisted goals, xG assisted"),
+    "m07": ("get_metric", {"id": "npxg"}, "npxg, npxG, non-penalty xG, non-penalty expected goals"),
+    "m08": ("get_metric", {"id": "progressive_passes"}, "progressive_passes, progressive passes, PrgP"),
+    "m09": ("get_metric", {"id": "xt"}, "xt, xT, expected threat"),
+    "m00": ("get_metric", {"id": "not-a-metric"}, "get_metric with an id not in this table (see rule 11)"),
     "x01": ("search_papers", {"query": "\"expected threat\" soccer"},
             "any search_papers query (expected threat, xT, possession value, EPV, VAEP, Singh)"),
     "x02": ("get_web_source", {"url": XT_URL},
@@ -97,9 +110,7 @@ How to answer a call:
 5. resolve_provider_id for a provider not in the table: return exactly
    `Provider "<query>" is not registered. Use request_update to suggest adding it, or open a GitHub issue with the new-provider template.`
    as an error result.
-6. resolve_entity with a provider and id not in the table: return exactly
-   `No Reep entity matches that query in the local register.` then a blank line, then
-   `Local register release: 20260926T145536Z (current).`
+6. resolve_entity with a provider and id not in the table: return recording r00 unchanged.
 7. request_update: return exactly
    `Request queued locally. Open this pre-filled issue to send it: https://github.com/withqwerty/football-docs/issues/new`
 8. Recordings marked `error` are tool errors: return them as an error result.
@@ -109,6 +120,12 @@ How to answer a call:
    x03 with every copy of the recorded quote replaced by the caller's quote, and drop the lines from
    `- **Where:**` to the end of the JSON block. Otherwise return recording x04 unchanged. match_quote on any other
    source: return the rule 9 error.
+11. get_metric: choose the recording whose keywords match the id. For a variant ID of a recorded card that has no
+   recording of its own (for example ppda.wyscout), return that card's recording (for example m02). For a card or
+   variant that recording m01 lists but this table has no recording for (for example vaep or field_tilt), return
+   exactly `Could not read that card: the replay has no recording for it.` as an error result. For an id that
+   matches no card or variant in m01, return recording m00 with `not-a-metric` replaced by the caller's id, as an
+   error result. list_metrics: return recording m01.
 """
 
 
@@ -148,7 +165,7 @@ def build(version, tools, recorded, mock_dir):
     lines = ["---", "type: agent",
              "tools: [search_docs, get_provider_docs, compare_providers, list_providers, "
              "resolve_provider_id, resolve_entity, request_update, search_papers, get_paper, "
-             "get_web_source, read_paper, match_quote]",
+             "get_web_source, read_paper, match_quote, get_metric, list_metrics]",
              "---", "", RULES.format(version=version),
              "## Routing table", "", "| Recording | Tool | Keywords |", "| --- | --- | --- |"]
     for key, (tool, _, keywords) in RECORDINGS.items():

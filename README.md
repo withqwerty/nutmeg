@@ -45,10 +45,10 @@ npx skills add withqwerty/nutmeg
 Nutmeg looks up provider facts in the football-docs MCP server, which this install does not include. Add it to your agent as well (Node.js 22.13 or newer):
 
 ```bash
-claude mcp add football-docs -- npx -y football-docs@0.16.2
+claude mcp add football-docs -- npx -y football-docs@0.17.0
 ```
 
-For other agents, add the same command (`npx -y football-docs@0.16.2`) as an MCP server in their settings. Without it, nutmeg says it cannot check provider facts, and labels anything it answers from memory as unverified.
+For other agents, add the same command (`npx -y football-docs@0.17.0`) as an MCP server in their settings. Without it, nutmeg says it cannot check provider facts, and labels anything it answers from memory as unverified.
 
 This installs the 11 skills but not the agents or MCP docs server. For the full experience (searchable provider docs, pipeline builder agent, data reviewer agent), use the plugin install above.
 
@@ -92,7 +92,7 @@ Think Context7 for football data. Provider-specific facts, including identity
 surfaces and ID-scheme quirks, should come from this index rather than from
 Nutmeg's own prompts.
 
-The server is published as the [`football-docs`](https://www.npmjs.com/package/football-docs) npm package and starts automatically when nutmeg is loaded (via `npx -y football-docs@0.16.2`; nutmeg pins the version it was tested with). No local build step is required. It needs Node.js 22.13 or newer.
+The server is published as the [`football-docs`](https://www.npmjs.com/package/football-docs) npm package and starts automatically when nutmeg is loaded (via `npx -y football-docs@0.17.0`; nutmeg pins the version it was tested with). No local build step is required. It needs Node.js 22.13 or newer.
 
 ### Adding provider docs
 
@@ -117,9 +117,11 @@ Nutmeg does not keep its own provider facts. Coverage, fields, IDs, access terms
 
 Cross-provider player, team and match IDs come from the [Reep Register](https://reep.football) (CC0), through the `resolve_entity` tool.
 
+Metric definitions come from the football-docs metric cards (`list_metrics`, `get_metric`): xG, npxG, xA, xG assisted, PPDA, progressive passes and carries, xT, VAEP, field tilt and pass completion, each with its published variants. Nutmeg names the variant ID it uses (for example `ppda.statsbomb-hudl`), never compares values from different variants, and in a research project records the variant on the plan choice and its claims (`rests_on` type `metric`).
+
 ## Evals
 
-`evals/` holds a behaviour suite for `claude plugin eval`: provider-fact grounding, abstention, Reep joins, common stat misuses, 2026 source changes, citations checked with the football-docs paper tools, and research projects (project start, the run gate, unsupported numbers, reasons). A replay mock stands in for the football-docs server, so runs do not depend on the live index.
+`evals/` holds a behaviour suite for `claude plugin eval`: provider-fact grounding, abstention, Reep joins, common stat misuses, 2026 source changes, citations checked with the football-docs paper tools, metric variants, point-in-time checks, safe package handling, and research projects (project start, the run gate, unsupported numbers, reasons). A replay mock stands in for the football-docs server, so runs do not depend on the live index.
 
 ```bash
 claude plugin eval . --runs 2 --scaffold --no-publish --model sonnet --judge-model haiku --allow-tools "Bash(python3:*)"

@@ -7,6 +7,7 @@ the latest version wins on read. Git merges concurrent appends with the
 `merge=union` attribute.
 """
 import json
+import re
 import secrets
 from contextlib import contextmanager
 from datetime import datetime, timezone
@@ -34,7 +35,9 @@ REQUIRED_EVIDENCE = {
 STATUSES = ("draft", "verified", "disputed", "withdrawn")
 INTERPRETATION_STATUSES = ("draft", "supported", "contested", "withdrawn")
 
-REST_TYPES = ("docs", "registry", "rule", "user", "paper", "claim")
+REST_TYPES = ("docs", "registry", "rule", "user", "paper", "claim", "metric")
+# A football-docs metric card or variant ID, for example ppda or ppda.statsbomb-hudl (from list_metrics).
+METRIC_REF = re.compile(r"^[a-z][a-z0-9_]*(\.[a-z0-9][a-z0-9_-]*)?$")
 
 # A reason is one sentence; the detail lives in rests_on.
 MAX_WHY_LENGTH = 240
@@ -105,6 +108,9 @@ def validate(record):
     if rests_on is not None:
         if not isinstance(rests_on, dict) or rests_on.get("type") not in REST_TYPES or not rests_on.get("ref"):
             raise ClaimError("rests_on", f"must be {{type, ref}} with type one of {', '.join(REST_TYPES)}")
+        if rests_on["type"] == "metric" and not METRIC_REF.match(str(rests_on["ref"])):
+            raise ClaimError("rests_on", "a metric reference is a football-docs metric card or variant ID from "
+                                         "list_metrics, for example ppda.statsbomb-hudl")
     for field in ("why", "note", "author", "signer", "by"):
         if field in record and record[field] is not None and not isinstance(record[field], str):
             raise ClaimError(field, "must be text")
