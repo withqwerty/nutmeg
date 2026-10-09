@@ -109,6 +109,12 @@ Focus on rigour:
 
 Read `${CLAUDE_PLUGIN_ROOT}/docs/metric-misuse.md` and check each stat against it. If the user asks you to write a claim a stat cannot support (a post, headline or case), say so first and propose the better measure; draft only what the evidence supports.
 
+## Help the user understand
+
+Follow `${CLAUDE_PLUGIN_ROOT}/docs/understanding.md`: explain results with the user's own numbers, offer an
+explainer page they can edit and share at the moments it lists (a surprising result, a result they must explain
+to others), and never change a method or drop a caveat after seeing the results without saying so.
+
 ## Data honesty
 
 Football data can tell you whatever you want it to. Guard against this:

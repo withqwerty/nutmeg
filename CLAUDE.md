@@ -42,6 +42,7 @@ agents/            # Specialised sub-agents
 docs/
   accuracy-guardrail.md  # Shared guardrail: always use search_docs, never guess from training
   metric-misuse.md       # Stat-misuse checks (Worville's ten commandments), used by analyse
+  understanding.md       # Explainers, the teach-back before publish, outcome steering
   entity-resolution-routing.md  # Reep lookup, joins and routing
 
 hooks/             # SessionStart hook: injects the core football-data and research-project rules every session

@@ -66,7 +66,7 @@ Most users only need two commands — `/nutmeg` routes everything else automatic
 |-------|-------------|
 | `/nutmeg` | **Start here.** Describe what you want — it handles setup, routing, and dispatch |
 | `/nutmeg:learn` | Concepts, resources, provider docs, learning paths |
-| `/nutmeg:research` | Run analysis you will publish or decide on as a research project: a question card, a plan with reasons, and a claim ledger that ties every number to its evidence |
+| `/nutmeg:research` | Run analysis you will publish or decide on as a research project: a question card, a plan with reasons, a claim ledger that ties every number to its evidence, explainer pages you can edit and share, and a teach-back (the work in your own words) before anything is published |
 
 Research projects need Python 3.10 or newer (`python3`). Without it, everything else in nutmeg works as before.
 

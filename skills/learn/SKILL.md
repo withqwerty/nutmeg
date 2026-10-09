@@ -27,6 +27,9 @@ and per 90. Read it when the user asks what a term means, and explain at their l
 links the same entries. For a provider's own definition of a metric or event, use `search_docs`; the glossary
 gives the general meaning only.
 
+When the user needs to explain a concept to someone else, or keeps coming back to it, offer once to write it up
+as an explainer page they can edit and share; follow `${CLAUDE_PLUGIN_ROOT}/docs/understanding.md` section 2.
+
 ### Per-90 normalisation
 
 Always normalise player stats per 90 minutes, not per match:

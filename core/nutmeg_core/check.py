@@ -2,8 +2,9 @@
 outputs must trace to the ledger.
 
 Outputs are the project's Markdown files other than the question card and the
-plan (for example `report.md`), files under `reports/`, and figure captions
-(`figures/*.md`, `figures/*.txt`). The chat is not checked.
+plan (for example `report.md`), files under `reports/`, explainer sources
+(`explainers/*.md`), and figure captions (`figures/*.md`, `figures/*.txt`).
+The chat is not checked.
 
 Failures:
 - orphan: a number with no ledger claim of that value;
@@ -82,6 +83,7 @@ def output_files(project):
     project = Path(project)
     files = [p for p in project.glob("*.md") if p.name not in NOT_OUTPUTS]
     files += sorted((project / "reports").rglob("*.md")) if (project / "reports").is_dir() else []
+    files += sorted((project / "explainers").glob("*.md")) if (project / "explainers").is_dir() else []
     if (project / "figures").is_dir():
         files += sorted(p for p in (project / "figures").iterdir() if p.suffix in (".md", ".txt"))
     return sorted(set(files))
@@ -271,6 +273,13 @@ def run_checks(project):
             failures.append({"kind": "needs sign-off", "id": _failure_id("signoff", cid, claim.get("version")),
                              "claim": cid, "message": f"{cid} ({claim['statement'][:60]}) is a headline claim; the "
                              "team requires a teammate who is not its author to run `nutmeg signoff`"})
+
+    # Not a failure: publish refuses a page older than its source; the teach-back is checked at publish only.
+    from . import understand
+    for source in understand.explainers(project):
+        state = understand.page_state(source)
+        if state != "current":
+            warnings.append(f"explainer page for explainers/{source.name} is {state}; run `nutmeg explain render`")
 
     for cid, claim in live.items():
         evidence = claim.get("evidence") or {}

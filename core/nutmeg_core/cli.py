@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 from . import __version__, card as cards, check as checks, figure as figures, project as projects, publish as publishing
-from . import bundle as bundling, review, run as runs, why as whys, workspace as workspaces
+from . import bundle as bundling, review, run as runs, understand, why as whys, workspace as workspaces
 from .config import (LEVELS, PERSONAS, STAGES, ConfigError, data_in_git_policy, load_effective, load_team,
                      save_user, team_signoff_required, user_config_path, user_name)
 from .gate import acknowledge_settings, pending_key
@@ -155,10 +155,12 @@ def cmd_status(args):
 def cmd_plan_choose(args):
     project = resolve_project(args)
     try:
-        projects.add_choice(project, args.kind, args.choice, args.why, args.rests_type, args.rests_ref)
+        projects.add_choice(project, args.kind, args.choice, args.why, args.rests_type, args.rests_ref,
+                            after_results=args.after_results)
     except projects.ProjectError as exc:
         raise UsageError(str(exc))
-    print(f"Added {args.kind}: {args.choice} to plan.md")
+    marked = " (marked as made after seeing the results)" if args.after_results is not None else ""
+    print(f"Added {args.kind}: {args.choice} to plan.md{marked}")
     return 0
 
 
@@ -314,6 +316,100 @@ def cmd_publish(args):
     return 0
 
 
+def cmd_teachback(args):
+    project = resolve_project(args)
+    repo = find_repo_root(project)
+    by = user_name(repo)
+    if not args.show:
+        words = {"claim": args.claim, "rests_on": args.rests_on, "would_change": args.would_change}
+        if not all(words.values()):
+            raise UsageError("give --claim, --rests-on and --would-change in the user's own words (or --show)")
+        covers = [c.strip() for c in (args.covers or "").split(",") if c.strip()] or None
+        try:
+            entry = understand.record(project, by, words, covers)
+        except understand.UnderstandError as exc:
+            raise UsageError(f"teach-back not recorded: {exc}")
+        print(f"Recorded {by}'s teach-back for {', '.join(sorted(entry['covers']))}. The publish card shows these words.")
+    state = understand.status(project, by)
+    gap = understand.describe_gap(state)
+    latest = state["latest"]
+    if args.show and latest:
+        print(f"Latest teach-back by {by} ({latest['at']}):")
+        for field in understand.FIELDS:
+            print(f"  {understand.LABELS[field]}: {latest[field]}")
+    if gap:
+        print(f"Publish still needs a teach-back by {by}: {gap}")
+        return 1
+    if args.show:
+        print(f"The teach-back covers every claim a publish needs ({', '.join(state['needed']) or 'none'}).")
+    return 0
+
+
+def cmd_explain_new(args):
+    project = resolve_project(args)
+    try:
+        path = understand.new(project, args.slug, args.title)
+    except understand.UnderstandError as exc:
+        raise UsageError(str(exc))
+    print(f"Wrote {path.relative_to(find_repo_root(project))}. Fill it in, then run `nutmeg explain render {args.slug}`.")
+    return 0
+
+
+def cmd_explain_render(args):
+    if args.file:
+        source = (Path.cwd() / args.file).resolve()
+        if not source.is_file() or source.suffix.lower() != ".md":
+            raise UsageError(f"not a Markdown file: {args.file}")
+        repo = find_repo_root(source.parent)
+        active = projects.active_project(repo)
+        project = active if active is not None and active.resolve() in source.parents else None
+        sources = [source]
+    else:
+        project = resolve_project(args)
+        repo = find_repo_root(project)
+        sources = understand.explainers(project)
+        if args.slug:
+            sources = [s for s in sources if s.stem == args.slug]
+            if not sources:
+                raise UsageError(f"no explainers/{args.slug}.md in {project.name}; `nutmeg explain new {args.slug}` starts one")
+        if not sources:
+            raise UsageError("no explainers yet; `nutmeg explain new <slug>` starts one")
+    for source in sources:
+        page = understand.render(source, project=project, repo_root=repo)
+        shown = page.relative_to(repo) if page.is_relative_to(repo) else page
+        print(f"Wrote {shown} (one file, no network needed). Edit {source.name} and render again to change it.")
+    if project is not None:
+        state = checks.check(project)
+        mine = [f for f in state["open"] if str(f.get("file", "")).startswith(understand.EXPLAINERS + "/")]
+        for failure in mine:
+            print(f"- {checks.describe(failure)}")
+        if mine:
+            print(f"{len(mine)} number(s) in the explainers do not trace to the ledger; fix them before sharing.")
+            return 1
+    return 0
+
+
+def cmd_explain_list(args):
+    project = resolve_project(args)
+    repo = find_repo_root(project)
+    sources = understand.explainers(project)
+    for source in sources:
+        print(f"{source.relative_to(repo)} · page {understand.page_state(source)}")
+    if not sources:
+        print("No explainers yet.")
+    declined = understand.declined(project)
+    if declined:
+        print("Declined (do not offer again): " + ", ".join(declined))
+    return 0
+
+
+def cmd_explain_decline(args):
+    project = resolve_project(args)
+    understand.decline(project, args.topic, user_name(find_repo_root(project)))
+    print(f"Recorded: do not offer an explainer on {args.topic!r} again in this project.")
+    return 0
+
+
 def cmd_signoff(args):
     project = resolve_project(args)
     repo = find_repo_root(project)
@@ -442,6 +538,8 @@ def build_parser(parser_class=cards.NutmegParser):
     choose.add_argument("--rests-type", required=True, choices=REST_TYPES, help="what the reason rests on")
     choose.add_argument("--rests-ref", required=True,
                         help="the reference: a football-docs page, rule, paper, claim ID or the user's words")
+    choose.add_argument("--after-results", metavar="NOTE",
+                        help="this choice was made after the results were seen: say what it replaces and who asked")
     choose.set_defaults(handler=cmd_plan_choose)
     plan_commands.add_parser("check", help="check every choice has a reason").set_defaults(handler=cmd_plan_check)
 
@@ -481,7 +579,7 @@ def build_parser(parser_class=cards.NutmegParser):
     bundle.add_argument("--out", help="the zip file to write (default: research/<slug>/bundles/)")
     bundle.set_defaults(handler=cmd_bundle)
 
-    publish = commands.add_parser("publish", help="publish the outputs (refuses while checks have open problems)")
+    publish = commands.add_parser("publish", help="publish the outputs (refuses while checks have open problems or the teach-back is missing)")
     publish.add_argument("--to", help="also copy the outputs to this folder in the repository")
     publish.set_defaults(handler=cmd_publish)
 
@@ -508,6 +606,29 @@ def build_parser(parser_class=cards.NutmegParser):
     queue.add_argument("--done", metavar="RUN", help="mark a run as reviewed")
     queue.add_argument("--note", help="what you checked")
     queue.set_defaults(handler=cmd_queue)
+
+    teachback = commands.add_parser("teachback", help="record the user's own words for the work before publishing")
+    teachback.add_argument("--claim", help="what the work claims, in the user's words")
+    teachback.add_argument("--rests-on", help="what that rests on (the main assumption or evidence), in their words")
+    teachback.add_argument("--would-change", help="what would change the answer, in their words")
+    teachback.add_argument("--covers", help="claim IDs it covers (default: the headline claims, else the cited claims)")
+    teachback.add_argument("--show", action="store_true", help="show the latest teach-back and what publish still needs")
+    teachback.set_defaults(handler=cmd_teachback)
+
+    explain = commands.add_parser("explain", help="write, render and list explainer pages the user can edit and share")
+    explain_commands = explain.add_subparsers(dest="explain_command", metavar="<action>")
+    explain_new = explain_commands.add_parser("new", help="start explainers/<slug>.md from a short outline")
+    explain_new.add_argument("slug", help="short name, for example why-mendes")
+    explain_new.add_argument("--title", help="the page title")
+    explain_new.set_defaults(handler=cmd_explain_new)
+    explain_render = explain_commands.add_parser("render", help="write a self-contained HTML page from each explainer")
+    explain_render.add_argument("slug", nargs="?", help="one explainer (default: all)")
+    explain_render.add_argument("--file", help="any Markdown file, also outside a research project")
+    explain_render.set_defaults(handler=cmd_explain_render)
+    explain_commands.add_parser("list", help="list explainers and declined topics").set_defaults(handler=cmd_explain_list)
+    explain_decline = explain_commands.add_parser("decline", help="record that the user declined an explainer topic")
+    explain_decline.add_argument("topic")
+    explain_decline.set_defaults(handler=cmd_explain_decline)
 
     signoff = commands.add_parser("signoff", help="verify a claim with your name (a teammate's check)")
     signoff.add_argument("claim_id")

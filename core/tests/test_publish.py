@@ -24,6 +24,12 @@ def project(repo):
     return folder
 
 
+def teach(project):
+    assert main(["teachback", "--claim", "Robertson moves the ball forward most often",
+                 "--rests-on", "counting carries per ninety minutes played",
+                 "--would-change", "a longer season or a different minutes cut"]) == 0
+
+
 def test_publish_refuses_with_open_orphan(project, capsys):
     (project / "report.md").write_text("Robertson leads with 9.23 [C1]. Kerkez has 7.7.\n")
     assert main(["publish"]) == 2
@@ -34,6 +40,7 @@ def test_publish_refuses_with_open_orphan(project, capsys):
 
 def test_publish_records_files_and_figures(project, repo, capsys):
     (project / "report.md").write_text("Robertson leads with 9.23 [C1].\n")
+    teach(project)
     assert main(["publish", "--to", "site/lb"]) == 0
     history = json.loads((project / "published.json").read_text())
     sources = [f["source"] for f in history[0]["files"]]
@@ -46,6 +53,7 @@ def test_publish_records_files_and_figures(project, repo, capsys):
 
 def test_publish_gate_shows_chart_data(project, repo):
     (project / "report.md").write_text("Robertson leads with 9.23 [C1].\n")
+    teach(project)
     decision = gate.decide("nutmeg publish", repo, project, repo)
     assert decision.decision == "ask"
     for text in ("Figure carries · n = 4 · 4 rows · filters: min 900 minutes", "player | prog_p90", "Robertson | 9.23",

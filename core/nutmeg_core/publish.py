@@ -1,6 +1,8 @@
 """`nutmeg publish`: approve a project's outputs for publication.
 
-Publish refuses while `nutmeg check` has open problems. Otherwise it records
+Publish refuses while `nutmeg check` has open problems, while the person who
+publishes has not put the claims in their own words (`nutmeg teachback`), and
+while an explainer page is older than its Markdown source. Otherwise it records
 what was published (each output file and figure with its hash) in
 `published.json` and a receipt, and with `--to DIR` copies the outputs there.
 The gate hook shows the preview (each figure's n, filters and first rows)
@@ -11,10 +13,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import check as checks
+from . import understand
 from .card import sha256_path
+from .config import user_name
 from .figure import IMAGE_TYPES, load_all
 from .project import append_receipt
 from .bundle import RedactionError, write_redacted
+from .project import parse_choices
 from .redact import Redactor, inside_repo
 from .why import sample_rows
 
@@ -29,11 +34,19 @@ def _now():
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def preview(project, repo_root):
-    """What a publish would release, plus the open problems that block it."""
+def preview(project, repo_root, by=None):
+    """What a publish would release, plus the open problems and missing teach-back that block it."""
     project, repo_root = Path(project), Path(repo_root)
+    by = by or user_name(repo_root)
     state = checks.check(project)
     outputs = [p.relative_to(repo_root).as_posix() for p in checks.output_files(project)]
+    pages, stale_pages = [], []
+    for source in understand.explainers(project):
+        if understand.page_state(source) == "current":
+            pages.append(source.with_suffix(".html").relative_to(repo_root).as_posix())
+        else:
+            stale_pages.append(source.relative_to(repo_root).as_posix())
+    outputs += pages
     figures = []
     for prov in load_all(project):
         if prov.get("error"):
@@ -52,15 +65,43 @@ def preview(project, repo_root):
             "header": header,
             "first_rows": rows,
         })
-    return {"outputs": outputs, "figures": figures, "open": state["open"]}
+    after = [c for c in parse_choices(_read(project / "plan.md")) if c.get("after_results")]
+    return {"outputs": outputs, "figures": figures, "open": state["open"], "by": by,
+            "teachback": understand.status(project, by), "stale_pages": stale_pages, "after_results": after}
+
+
+def _read(path):
+    try:
+        return Path(path).read_text(encoding="utf-8")
+    except OSError:
+        return ""
+
+
+def blockers(data):
+    """Why a publish would refuse, as lines; empty when it may go ahead."""
+    out = [f"open problem from `nutmeg check`: {checks.describe(f)}" for f in data["open"]]
+    gap = understand.describe_gap(data["teachback"])
+    if gap:
+        out.append(f"teach-back by {data['by']}: {gap}. Ask {data['by']} to say, in their own words, what the work "
+                   "claims, what it rests on and what would change the answer; correct a wrong reading first; then "
+                   "record their words with `nutmeg teachback`")
+    out += [f"explainer page older than its source: {p}; run `nutmeg explain render`" for p in data["stale_pages"]]
+    return out
 
 
 def render_preview(data, project_label):
     out = [f"nutmeg publish gate · {project_label} · needs approval; nothing has been published yet"]
-    if data["open"]:
-        out.append(f"REFUSED: {len(data['open'])} open problem(s) from `nutmeg check`; publish will refuse:")
-        out += [f"- {checks.describe(f)}" for f in data["open"][:10]]
+    blocked = blockers(data)
+    if blocked:
+        out.append(f"REFUSED: publish will refuse ({len(blocked)} reason(s)):")
+        out += [f"- {line}" for line in blocked[:10]]
         return "\n".join(out)
+    latest = data["teachback"]["latest"]
+    if latest:
+        out.append(f"In {latest.get('by')}'s own words ({latest.get('at')}):")
+        out += [f"  {understand.LABELS[f]}: {latest.get(f)}" for f in understand.FIELDS]
+    for choice in data.get("after_results", []):
+        out.append(f"Changed after seeing results: {choice['kind']}: {choice['choice']} ({choice['after_results']})")
     out.append("Outputs: " + (", ".join(data["outputs"]) or "none"))
     if not data["figures"]:
         out.append("Figures: none registered (`nutmeg figure register`)")
@@ -79,12 +120,15 @@ def render_preview(data, project_label):
 
 def publish(project, repo_root, by, to=None):
     project, repo_root = Path(project), Path(repo_root)
-    data = preview(project, repo_root)
+    data = preview(project, repo_root, by=by)
     if data["open"]:
         raise PublishError(
             f"{len(data['open'])} open problem(s); fix them or accept each with a reason "
             "(`nutmeg check --accept <id> --reason ...`), then publish again:\n"
             + "\n".join(f"- {checks.describe(f)}" for f in data["open"]))
+    blocked = blockers(data)
+    if blocked:
+        raise PublishError("\n".join(f"- {line}" for line in blocked))
     files = [repo_root / p for p in data["outputs"]]
     figures_dir = project / "figures"
     for fig in data["figures"]:

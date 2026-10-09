@@ -162,7 +162,9 @@ says a problem is not one, record their reason:
   `nutmeg figure register <name> --data <snapshot> --source "<source>" --claims C3,C5 --season "<competition and season>" --filters "<filters>" --metric "<metric>" --run R2 --image <chart file>`.
   Put the footnote it prints under the chart. `/nutmeg:brainstorm` has the chart conventions.
 - `nutmeg publish` releases the outputs. The user first sees each figure's n, filters and first rows, and approves.
-  It refuses while `nutmeg check` has open problems. `--to <folder>` also copies the outputs there.
+  It refuses while `nutmeg check` has open problems, until the user has put the work in their own words
+  (`nutmeg teachback`, section 9), and while an explainer page is older than its source. `--to <folder>` also
+  copies the outputs there.
 
 - To hand the project over, run `nutmeg bundle --raw no` or `--raw yes`. Ask the user which every time: raw data
   (the project's `data/`, run outputs, figure snapshots) may be licensed.
@@ -185,7 +187,23 @@ says a problem is not one, record their reason:
   becomes disputed (an interpretation becomes contested). `nutmeg resolve <claim> --note "<how>"`
   returns it to its earlier status. Both record the person's name.
 
-## 9. Control and sign-off
+## 9. Understanding before sharing
+
+Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/understanding.md`. In short:
+
+- Explain terms, methods and results with this project's own numbers when the user is unsure.
+- Offer an explainer page at the moments that file lists, once per topic, and never again after a no
+  (`nutmeg explain decline "<topic>"`). Make it with `nutmeg explain new <slug>`, fill in the Markdown with claim
+  IDs next to each number, then `nutmeg explain render <slug>`. The user edits the `.md` and renders again; the
+  `.html` is one file they can share.
+- Before a publish, ask the user to say what the work claims, what it rests on and what would change the answer,
+  in their own words. Correct a wrong reading first. Record right answers as they wrote them with
+  `nutmeg teachback --claim "..." --rests-on "..." --would-change "..."`. Never write these words for the user.
+- When the user asks to change a method or drop a caveat after seeing the results to get a preferred answer, say
+  first that it would mislead, keep the original result visible, and record any change with
+  `nutmeg plan choose ... --after-results "<what it replaces; who asked>"`.
+
+## 10. Control and sign-off
 
 - `nutmeg config show` prints the user's persona and autonomy levels (L1 suggest, L2 draft, L3 execute with
   checkpoints) and the team limits from `.nutmeg/team.json`. Follow them:
@@ -195,7 +213,7 @@ says a problem is not one, record their reason:
 - Mark the claims a decision rests on with `--headline` when you add them. When the team requires sign-off, a
   teammate who is not the author runs `nutmeg signoff <claim>`; never sign off a claim yourself.
 
-## 10. Close
+## 11. Close
 
 When the user is done with the project, run `nutmeg close`. The files stay; only the active marker
 goes. `nutmeg open <slug>` makes it active again.

@@ -2,7 +2,8 @@
 
 The page shows, in order: when it was generated and how big the ledger is,
 the review queue (open check problems, runs waiting for review, disputed
-claims, headline claims waiting for sign-off), the question, the plan with
+claims, headline claims waiting for sign-off or for the author's teach-back,
+explainer pages older than their source), the question, the plan with
 its reasons, the ledger (disputed and failing claims first, each with its
 `why` card), the figures with their footnotes, the runs, and the glossary
 entries the page links to.
@@ -20,7 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import check as checks
-from . import glossary
+from . import glossary, understand
 from .config import ConfigError, team_signoff_required
 from .figure import load_all as load_figures
 from .ledger import Ledger
@@ -184,6 +185,15 @@ def build(project, repo_root=None, now=None):
         if signoff_required and claim.get("headline") and not claim.get("signer"):
             queue.append(f'<li><strong>Waiting for sign-off</strong> <a href="#{r.esc(claim["id"])}">'
                          f"{r.esc(claim['id'])}</a> {r.esc(claim['statement'])}</li>")
+    gap = understand.describe_gap(understand.status(project))
+    if gap:
+        queue.append(f"<li><strong>Waiting for the author's teach-back</strong> {r.esc(gap)}; publish refuses "
+                     "until the author puts the work in their own words</li>")
+    for source in understand.explainers(project):
+        state = understand.page_state(source)
+        if state != "current":
+            queue.append(f"<li><strong>Explainer page {r.esc(state)}</strong> <code>explainers/{r.esc(source.name)}"
+                         "</code>; run <code>nutmeg explain render</code></li>")
     queue_html = "<ul>" + "".join(queue) + "</ul>" if queue else '<p class="empty">Nothing waits for review.</p>'
 
     # Question
@@ -197,7 +207,9 @@ def build(project, repo_root=None, now=None):
         rests = (choice.get("rests_on") or "").split(None, 1)
         rests_type = rests[0] if rests else ""
         rests_ref = rests[1] if len(rests) > 1 else ""
-        rows.append(f"<tr><td>{r.esc(choice.get('kind') or '?')}</td><td>{r.inline(choice['choice'])}</td>"
+        after = (f' <span class="tag">changed after seeing results</span> {r.inline(choice["after_results"])}'
+                 if choice.get("after_results") else "")
+        rows.append(f"<tr><td>{r.esc(choice.get('kind') or '?')}</td><td>{r.inline(choice['choice'])}{after}</td>"
                     f"<td>{r.inline(choice.get('why') or 'no reason given')}</td>"
                     f"<td><span class=\"tag\">{r.esc(rests_type)}</span> {r.inline(rests_ref)}</td></tr>")
     plan_html = ("<table><thead><tr><th>Kind</th><th>Choice</th><th>Why</th><th>Rests on</th></tr></thead><tbody>"

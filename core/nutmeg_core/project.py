@@ -189,11 +189,14 @@ def close(repo_root):
 CHOICE_KINDS = ("question", "metric", "filter", "join", "threshold", "source", "method", "chart", "other")
 
 _CHOICE_HEADING = re.compile(r"^###\s+(?P<kind>[a-z_]+):\s*(?P<choice>.+?)\s*$")
-_FIELD = re.compile(r"^\s*[-*]\s*(?P<name>why|rests_on|rests on):\s*(?P<value>.*?)\s*$", re.IGNORECASE)
+_FIELD = re.compile(r"^\s*[-*]\s*(?P<name>why|rests_on|rests on|after_results|after results):\s*(?P<value>.*?)\s*$",
+                    re.IGNORECASE)
 
 
 def parse_choices(plan_text):
-    """Return the choices under `## Choices` as dicts with kind, choice, why, rests_on, line."""
+    """Return the choices under `## Choices` as dicts with kind, choice, why, rests_on, after_results, line.
+
+    after_results is set on a choice made after the results were seen: what changed and who asked."""
     choices, in_section, current = [], False, None
     for lineno, line in enumerate(plan_text.splitlines(), start=1):
         if line.startswith("## "):
@@ -204,11 +207,13 @@ def parse_choices(plan_text):
             continue
         heading = _CHOICE_HEADING.match(line)
         if heading:
-            current = {"kind": heading["kind"], "choice": heading["choice"], "why": None, "rests_on": None, "line": lineno}
+            current = {"kind": heading["kind"], "choice": heading["choice"], "why": None, "rests_on": None,
+                       "after_results": None, "line": lineno}
             choices.append(current)
             continue
         if line.startswith("### "):
-            current = {"kind": None, "choice": line[4:].strip(), "why": None, "rests_on": None, "line": lineno}
+            current = {"kind": None, "choice": line[4:].strip(), "why": None, "rests_on": None, "after_results": None,
+                       "line": lineno}
             choices.append(current)
             continue
         field = _FIELD.match(line)
@@ -240,8 +245,11 @@ def check_choices(choices):
     return problems
 
 
-def add_choice(project, kind, choice, why, rests_type, rests_ref):
-    """Append a choice block to plan.md after validating it."""
+def add_choice(project, kind, choice, why, rests_type, rests_ref, after_results=None):
+    """Append a choice block to plan.md after validating it.
+
+    after_results marks a choice made after the results were seen (what it replaces, and who asked); the
+    publish card lists these choices, and earlier choices stay in the plan."""
     item = {"kind": kind, "choice": choice, "why": why, "rests_on": f"{rests_type} {rests_ref}", "line": 0}
     problems = check_choices([item])
     if problems:
@@ -259,6 +267,11 @@ def add_choice(project, kind, choice, why, rests_type, rests_ref):
     while end > start + 1 and not lines[end - 1].strip():
         end -= 1
     block = ["", f"### {kind}: {choice}", f"- why: {why}", f"- rests_on: {rests_type} {rests_ref}"]
+    if after_results is not None:
+        note = " ".join(str(after_results).split())
+        if not note:
+            raise ProjectError("--after-results needs a note: what this choice replaces and who asked for it")
+        block.append(f"- after_results: {note}")
     if end < len(lines):
         block.append("")
     lines[end:end] = block
