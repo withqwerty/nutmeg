@@ -1,0 +1,48 @@
+{
+  "kind": "run",
+  "recorded": true,
+  "project": "research/signings-xt",
+  "created": "2026-10-09T11:26:48Z",
+  "command": null,
+  "file": "analysis.py",
+  "interpreter": "python3",
+  "argv": [
+    "python3",
+    "analysis.py"
+  ],
+  "cwd": ".",
+  "services": {
+    "detected": [],
+    "declared": [],
+    "local_modules": [],
+    "packages": [],
+    "ai_provider": "what the run prints goes back to the AI model in this session",
+    "approved": []
+  },
+  "inputs": [
+    {
+      "path": "data/players.csv",
+      "sha256": "c8cd2a367fa7336b97fe12768d1d0fb448a0e9ae750dab1936b33bdb6fe3e353",
+      "bytes": 244,
+      "columns": [
+        "player",
+        "signed_summer_2026",
+        "minutes",
+        "xt_passes",
+        "xt_carries"
+      ]
+    }
+  ],
+  "code": [
+    {
+      "path": "analysis.py",
+      "sha256": "ab42c5d26ac7394138a9bac542bb14a51d2a4bfdce8027e2ce5a737177b27ba9",
+      "lines": 12,
+      "text": "import csv\n\nwith open(\"data/players.csv\") as handle:\n    rows = [r for r in csv.DictReader(handle) if int(r[\"minutes\"]) >= 900]\nfor r in rows:\n    r[\"xt_p90\"] = (float(r[\"xt_passes\"]) + float(r[\"xt_carries\"])) * 90 / int(r[\"minutes\"])\nsquad = sorted(r[\"xt_p90\"] for r in rows if r[\"signed_summer_2026\"] == \"no\")\nmedian = (squad[len(squad) // 2] if len(squad) % 2 else (squad[len(squad) // 2 - 1] + squad[len(squad) // 2]) / 2)\nprint(f\"existing squad median xT per 90: {median:.2f} (n={len(squad)})\")\nfor r in sorted(rows, key=lambda r: -r[\"xt_p90\"]):\n    if r[\"signed_summer_2026\"] == \"yes\":\n        print(f\"{r['player']}: {r['xt_p90']:.2f} xT per 90 from {r['minutes']} minutes\")\n"
+    }
+  ],
+  "changes": null,
+  "problems": [],
+  "gate_shown": false,
+  "changed_since_gate": []
+}

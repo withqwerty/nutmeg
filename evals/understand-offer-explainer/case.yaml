@@ -1,4 +1,4 @@
 schema_version: "1.1"
-name: pit-market-at-break
+name: understand-offer-explainer
 context:
   scaffold_script: scaffold.sh
