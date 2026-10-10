@@ -229,13 +229,31 @@ def test_wrapper_terminates_on_odd_paths(path):
 def test_session_start_json_for_odd_paths(tmp_path, name):
     root = tmp_path / name
     (root / "hooks").mkdir(parents=True)
-    for f in ("session-start.json", "session-start.sh"):
+    for f in ("session-start.json", "session-start.sh", "session-start-research.txt"):
         shutil.copy(PLUGIN / "hooks" / f, root / "hooks" / f)
+    project = tmp_path / "project"
+    (project / "research").mkdir(parents=True)
     result = subprocess.run(["/bin/sh", str(root / "hooks" / "session-start.sh")], capture_output=True, text=True,
-                            env=dict(os.environ, CLAUDE_PLUGIN_ROOT=str(root)))
+                            env=dict(os.environ, CLAUDE_PLUGIN_ROOT=str(root), CLAUDE_PROJECT_DIR=str(project)))
     context = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
-    assert "@PLUGIN_ROOT@" not in context
+    assert "@PLUGIN_ROOT@" not in context and "@RESEARCH@" not in context
     assert f'python3 "{root}/core/nutmeg.py"' in context
+
+
+def test_research_rules_load_only_in_projects_with_research(tmp_path):
+    """Sessions without research projects do not pay for the research-project rules."""
+    plain, research = tmp_path / "plain", tmp_path / "with-research"
+    plain.mkdir()
+    (research / "research").mkdir(parents=True)
+    out = {}
+    for name, project in (("plain", plain), ("research", research)):
+        result = subprocess.run(["/bin/sh", str(PLUGIN / "hooks" / "session-start.sh")], capture_output=True, text=True,
+                                env=dict(os.environ, CLAUDE_PLUGIN_ROOT=str(PLUGIN), CLAUDE_PROJECT_DIR=str(project)))
+        out[name] = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
+    assert "teachback" not in out["plain"] and "claim add" not in out["plain"] and "@RESEARCH@" not in out["plain"]
+    assert "teachback --shown" in out["research"] and "claim add --file" in out["research"]
+    assert "Provider facts" in out["plain"] and "Help the user understand" in out["plain"]
+    assert len(out["plain"]) < len(out["research"])
 
 
 # --- second review (findings on U6-U10, U14) ------------------------------------------------
@@ -423,10 +441,12 @@ def test_live_harness_grades_the_named_tool():
 def test_session_start_json_with_control_characters(tmp_path, name):
     root = tmp_path / name
     (root / "hooks").mkdir(parents=True)
-    for f in ("session-start.json", "session-start.sh"):
+    for f in ("session-start.json", "session-start.sh", "session-start-research.txt"):
         shutil.copy(PLUGIN / "hooks" / f, root / "hooks" / f)
+    project = tmp_path / "project"
+    (project / "research").mkdir(parents=True)
     result = subprocess.run(["/bin/sh", str(root / "hooks" / "session-start.sh")], capture_output=True, text=True,
-                            env=dict(os.environ, CLAUDE_PLUGIN_ROOT=str(root)))
+                            env=dict(os.environ, CLAUDE_PLUGIN_ROOT=str(root), CLAUDE_PROJECT_DIR=str(project)))
     context = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
     assert f'python3 "{root}/core/nutmeg.py"' in context
 

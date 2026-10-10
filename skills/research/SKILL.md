@@ -1,6 +1,6 @@
 ---
 name: nutmeg-research
-description: "Run a football analysis as a research project that shows its work: a question card, a plan where every choice has a reason, and a claim ledger that ties every number, provider fact, ID and citation to its evidence. Use when the user wants analysis to publish or to decide on (a recruitment shortlist, a match or opposition report, a club memo, a chart or thread for social media), asks for sourced or checkable numbers, or says 'research project'. Quick questions stay outside projects."
+description: "Run football analysis as a research project that shows its work: a question, a plan with reasons, a claim ledger tying every number to evidence. Use for work to publish or decide on (shortlists, match or opposition reports, memos, charts, threads) or when sourced numbers are asked for."
 argument-hint: "[the question to research]"
 allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "AskUserQuestion", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs", "mcp__plugin_nutmeg_football-docs__resolve_entity", "mcp__football-docs__resolve_entity", "mcp__plugin_nutmeg_football-docs__get_provider_docs", "mcp__football-docs__get_provider_docs", "mcp__plugin_nutmeg_football-docs__get_metric", "mcp__football-docs__get_metric", "mcp__plugin_nutmeg_football-docs__list_metrics", "mcp__football-docs__list_metrics"]
 ---
@@ -44,7 +44,7 @@ cross?"), a code fix or a lookup.
 
 The project lives in `research/<slug>/` and becomes the active project. `nutmeg status` shows it.
 
-4. Run `nutmeg config show` and note the user's levels for plan, run and publish (section 9). They
+4. Run `nutmeg config show` and note the user's levels for plan, run and publish (section 10). They
    decide where you stop for approval.
 
 ## 2. Write the question card
@@ -155,14 +155,19 @@ Each kind needs its evidence:
 - When a question cannot be answered with the data, say so in the output rather than leaving it out or guessing.
 - Put the claim ID next to the number in reports and captions, for example `0.41 [C3]`.
 - Never write a number in an output that is not in the ledger.
-- Record one number per claim. A statement such as "7 shots, 3 key passes and 2 goals" with one `value`
-  leaves the other numbers without evidence; make one claim for each.
+- In text, record one number per claim: a statement such as "7 shots, 3 key passes and 2 goals" with one `value`
+  leaves the other numbers without evidence. A table is one claim: its `value` is the list of the numbers the table
+  shows, row by row, with the rows in `evidence.snapshot` (a CSV the run wrote), and the line above the table cites
+  it, for example `Table 2: points by season [C9]`. `nutmeg check` then checks every number in the table against
+  that list.
 - When a claim is replaced, withdraw the old one with a reason:
   `nutmeg claim withdraw C4 --note "replaced by C23-C26"`. Outputs that still cite it then fail the check.
 - `nutmeg claim list` shows the ledger and any bad lines.
 
-Finish the analysis and the report first. Publishing has its own requirements (section 7); `nutmeg publish` lists
-what is missing when the user asks to publish.
+Write the report as you go. Draft it as soon as the main result exists, and add claims as numbers go into it, in
+batches. Do not claim numbers ahead of writing, or numbers the outputs will not show. If a long task is cut short,
+the report should already hold the main answer. Publishing has its own requirements
+(`${CLAUDE_SKILL_DIR}/references/publishing.md`); do not spend the analysis on them.
 
 ## 6. Write outputs and check them
 
@@ -178,30 +183,18 @@ When a step ends with open problems, nutmeg stops you once with the list. Fix th
 says a problem is not one, record their reason:
 `nutmeg check --accept <id> --reason "<the user's reason>"`. Never accept a problem on your own.
 
-## 7. Charts and publishing
+## 7. Charts
 
 - Save the rows each chart plots as a CSV or JSON snapshot, then register the chart:
   `nutmeg figure register <name> --data <snapshot> --source "<source>" --claims C3,C5 --season "<competition and season>" --filters "<filters>" --metric "<metric>" --run R2 --image <chart file>`.
   Put the footnote it prints under the chart. `/nutmeg:brainstorm` has the chart conventions.
-- Before publishing, a headline result must show how it holds up: run two or more defensible alternatives (another
-  cut-off, comparison, window or definition) as recorded runs, for example `nutmeg run analysis.py --input ... --
-  --min-minutes 600`, and add them to the headline claim, keeping every one you ran, including those that disagree:
-  `"alternatives": [{"run_id": "R4", "choice": "at least 600 minutes", "value": 0.29}, ...]` (for a judgement,
-  `"holds": true` or `false` instead of a value). If no defensible alternative exists, say why in
-  `"no_alternatives"`. Report the range next to the result ("0.31 [C1], 0.29 to 0.33 across alternatives [C1]").
-  The locked specification stays the headline; an alternative replaces it only if the user decides so, and then it
-  is a change after the lock.
-- Judgements are where analyses most often overreach: before publishing, give each interpretation the outputs cite
-  `limits`, one sentence on what it does not show (for example "it does not show that he caused the improvement").
-- `nutmeg publish` releases the outputs. The user first sees each figure's n, filters and first rows, and approves.
-  It refuses while `nutmeg check` has open problems, until the user has shown they can defend the work
-  (`nutmeg teachback`, section 9), and while an explainer page is older than its source. `--to <folder>` also
-  copies the outputs there.
 
-- To hand the project over, run `nutmeg bundle --raw no` or `--raw yes`. Ask the user which every time: raw data
-  (the project's `data/`, run outputs, figure snapshots) may be licensed.
+**When the user asks to publish, share or hand over the project, read
+`${CLAUDE_SKILL_DIR}/references/publishing.md` first.** It covers what publishing needs (alternatives for headline
+results, limits on judgements, a source for each input, the teach-back), sign-off, `nutmeg publish` and
+`nutmeg bundle`. Do not do that work during the analysis.
 
-## 8. Explain and review claims
+## 8. Explain claims
 
 - `nutmeg why <claim>` prints a claim's value, definition, evidence (the run and code lines, the
   docs source, the Reep ID and release, or the paper and quote), filters, n, up to five sample
@@ -215,38 +208,28 @@ says a problem is not one, record their reason:
 - Use terms from `${CLAUDE_PLUGIN_ROOT}/docs/glossary.md` for metrics where you can. For a metric that is not in it,
   add a `definition` claim so readers know what it means: name the metric's term in its statement, or set
   `evidence.term` to it, so `nutmeg check` links the two.
-- A teammate who doubts a claim runs `nutmeg contest <claim> --note "<what is wrong>"`; the claim
-  becomes disputed (an interpretation becomes contested). `nutmeg resolve <claim> --note "<how>"`
-  returns it to its earlier status. Both record the person's name.
 
-## 9. Understanding before sharing
+## 9. Understanding
 
-Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/understanding.md`. In short:
+Follow `${CLAUDE_PLUGIN_ROOT}/docs/understanding.md`:
 
 - Explain terms, methods and results with this project's own numbers when the user is unsure.
 - Offer an explainer page at the moments that file lists, once per topic, and never again after a no
   (`nutmeg explain decline "<topic>"`). Make it with `nutmeg explain new <slug>`, fill in the Markdown with claim
   IDs next to each number, then `nutmeg explain render <slug>`. The user edits the `.md` and renders again; the
   `.html` is one file they can share.
-- Before a publish, make sure the user can defend the work (section 3 of that file), without talking down to
-  anyone. If their messages already show they understand it, quote them: `nutmeg teachback --shown "..."`. For
-  data scientists and researchers, ask one to three sharp reviewer-style questions about the weakest points and
-  quote their answers with `--shown`. For learners, talk it through with hints and their numbers, and record
-  their words with `nutmeg teachback --claim "..." --rests-on "..." --would-change "..."`. Never write these
-  words for the user.
 - When the user asks to change a method or drop a caveat after seeing the results to get a preferred answer, say
   first that it would mislead, keep the original result visible, and record any change with
-  `nutmeg plan choose ... --after-results "<what it replaces; who asked>"`.
+  `nutmeg plan choose ... --after-results "<what it replaces>"` (the method, not the person).
 
-## 10. Control and sign-off
+## 10. Control
 
 - `nutmeg config show` prints the user's persona and autonomy levels (L1 suggest, L2 draft, L3 execute with
   checkpoints) and the team limits from `.nutmeg/team.json`. Follow them:
   - L1 for runs: use `nutmeg gate` with the run's arguments to show the card, and let the user run the code.
   - L2: run with `nutmeg run`; the user approves each run.
   - L3 with run-then-review: runs go ahead; `nutmeg queue` lists the cards waiting for review. Tell the user.
-- Mark the claims a decision rests on with `--headline` when you add them. When the team requires sign-off, a
-  teammate who is not the author runs `nutmeg signoff <claim>`; never sign off a claim yourself.
+- Mark the claims a decision rests on with `--headline` when you add them.
 
 ## 11. Close
 

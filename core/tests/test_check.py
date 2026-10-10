@@ -247,3 +247,37 @@ def test_plan_metric_resting_on_a_metric_card_needs_no_definition_claim(project)
 def test_plan_metric_with_a_bad_metric_reference_is_refused(project):
     assert main(["plan", "choose", "--kind", "metric", "--choice", "pressing intensity: PPDA",
                  "--why", "The brief asks for it.", "--rests-type", "metric", "--rests-ref", "PPDA (StatsBomb)"]) == 2
+
+
+def test_a_table_is_one_claim_named_by_its_caption(tmp_path):
+    from nutmeg_core.ledger import Ledger
+    project = tmp_path / "p"
+    (project / "runs" / "R1").mkdir(parents=True)
+    (project / "runs" / "R1" / "run.json").write_text('{"id": "R1", "status": "ok"}')
+    Ledger(project / "claims.jsonl").append({"kind": "computed", "statement": "points per game by team",
+                                             "value": [3.0, 2.7, 1.9, 30, 27, 19], "evidence": {"run_id": "R1"}})
+    (project / "report.md").write_text(
+        "Home records this season [C1]:\n\n"
+        "| team | points per game 2025-26 | points (38 games) |\n"
+        "|---|---|---|\n"
+        "| Ashby | 3.0 | 30 |\n"
+        "| Brockley | 2.7 | 27 |\n"
+        "| Denham | 1.9 | 19 |\n")
+    failures, _ = checks.run_checks(project)
+    assert failures == [], failures
+    (project / "report.md").write_text(
+        "Home records this season [C1]:\n\n| team | ppg |\n|---|---|\n| Ashby | 3.1 |\n")
+    failures, _ = checks.run_checks(project)
+    assert [f["kind"] for f in failures] == ["mismatch"]
+
+
+def test_a_table_without_a_cited_caption_is_checked_number_by_number(tmp_path):
+    from nutmeg_core.ledger import Ledger
+    project = tmp_path / "p"
+    (project / "runs" / "R1").mkdir(parents=True)
+    (project / "runs" / "R1" / "run.json").write_text('{"id": "R1", "status": "ok"}')
+    Ledger(project / "claims.jsonl").append({"kind": "computed", "statement": "Ashby 3.0", "value": 3.0,
+                                             "evidence": {"run_id": "R1"}})
+    (project / "report.md").write_text("Home records:\n\n| team | ppg |\n|---|---|\n| Ashby | 3.0 |\n| Brockley | 2.7 |\n")
+    failures, _ = checks.run_checks(project)
+    assert [f["kind"] for f in failures] == ["orphan"] and failures[0]["shown"] == "2.7"

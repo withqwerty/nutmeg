@@ -13,7 +13,8 @@ def test_hook_text_stays_within_its_budget_and_claude_codes_limit():
 
 
 def test_check_reports_each_kind_of_growth():
-    budget = {"hook_tokens": 10, "always_on_tokens": 100, "on_invoke_tokens": {"default": 50, "research": 80}}
+    budget = {"hook_tokens": 10, "hook_research_tokens": 10_000, "always_on_tokens": 100,
+              "on_invoke_tokens": {"default": 50, "research": 80}}
     data = {"hook": {"chars": 12_000, "tokens_est": 3_000}, "always_on": 150,
             "components": {"research": (10, 90), "learn": (10, 40)}}
     over = footprint.check(data, budget)

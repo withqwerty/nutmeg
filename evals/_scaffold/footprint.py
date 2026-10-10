@@ -18,8 +18,12 @@ BUDGET_FILE = Path(__file__).with_name("footprint_budget.json")
 HOOK_HARD_LIMIT_CHARS = 10_000  # Claude Code replaces longer additionalContext with a file path and a preview
 
 
-def hook_text(root=ROOT):
-    return json.loads((root / "hooks" / "session-start.json").read_text())["hookSpecificOutput"]["additionalContext"]
+def hook_text(root=ROOT, research=False):
+    """The hook text a session gets: without the research-project rules, or with them (a project with research/)."""
+    text = json.loads((root / "hooks" / "session-start.json").read_text())["hookSpecificOutput"]["additionalContext"]
+    fragment = root / "hooks" / "session-start-research.txt"
+    extra = json.loads('"' + fragment.read_text().strip() + '"') if research and fragment.is_file() else ""
+    return text.replace("@RESEARCH@", extra)
 
 
 def _tokens(text):
@@ -41,8 +45,9 @@ def plugin_details(root=ROOT):
 
 
 def footprint(root=ROOT, details=True):
-    hook = hook_text(root)
-    data = {"hook": {"chars": len(hook), "tokens_est": round(len(hook) / 4)}}
+    hook, research = hook_text(root), hook_text(root, research=True)
+    data = {"hook": {"chars": len(hook), "tokens_est": round(len(hook) / 4)},
+            "hook_in_research_projects": {"chars": len(research), "tokens_est": round(len(research) / 4)}}
     if details:
         data.update(plugin_details(root))
     return data
@@ -50,10 +55,14 @@ def footprint(root=ROOT, details=True):
 
 def check(data, budget):
     over = []
-    if data["hook"]["chars"] > HOOK_HARD_LIMIT_CHARS:
-        over.append(f"hook text {data['hook']['chars']} chars > hard limit {HOOK_HARD_LIMIT_CHARS}")
-    if data["hook"]["tokens_est"] > budget["hook_tokens"]:
-        over.append(f"hook {data['hook']['tokens_est']} tokens > budget {budget['hook_tokens']}")
+    for key, limit_key in (("hook", "hook_tokens"), ("hook_in_research_projects", "hook_research_tokens")):
+        item = data.get(key)
+        if not item:
+            continue
+        if item["chars"] > HOOK_HARD_LIMIT_CHARS:
+            over.append(f"{key} {item['chars']} chars > hard limit {HOOK_HARD_LIMIT_CHARS}")
+        if item["tokens_est"] > budget[limit_key]:
+            over.append(f"{key} {item['tokens_est']} tokens > budget {budget[limit_key]}")
     if data.get("always_on") and data["always_on"] > budget["always_on_tokens"]:
         over.append(f"always-on {data['always_on']} tokens > budget {budget['always_on_tokens']}")
     for name, (_, on_invoke) in (data.get("components") or {}).items():
@@ -69,6 +78,7 @@ if __name__ == "__main__":
         print(json.dumps(data, indent=2))
     else:
         print(f"hook (every session, not in plugin details)  ~{data['hook']['tokens_est']:,} tokens  ({data['hook']['chars']:,} chars)")
+        print(f"hook in projects with research/              ~{data['hook_in_research_projects']['tokens_est']:,} tokens")
         print(f"skills and agents always-on                  ~{data.get('always_on') or 0:,} tokens")
         for name, (always, invoke) in sorted((data.get("components") or {}).items(), key=lambda x: -x[1][1]):
             print(f"  {name:20} always-on ~{always:>4}  on-invoke ~{invoke:,}")

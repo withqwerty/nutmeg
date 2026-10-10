@@ -1,6 +1,6 @@
 ---
 name: nutmeg-analyse
-description: "Explore, interpret, and draw conclusions from football data, including judging players or teams from stats (rankings, comparisons, headlines, social posts). Use when the user wants to analyse match events, compare teams or players, understand tactical patterns, build visualisations, or needs guidance on what questions to ask of their data. Adapts to the user's experience level."
+description: "Explore and interpret football data, and judge players or teams from stats (rankings, comparisons, headlines, social posts). Use for match events, team and player comparisons and tactical patterns, at the user's level."
 argument-hint: "[analysis question or topic]"
 allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs", "mcp__plugin_nutmeg_football-docs__get_metric", "mcp__football-docs__get_metric", "mcp__plugin_nutmeg_football-docs__list_metrics", "mcp__football-docs__list_metrics"]
 ---

@@ -58,8 +58,10 @@ for line in (work / "research/signings-xt/claims.jsonl").read_text().splitlines(
     claims[rec["id"]] = rec
 allowed = set()
 for rec in claims.values():
-    if "value" in rec:
-        allowed.add(f"{float(rec['value']):g}")
+    values = rec.get("value") if isinstance(rec.get("value"), list) else [rec.get("value")]
+    for v in values:
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            allowed.add(f"{float(v):g}")
     allowed.update(f"{float(x):g}" for x in re.findall(r"\d+\.\d+", rec.get("statement", "")))
 
 problems = []

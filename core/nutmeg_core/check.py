@@ -112,14 +112,49 @@ def _masked(line):
     return "".join(chars)
 
 
+_TABLE_ROW = re.compile(r"^\s*\|")
+_TABLE_RULE = re.compile(r"^\s*\|?\s*:?-{3,}")
+
+
+def _table_names(lines):
+    """For each line of a Markdown table body, the claim IDs its caption names: a table is one claim when the line
+    just above it (a blank line may sit between) cites the claim, for example `Table 2: points by season [C9]`.
+    Returns (names by line index, header row indexes); a named table's header and separator rows hold labels, not
+    results, and are not checked."""
+    names, headers, i = {}, set(), 0
+    while i < len(lines):
+        if _TABLE_ROW.match(lines[i]) and (i == 0 or not _TABLE_ROW.match(lines[i - 1])):
+            above = i - 1
+            while above >= 0 and not lines[above].strip():
+                above -= 1
+            caption = lines[above] if above >= 0 and above >= i - 2 else ""
+            ids = [cid for ref in _CLAIM_REF.finditer(caption) for cid in _CLAIM_IDS.findall(ref.group(0))]
+            start = i
+            while i < len(lines) and _TABLE_ROW.match(lines[i]):
+                i += 1
+            if ids:
+                body = [n for n in range(start, i) if not _TABLE_RULE.match(lines[n])]
+                if start + 1 < i and _TABLE_RULE.match(lines[start + 1]):
+                    body = [n for n in body if n != start]
+                    headers.add(start)
+                for n in body:
+                    names[n] = ids
+            continue
+        i += 1
+    return names, headers
+
+
 def shown_numbers(text):
     """Yield (line number, shown text, decimals, is percent, value, claim IDs named nearby, context)."""
     in_fence = False
-    for lineno, line in enumerate(text.splitlines(), start=1):
+    lines = text.splitlines()
+    table_names, header_rows = _table_names(lines)
+    for lineno, line in enumerate(lines, start=1):
         if _FENCE.match(line):
             in_fence = not in_fence
             continue
-        if in_fence:
+        if in_fence or (lineno - 1) in header_rows or (_TABLE_RULE.match(line) and _TABLE_ROW.match(line)
+                                                         and (lineno - 2) in header_rows):
             continue
         masked = _masked(line)
         refs = [(m.start(), _CLAIM_IDS.findall(m.group(0))) for m in _CLAIM_REF.finditer(line)]
@@ -130,13 +165,13 @@ def shown_numbers(text):
             decimals = len(plain.split(".")[1]) if "." in plain else 0
             # A claim reference names this number when it is the first one after it,
             # close by, in the same sentence, with no other number in between.
-            named = []
+            named = list(table_names.get(lineno - 1, []))
             following = next(((start, ids) for start, ids in refs if start >= match.end()), None)
             if following is not None:
                 start, ids = following
                 gap = masked[match.end():start]
                 if len(gap) <= 40 and ". " not in gap and not re.search(r"\d", gap):
-                    named = ids
+                    named = sorted(set(named) | set(ids))
             context = line.strip()
             yield lineno, raw + ("%" if percent else ""), decimals, percent, float(plain), named, context
 

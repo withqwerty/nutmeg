@@ -1,6 +1,6 @@
 ---
 name: nutmeg-brainstorm
-description: "Brainstorm football data visualisations and chart designs. Use when the user wants ideas for how to visualise football data, needs inspiration for chart types, wants to explore design approaches for match reports, player profiles, team dashboards, or any football analytics graphic. Searches the web for popular approaches and real-world examples before proposing options."
+description: "Ideas for football data visualisations: chart types and designs for match reports, player profiles, dashboards and other graphics, with real-world examples. Use when the user wants options for how to show their data."
 argument-hint: "[what to visualise, e.g. 'shot map for a single match' or 'player comparison radar']"
 allowed-tools: ["Read", "Write", "Bash", "WebSearch", "WebFetch", "Agent", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs"]
 ---

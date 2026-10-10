@@ -1,6 +1,6 @@
 ---
 name: nutmeg-acquire
-description: "Fetch, scrape, or download football data from any source. Also handles API key setup and credential management. Use when the user wants to get data from StatsBomb, Opta, FBref, Understat, SportMonks, Wyscout, Kaggle, or any football data source. Also use when they ask about API keys, authentication, setting up access to a provider, or what data is available free vs paid."
+description: "Get football data: fetch, scrape or download from StatsBomb, Opta, FBref, Understat, SportMonks, Wyscout, Kaggle or any source, and set up API keys and access. Use when the user wants data, or asks what is free and what is paid."
 argument-hint: "[what data to get]"
 allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "AskUserQuestion", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs", "mcp__plugin_nutmeg_football-docs__resolve_entity", "mcp__football-docs__resolve_entity"]
 ---
