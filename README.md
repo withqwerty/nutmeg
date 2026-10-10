@@ -115,7 +115,7 @@ docs/
 
 Nutmeg does not keep its own provider facts. Coverage, fields, IDs, access terms and rate limits come from football-docs, which indexes 26 providers and tools, including Opta, StatsBomb, Wyscout, SkillCorner, Sportradar, SportMonks, Impect, FBref, Understat, kloppy, socceraction, mplsoccer and databallpy. Ask nutmeg "which providers do you cover?" or call `list_providers` for the current list.
 
-Cross-provider player, team and match IDs come from the [Reep Register](https://reep.football) (CC0), through the `resolve_entity` tool.
+Cross-provider player, team and match IDs come from the [Reep Register](https://reep.football) (CC0), through the `resolve_entity` tool. ID joins need Reep: download the free register and set `REEP_DUCKDB_PATH`, or set `REEP_API_KEY` ([set-up steps](docs/entity-resolution-routing.md#looking-up-ids)). Without either, `resolve_entity` explains the set-up and returns a DuckDB query instead of IDs.
 
 Metric definitions come from the football-docs metric cards (`list_metrics`, `get_metric`): xG, npxG, xA, xG assisted, PPDA, progressive passes and carries, xT, VAEP, field tilt and pass completion, each with its published variants. Nutmeg names the variant ID it uses (for example `ppda.statsbomb-hudl`), never compares values from different variants, and in a research project records the variant on the plan choice and its claims (`rests_on` type `metric`).
 

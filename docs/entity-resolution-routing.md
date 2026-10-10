@@ -46,19 +46,27 @@ search_docs(query="lineup squad career membership current team", provider="<prov
 
 ## Looking Up IDs
 
-The Reep Register is published as a CC0 release (DuckDB and CSV). The
-`resolve_entity` tool reads a local copy of the release DuckDB; API keys are
-issued only to data partners.
+The Reep Register is published as a CC0 release (DuckDB and CSV). Without set-up,
+`resolve_entity` maps no IDs: it explains the set-up and returns the DuckDB query that
+would answer the question. There are two ways to enable it:
 
-Set up a local copy once:
+- **Local file (free, no key; recommended).**
+  1. Download the release once: `curl -L -o reep-register-v1.duckdb https://reep.football/downloads/duckdb`
+     (one DuckDB file of about 780 MB; a new release comes out each week, and
+     `resolve_entity` says when your copy is out of date).
+  2. Point the football-docs server at it with the file's absolute path:
+     - with the nutmeg plugin, export `REEP_DUCKDB_PATH` in the shell that starts
+       Claude Code, then restart it (the plugin's server inherits that environment);
+     - with a server you added yourself:
+       `claude mcp add football-docs -e REEP_DUCKDB_PATH=/absolute/path/reep-register-v1.duckdb -- npx -y football-docs@0.17.0`
+       (or `"env": {"REEP_DUCKDB_PATH": "..."}` in your MCP JSON).
+  3. Record the release stamp. `resolve_entity` prints it; the current stamp is at
+     `https://data.reep.football/releases/latest.json`.
 
-1. Download the release: `curl -L -o reep-register-v1.duckdb https://reep.football/downloads/duckdb`
-   (several hundred MB).
-2. Set `REEP_DUCKDB_PATH` to the file's absolute path in the shell that starts
-   Claude Code, then restart it.
-3. Record the release stamp. `resolve_entity` prints it and says when a newer
-   release exists; the current stamp is at
-   `https://data.reep.football/releases/latest.json`.
+  Reading the file needs `@duckdb/node-api`, an optional dependency that `npx`
+  installs with football-docs; if its native build fails, `resolve_entity` says so.
+- **API key.** Set `REEP_API_KEY`. Keys are issued by hand: a free evaluation key
+  (30 days, extended on request) is available through https://reep.football/api.
 
 Call `resolve_entity` with a full provider key where you have one:
 
