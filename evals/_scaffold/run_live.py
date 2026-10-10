@@ -238,6 +238,7 @@ def run_once(name, model, keep, judge_model, eval_dir=EVALS):
         shutil.rmtree(work, ignore_errors=True)
     mcp.unlink(missing_ok=True)
     efficiency["tool_calls"] = len(calls)
+    efficiency["skills"] = [json.loads(payload).get("skill") for tool, payload in calls if tool == "Skill"]
     efficiency["nutmeg_calls"] = sum(1 for tool, payload in calls if tool == "Bash" and "nutmeg.py" in payload)
     return {"case": name, "verdicts": verdicts, "judged": judged, "cost": cost, "last": last, "efficiency": efficiency,
             "bash": [payload for tool, payload in calls if tool == "Bash"],
