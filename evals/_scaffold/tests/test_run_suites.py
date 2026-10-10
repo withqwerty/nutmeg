@@ -262,3 +262,27 @@ def test_live_runner_saves_each_run_outside_the_repo(tmp_path, monkeypatch):
     assert (score, error) == (0.5, None)
     saved = json.loads((tmp_path / "out" / "holdout" / "c1-run2.json").read_text())
     assert saved["last"] == "answer"
+
+
+def test_spend_cap_refuses_new_runs_and_counts_parallel_spend(tmp_path, monkeypatch):
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("run_live_cap", Path(__file__).resolve().parents[1] / "run_live.py")
+    rl = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(rl)
+    monkeypatch.setenv(rl.BUDGET_ENV, "30")
+    monkeypatch.setenv(rl.SPEND_ENV, str(tmp_path / "spend.txt"))
+    rl.check_budget(reserve=rl.RUN_RESERVE_USD)  # nothing spent yet
+    rl.record_spend(6.5, "agent a")
+    rl.record_spend(None, "judge")
+    assert rl.spent() == 6.5
+    import pytest
+    with pytest.raises(rl.BudgetExceeded):
+        rl.check_budget(reserve=rl.RUN_RESERVE_USD)  # 6.5 + 20 reserve is under 30, so add more
+        rl.record_spend(5, "agent b")
+        rl.check_budget(reserve=rl.RUN_RESERVE_USD)
+    rl.check_budget()  # judges may still grade finished runs below the cap
+    with pytest.raises(rl.BudgetExceeded):
+        rl.record_spend(20, "agent c")
+        rl.check_budget()
+    with pytest.raises(rl.BudgetExceeded):
+        rl.run_once("anything", "m", False, "j")

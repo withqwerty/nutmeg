@@ -3,7 +3,7 @@
 Usage (from the nutmeg repo root):
 
     python3 evals/_scaffold/run_live.py research-run-gate research-orphan-number \
-        [--model sonnet] [--judge-model haiku] [--runs 1] [--keep]
+        [--model claude-sonnet-5-5] [--judge-model claude-sonnet-5-5] [--runs 1] [--keep]
 
 Use it for cases that grant Bash when `claude plugin eval` cannot run them on
 this machine (for example, its Bash sandbox refuses to start when a
@@ -90,7 +90,59 @@ def agent_env(work):
     return dict(os.environ, NUTMEG_USER_CONFIG=str(Path(work) / ".nutmeg-user.json"), PIP_REQUIRE_VIRTUALENV="1")
 
 
+# --- spend cap ------------------------------------------------------------------------------------------------------
+# With NUTMEG_EVAL_BUDGET_USD and NUTMEG_EVAL_SPEND_FILE set, every agent and judge call adds its reported cost to the
+# spend file (one line per call, locked, so parallel runs share one total). A new agent run starts only while the
+# total plus a reserve for runs already in flight stays under the cap; a judge call starts only while the total is
+# under the cap. Without the variables nothing is tracked or refused.
+
+BUDGET_ENV, SPEND_ENV = "NUTMEG_EVAL_BUDGET_USD", "NUTMEG_EVAL_SPEND_FILE"
+RUN_RESERVE_USD = 20.0  # room for agent runs already started when the cap check passes
+UNREPORTED_RUN_USD = 3.0  # what a run that timed out (and so reported no cost) is counted as
+
+
+class BudgetExceeded(RuntimeError):
+    pass
+
+
+def _budget():
+    cap, path = os.environ.get(BUDGET_ENV), os.environ.get(SPEND_ENV)
+    return (float(cap), Path(path)) if cap and path else (None, None)
+
+
+def spent():
+    cap, path = _budget()
+    if path is None or not path.is_file():
+        return 0.0
+    total = 0.0
+    for line in path.read_text().splitlines():
+        try:
+            total += float(line.split()[0])
+        except (ValueError, IndexError):
+            continue
+    return total
+
+
+def check_budget(reserve=0.0):
+    cap, _ = _budget()
+    if cap is not None and spent() + reserve >= cap:
+        raise BudgetExceeded(f"eval budget reached: ${spent():.2f} spent of ${cap:.2f}")
+
+
+def record_spend(cost, label):
+    cap, path = _budget()
+    if path is None:
+        return
+    import fcntl
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "a") as handle:
+        fcntl.flock(handle, fcntl.LOCK_EX)
+        handle.write(f"{float(cost or 0.0):.6f} {label}\n")
+        fcntl.flock(handle, fcntl.LOCK_UN)
+
+
 def run_once(name, model, keep, judge_model, eval_dir=EVALS):
+    check_budget(reserve=float(os.environ.get("NUTMEG_EVAL_RESERVE_USD") or RUN_RESERVE_USD))
     folder, meta, prompt, graders = load_case(name, eval_dir)
     work = Path(tempfile.mkdtemp(prefix=f"nutmeg-live-{name}-"))
     subprocess.run(["git", "init", "-q"], cwd=work, check=True)
@@ -132,6 +184,9 @@ def run_once(name, model, keep, judge_model, eval_dir=EVALS):
         if event.get("type") == "result":
             last = event.get("result") or last
             cost = event.get("total_cost_usd") or 0.0
+    reported = any(event.get("type") == "result" for event in events)
+    # A run that timed out reports no cost but still spent money: count an estimate.
+    record_spend(cost if reported else UNREPORTED_RUN_USD, f"agent {name}" + ("" if reported else " (estimate)"))
     verdicts, judged = {}, {}
     for gname, grader in graders.items():
         kind = grader.get("type")
@@ -185,11 +240,17 @@ def judge_votes(criteria, response, model, votes=JUDGE_VOTES):
               "\n\nResponse:\n" + (response or "(empty)"))
     replies, passes = [], 0
     for _ in range(votes):
+        check_budget()
         try:
             out = subprocess.run(["claude", "-p", prompt, "--model", model, "--setting-sources", "project",
-                                  "--strict-mcp-config", "--max-turns", "1"], capture_output=True, text=True,
-                                 stdin=subprocess.DEVNULL, timeout=300)
-            reply = out.stdout.strip()
+                                  "--strict-mcp-config", "--max-turns", "1", "--output-format", "json"],
+                                 capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=300)
+            try:
+                data = json.loads(out.stdout)
+                reply = str(data.get("result") or "").strip()
+                record_spend(data.get("total_cost_usd"), "judge")
+            except (json.JSONDecodeError, AttributeError):
+                reply = out.stdout.strip()
         except subprocess.TimeoutExpired:
             reply = "(judge timed out)"
         replies.append(reply[:400])
@@ -206,8 +267,8 @@ def judge(criteria, response, model):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("cases", nargs="+")
-    parser.add_argument("--model", default="sonnet")
-    parser.add_argument("--judge-model", default="haiku")
+    parser.add_argument("--model", default="claude-sonnet-5-5")
+    parser.add_argument("--judge-model", default="claude-sonnet-5-5")
     parser.add_argument("--runs", type=int, default=1)
     parser.add_argument("--keep", action="store_true", help="keep the work folders")
     parser.add_argument("--json", help="write the results here")
@@ -217,7 +278,11 @@ if __name__ == "__main__":
     results = []
     for name in args.cases:
         for _ in range(args.runs):
-            outcome = run_once(name, args.model, args.keep, args.judge_model, args.eval_dir)
+            try:
+                outcome = run_once(name, args.model, args.keep, args.judge_model, args.eval_dir)
+            except BudgetExceeded as exc:
+                print(f"{name}: skipped ({exc})")
+                continue
             results.append(outcome)
             passed = sum(outcome["verdicts"].values())
             print(f"{name}: {passed}/{len(outcome['verdicts'])} graders pass · ${outcome['cost']:.2f}")

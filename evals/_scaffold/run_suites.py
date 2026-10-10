@@ -3,7 +3,7 @@
 Usage (from the nutmeg repo root):
 
     NUTMEG_HOLDOUT_DIR=../nutmeg-evals-holdout python3 evals/_scaffold/run_suites.py \
-        [--suite both|public|holdout] [--case GLOB] [--runs 1] [--model sonnet] [--judge-model haiku] \
+        [--suite both|public|holdout] [--case GLOB] [--runs 1] [--model claude-sonnet-5-5] [--judge-model claude-sonnet-5-5] \
         [--engine auto|plugin|live] [--out DIR] [--loop]
 
 The held-out set lives in a private repository (never in this one). For `claude plugin eval`, which only reads
@@ -182,7 +182,13 @@ def run_live_case(eval_dir, name, args, out=None, label="holdout"):
     """One case through run_live; returns (score, error). Each run's verdicts and answer go to `out`."""
     scores = []
     for n in range(args.runs):
-        outcome = run_live.run_once(name, args.model, getattr(args, "keep", False), args.judge_model, eval_dir)
+        try:
+            outcome = run_live.run_once(name, args.model, getattr(args, "keep", False), args.judge_model, eval_dir)
+        except run_live.BudgetExceeded as exc:
+            print(f"    run {n + 1}: skipped ({exc})", flush=True)
+            if not scores:
+                return None, f"skipped: {exc}"
+            break
         verdicts = outcome["verdicts"]
         scores.append(sum(verdicts.values()) / max(1, len(verdicts)))
         if out is not None:
@@ -208,6 +214,9 @@ def score_suite(label, eval_dir, eval_dir_name, cases, args, out, root=ROOT):
             score, error = run_plugin(eval_dir_name, name, allowed_tools(eval_dir, name), args, out, root)
         else:
             score, error = run_live_case(eval_dir, name, args, out, label)
+        if score is None:  # skipped before any run (the spend cap): not scored, so it does not count as a zero
+            print(f"  {label:8} {name:32} {engine:6} skipped ({error})", flush=True)
+            continue
         rows.append({"suite": label, "case": name, "engine": engine, "score": round(score, 3), "error": error})
         print(f"  {label:8} {name:32} {engine:6} {score:.2f}" + (f"  ({error[:80]})" if error else ""), flush=True)
     return rows
@@ -223,8 +232,8 @@ def main(argv=None, root=ROOT, environ=None):
     parser.add_argument("--suite", choices=["both", "public", "holdout"], default="both")
     parser.add_argument("--case", help="only cases whose name matches this glob")
     parser.add_argument("--runs", type=int, default=1)
-    parser.add_argument("--model", default="sonnet")
-    parser.add_argument("--judge-model", default="haiku")
+    parser.add_argument("--model", default="claude-sonnet-5-5")
+    parser.add_argument("--judge-model", default="claude-sonnet-5-5")
     parser.add_argument("--engine", choices=["auto", "plugin", "live"], default="auto")
     parser.add_argument("--out", help="results folder, outside the repository (default: a new temporary folder)")
     parser.add_argument("--keep", action="store_true", help="keep each live run's work folder")

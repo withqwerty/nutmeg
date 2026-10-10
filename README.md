@@ -124,12 +124,12 @@ Metric definitions come from the football-docs metric cards (`list_metrics`, `ge
 `evals/` holds a behaviour suite for `claude plugin eval`: provider-fact grounding, abstention, Reep joins, common stat misuses, 2026 source changes, citations checked with the football-docs paper tools, metric variants, point-in-time checks, safe package handling, and research projects (project start, the run gate, unsupported numbers, reasons). A replay mock stands in for the football-docs server, so runs do not depend on the live index.
 
 ```bash
-claude plugin eval . --runs 2 --scaffold --no-publish --model sonnet --judge-model haiku --allow-tools "Bash(python3:*)"
+claude plugin eval . --runs 2 --scaffold --no-publish --model claude-sonnet-5-5 --judge-model claude-sonnet-5-5 --allow-tools "Bash(python3:*)"
 ```
 
 The research cases that grant Bash (`--tag gate`, `--tag check` and `research-project-start`) need the eval's Bash sandbox. If it refuses to start on your machine (for example because a credentials file points at missing files), run them live instead: `python3 evals/_scaffold/run_live.py research-run-gate research-orphan-number research-project-start`. It loads the plugin with `claude -p --plugin-dir`, uses the real football-docs server and grades the same way.
 
-`--scaffold` runs each case's `scaffold.sh`, which writes a nutmeg profile into the sandbox. To refresh the mock after football-docs changes, run `evals/_scaffold/record_football_docs.py`. Keep the agent on Sonnet so scores stay comparable; Haiku as the judge (it also runs the mock) keeps each pass of the suite (one run per case) to about $9. `evals/_scaffold/adopt_replays.py` checks a run's mock answers against the real server.
+`--scaffold` runs each case's `scaffold.sh`, which writes a nutmeg profile into the sandbox. To refresh the mock after football-docs changes, run `evals/_scaffold/record_football_docs.py`. The agent and the judge (which also runs the mock) are both pinned to Sonnet 5.5, so scores stay comparable across runs; compare only scores made with the same models. `evals/_scaffold/adopt_replays.py` checks a run's mock answers against the real server.
 
 To score the public suite and a private held-out set together, set `NUTMEG_HOLDOUT_DIR` to the held-out folder (it must be outside this repository) and run `python3 evals/_scaffold/run_suites.py`. It prints one score per suite, writes results to a folder outside the repository, and runs cases that grant Bash live. Without `NUTMEG_HOLDOUT_DIR` it scores only the public suite and says so. `--loop` refuses to start until the held-out set has at least 10 cases.
 
