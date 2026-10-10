@@ -1,0 +1,37 @@
+{
+  "id": "R3",
+  "file": "analysis.py",
+  "interpreter": "python3",
+  "interpreter_version": "Python 3.14.0",
+  "argv": [
+    "python3",
+    "analysis.py",
+    "--compare",
+    "mean"
+  ],
+  "cwd": ".",
+  "code": [
+    {
+      "path": "analysis.py",
+      "sha256": "3a0fda6b51294aca88c0e1b1315602ca52e5732bfa220c93e2006cc89700184b"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "data/players.csv",
+      "sha256": "c8cd2a367fa7336b97fe12768d1d0fb448a0e9ae750dab1936b33bdb6fe3e353"
+    }
+  ],
+  "sends": [],
+  "started": "2026-10-09T21:36:13Z",
+  "duration_seconds": 0.039,
+  "exit_code": 0,
+  "status": "ok",
+  "gate": {
+    "shown": false,
+    "queued_for_review": false,
+    "changed_since_gate": []
+  },
+  "outputs": [],
+  "inputs_modified": []
+}

@@ -1,0 +1,4 @@
+{"at": "2026-10-09T21:37:23Z", "author": "Analyst", "data_in_git": "yes", "data_in_git_from": "user", "kind": "project_created"}
+{"at": "2026-10-09T21:37:23Z", "by": "Analyst", "kind": "data_added", "path": "data/matches.csv", "sha256": "60b145456fd268e63e1958a7d38d42aa5610bc17238de48037b03eeba7426066", "source": "club match data export, 2025-26 season to date"}
+{"at": "2026-10-09T21:37:23Z", "by": null, "choices": 2, "hash": "2aa1e97929327b17", "kind": "plan_locked", "reason": null, "run_id": "R1"}
+{"at": "2026-10-09T21:37:23Z", "changed_since_gate": [], "file": "analysis.py", "gate_shown": false, "kind": "run", "queued_for_review": false, "run_id": "R1", "status": "ok"}

@@ -1,0 +1,38 @@
+{
+  "id": "R1",
+  "file": "analysis.py",
+  "interpreter": "python3",
+  "interpreter_version": "Python 3.14.0",
+  "argv": [
+    "python3",
+    "analysis.py"
+  ],
+  "cwd": ".",
+  "code": [
+    {
+      "path": "analysis.py",
+      "sha256": "06a58f10d621c735a40b2876d5d8bc7e2b2b7bf7f338a82138b014c2fc58782b"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "data/events.csv",
+      "sha256": "51684d620b236ef6937ebf729f7108345f3387f1699919a72f36e0c1b4145883"
+    },
+    {
+      "path": "data/players.csv",
+      "sha256": "10971f3e778c35a4974dcd02071c53eec78051e76fdbd43dc61bc5a9286f8117"
+    }
+  ],
+  "sends": [],
+  "started": "2026-10-09T21:05:32Z",
+  "duration_seconds": 0.02,
+  "exit_code": 0,
+  "status": "ok",
+  "gate": {
+    "shown": false,
+    "queued_for_review": false,
+    "changed_since_gate": []
+  },
+  "outputs": []
+}

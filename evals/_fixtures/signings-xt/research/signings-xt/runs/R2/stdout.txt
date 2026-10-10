@@ -1,0 +1,4 @@
+existing squad median xT per 90: 0.14 (n=4, min 600 minutes)
+R. Mendes: 0.31 xT per 90 from 1710 minutes
+T. Okafor: 0.18 xT per 90 from 2140 minutes
+J. Lund: 0.12 xT per 90 from 955 minutes

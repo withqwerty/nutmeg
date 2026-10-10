@@ -35,6 +35,6 @@ primary_goal: professional
 initialized: 2026-10-01
 ---
 PROFILE
-    printf '{"persona": "fanalyst", "name": "Sam"}\n' > .nutmeg-user.json ;;
+    printf '{"persona": "club", "name": "Sam"}\n' > .nutmeg-user.json ;;
 esac
 git add -A >/dev/null 2>&1 && git commit -qm "project so far" >/dev/null 2>&1 || true

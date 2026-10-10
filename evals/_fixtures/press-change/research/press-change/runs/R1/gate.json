@@ -1,0 +1,53 @@
+{
+  "kind": "run",
+  "recorded": true,
+  "project": "research/press-change",
+  "created": "2026-10-09T21:37:23Z",
+  "command": null,
+  "file": "analysis.py",
+  "interpreter": "python3",
+  "argv": [
+    "python3",
+    "analysis.py"
+  ],
+  "cwd": ".",
+  "services": {
+    "detected": [],
+    "declared": [],
+    "local_modules": [],
+    "packages": [],
+    "ai_provider": "what the run prints goes back to the AI model in this session",
+    "approved": []
+  },
+  "inputs": [
+    {
+      "path": "data/matches.csv",
+      "sha256": "60b145456fd268e63e1958a7d38d42aa5610bc17238de48037b03eeba7426066",
+      "bytes": 2006,
+      "columns": [
+        "match_no",
+        "date",
+        "competition",
+        "manager",
+        "opponent_possession",
+        "ppda"
+      ],
+      "provenance": {
+        "source": "club match data export, 2025-26 season to date",
+        "sha256": "60b145456fd268e63e1958a7d38d42aa5610bc17238de48037b03eeba7426066"
+      }
+    }
+  ],
+  "code": [
+    {
+      "path": "analysis.py",
+      "sha256": "656e9ff2466f5c363143c0e9a8d25974617758266f14258ed88aceb023445556",
+      "lines": 35,
+      "text": "\"\"\"Pressing before and after the manager change: difference in mean PPDA (new minus previous), Welch interval.\"\"\"\nimport argparse\nimport csv\nimport json\nimport math\nimport statistics\n\nparser = argparse.ArgumentParser()\nparser.add_argument(\"--window\", type=int, default=15, help=\"matches each side of the change\")\nparser.add_argument(\"--league-only\", action=\"store_true\")\nparser.add_argument(\"--adjust\", action=\"store_true\", help=\"adjust PPDA for opponent possession and cup games\")\nargs = parser.parse_args()\n\nrows = list(csv.DictReader(open(\"data/matches.csv\")))\nfor r in rows:\n    r[\"ppda\"], r[\"opponent_possession\"] = float(r[\"ppda\"]), float(r[\"opponent_possession\"])\nuse = [r for r in rows if not args.league_only or r[\"competition\"] == \"league\"]\nbefore = [r for r in use if r[\"manager\"] == \"previous\"][-args.window:]\nafter = [r for r in use if r[\"manager\"] == \"new\"][:args.window]\n\n\ndef value(r):\n    if not args.adjust:\n        return r[\"ppda\"]\n    return r[\"ppda\"] - 0.12 * (r[\"opponent_possession\"] - 50) - (1.2 if r[\"competition\"] == \"cup\" else 0)\n\n\na, b = [value(r) for r in before], [value(r) for r in after]\ndiff = statistics.mean(b) - statistics.mean(a)\nse = math.sqrt(statistics.variance(a) / len(a) + statistics.variance(b) / len(b))\np = math.erfc(abs(diff / se) / math.sqrt(2))\nprint(json.dumps({\"window\": args.window, \"league_only\": args.league_only, \"adjusted\": args.adjust,\n                  \"n_before\": len(a), \"n_after\": len(b), \"ppda_before\": round(statistics.mean(a), 2),\n                  \"ppda_after\": round(statistics.mean(b), 2), \"difference\": round(diff, 2),\n                  \"ci_low\": round(diff - 1.96 * se, 2), \"ci_high\": round(diff + 1.96 * se, 2), \"p\": round(p, 3)}))\n"
+    }
+  ],
+  "changes": null,
+  "problems": [],
+  "gate_shown": false,
+  "changed_since_gate": []
+}

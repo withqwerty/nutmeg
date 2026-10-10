@@ -1,0 +1,57 @@
+{
+  "kind": "run",
+  "recorded": true,
+  "project": "research/signings-xt",
+  "created": "2026-10-09T21:05:32Z",
+  "command": null,
+  "file": "analysis.py",
+  "interpreter": "python3",
+  "argv": [
+    "python3",
+    "analysis.py"
+  ],
+  "cwd": ".",
+  "services": {
+    "detected": [],
+    "declared": [],
+    "local_modules": [],
+    "packages": [],
+    "ai_provider": "what the run prints goes back to the AI model in this session",
+    "approved": []
+  },
+  "inputs": [
+    {
+      "path": "data/events.csv",
+      "sha256": "51684d620b236ef6937ebf729f7108345f3387f1699919a72f36e0c1b4145883",
+      "bytes": 40935,
+      "columns": [
+        "match_id",
+        "player",
+        "action",
+        "xt_added"
+      ]
+    },
+    {
+      "path": "data/players.csv",
+      "sha256": "10971f3e778c35a4974dcd02071c53eec78051e76fdbd43dc61bc5a9286f8117",
+      "bytes": 161,
+      "columns": [
+        "player",
+        "signed_summer_2026",
+        "minutes"
+      ]
+    }
+  ],
+  "code": [
+    {
+      "path": "analysis.py",
+      "sha256": "06a58f10d621c735a40b2876d5d8bc7e2b2b7bf7f338a82138b014c2fc58782b",
+      "lines": 17,
+      "text": "import csv\nfrom collections import defaultdict\n\nxt = defaultdict(float)\nwith open(\"data/events.csv\") as handle:\n    for r in csv.DictReader(handle):\n        xt[r[\"player\"]] += float(r[\"xt_added\"])\nwith open(\"data/players.csv\") as handle:\n    rows = [r for r in csv.DictReader(handle) if int(r[\"minutes\"]) >= 900]\nfor r in rows:\n    r[\"xt_p90\"] = xt[r[\"player\"]] * 90 / int(r[\"minutes\"])\nsquad = sorted(r[\"xt_p90\"] for r in rows if r[\"signed_summer_2026\"] == \"no\")\nmedian = (squad[len(squad) // 2] if len(squad) % 2 else (squad[len(squad) // 2 - 1] + squad[len(squad) // 2]) / 2)\nprint(f\"existing squad median xT per 90: {median:.2f} (n={len(squad)})\")\nfor r in sorted(rows, key=lambda r: -r[\"xt_p90\"]):\n    if r[\"signed_summer_2026\"] == \"yes\":\n        print(f\"{r['player']}: {r['xt_p90']:.2f} xT per 90 from {r['minutes']} minutes\")\n"
+    }
+  ],
+  "changes": null,
+  "problems": [],
+  "gate_shown": false,
+  "changed_since_gate": []
+}

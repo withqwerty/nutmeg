@@ -1,0 +1,29 @@
+{
+  "files": [
+    {
+      "path": "data/matches.csv",
+      "sha256": "60b145456fd268e63e1958a7d38d42aa5610bc17238de48037b03eeba7426066",
+      "bytes": 2006,
+      "source": "club match data export, 2025-26 season to date",
+      "licence": "club internal",
+      "retrieved": null,
+      "added_at": "2026-10-09T21:37:23Z",
+      "added_by": "Analyst",
+      "note": null,
+      "profile": {
+        "rows": 50,
+        "columns": [
+          "match_no",
+          "date",
+          "competition",
+          "manager",
+          "opponent_possession",
+          "ppda"
+        ],
+        "duplicate_rows": 0,
+        "repeated_ids": {},
+        "empty_columns": []
+      }
+    }
+  ]
+}
