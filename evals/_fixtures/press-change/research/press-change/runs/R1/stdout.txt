@@ -1,0 +1,1 @@
+{"window": 15, "league_only": false, "adjusted": false, "n_before": 15, "n_after": 15, "ppda_before": 12.08, "ppda_after": 11.73, "difference": -0.35, "ci_low": -1.71, "ci_high": 1.01, "p": 0.614}

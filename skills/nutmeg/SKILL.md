@@ -1,8 +1,8 @@
 ---
 name: nutmeg
-description: "Football data analytics — the single entry point. Use whenever the user mentions football data, xG, expected goals, match analysis, player stats, scouting, match reports, shot maps, passing networks, Premier League data, Champions League stats, scraping FBref/Understat/Transfermarkt, building football charts, judging players or teams from stats (rankings, 'who is the best', 'is he a poor finisher', headlines or social posts about stats), or anything football analytics related. Routes to specialised sub-skills automatically. Also handles first-time setup and profile management."
+description: "Football data analytics entry point. Use for any task with football data: xG, match or player stats, scouting, shot maps, scraping FBref, Understat or Transfermarkt, judging players or teams from stats. Routes to the right nutmeg skill and handles first-time setup."
 argument-hint: "[what you want to do]"
-allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "AskUserQuestion", "WebSearch", "WebFetch", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs", "mcp__plugin_nutmeg_football-docs__list_providers", "mcp__football-docs__list_providers", "mcp__plugin_nutmeg_football-docs__compare_providers", "mcp__football-docs__compare_providers", "mcp__plugin_nutmeg_football-docs__resolve_entity", "mcp__football-docs__resolve_entity", "mcp__plugin_nutmeg_football-docs__get_provider_docs", "mcp__football-docs__get_provider_docs", "mcp__plugin_nutmeg_football-docs__resolve_provider_id", "mcp__football-docs__resolve_provider_id"]
+allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "AskUserQuestion", "WebSearch", "WebFetch", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs", "mcp__plugin_nutmeg_football-docs__list_providers", "mcp__football-docs__list_providers", "mcp__plugin_nutmeg_football-docs__compare_providers", "mcp__football-docs__compare_providers", "mcp__plugin_nutmeg_football-docs__resolve_entity", "mcp__football-docs__resolve_entity", "mcp__plugin_nutmeg_football-docs__get_provider_docs", "mcp__football-docs__get_provider_docs", "mcp__plugin_nutmeg_football-docs__resolve_provider_id", "mcp__football-docs__resolve_provider_id", "mcp__plugin_nutmeg_football-docs__get_metric", "mcp__football-docs__get_metric", "mcp__plugin_nutmeg_football-docs__list_metrics", "mcp__football-docs__list_metrics"]
 ---
 
 # Nutmeg
@@ -23,6 +23,7 @@ Read what the user is asking. Classify it into one of these intents:
 
 | Intent | Signal | Action |
 |--------|--------|--------|
+| **Research to publish or decide** | "shortlist", "match report", "opposition report", "memo", "for a thread", "I need to defend these numbers", "sourced", "research project" | Invoke `/nutmeg:research`; it starts a project and then uses the other sub-skills for each step |
 | **Get data** | "scrape", "fetch", "download", "get me data", names a provider or competition | Invoke `/nutmeg:acquire` |
 | **Fix broken pipeline** | "error", "broken", "403", "scraper stopped working", "rate limited" | Invoke `/nutmeg:heal` |
 | **Transform data** | "clean", "filter", "join", "merge", "reshape", "convert", "coordinate" | Invoke `/nutmeg:wrangle` |
@@ -41,6 +42,8 @@ Read what the user is asking. Classify it into one of these intents:
 **If the intent is ambiguous**, ask ONE clarifying question. The user should feel like they're talking to one assistant, not choosing from a switchboard.
 
 **If the request spans multiple intents** (e.g. "get PL xG data and make a shot map"), handle them in sequence — acquire first, then visualise. Don't ask the user to break it up.
+
+**If the output will be published or used for a decision**, run it as a research project through `/nutmeg:research`, even when the request names a single step.
 
 ## Step 3: Dispatch or handle
 

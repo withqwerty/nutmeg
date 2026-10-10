@@ -2,7 +2,7 @@
 name: nutmeg-review
 description: "Review football data code and visualisations for correctness. Use after building a chart, data pipeline, or analysis. Dispatches specialised reviewers for data correctness, chart conventions, visual inspection, and interactive edge cases."
 argument-hint: "[what to review, e.g. 'my shot map code' or 'the passmap page']"
-allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "WebFetch", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs"]
+allowed-tools: ["Read", "Write", "Bash", "Glob", "Grep", "Agent", "WebFetch", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs", "mcp__plugin_nutmeg_football-docs__get_metric", "mcp__football-docs__get_metric", "mcp__plugin_nutmeg_football-docs__list_metrics", "mcp__football-docs__list_metrics"]
 ---
 
 # Review

@@ -50,6 +50,19 @@ If multiple: "Which is your primary goal?"
 - **Yes** — offer to set up a local copy of the Reep Register (several hundred MB), following "Looking Up IDs" in `docs/entity-resolution-routing.md` in the nutmeg plugin folder. Record the file path and release stamp in the profile.
 - **No / later** — skip. Nutmeg will offer it when a join comes up.
 
+## Q8: How nutmeg works with you
+"When nutmeg does analysis you will publish or decide on, how much should it do on its own?"
+- **Club or company analyst (recommended for licensed data)** — persona `club`: nutmeg shows the inputs and the
+  exact code or SQL and asks before every run, and shows the chart data before anything is published (level L2).
+- **Fanalyst** — persona `fanalyst`: nutmeg works through the plan with checkpoints (level L3). Ask a follow-up:
+  "Should runs go ahead and wait for your review afterwards (run-then-review)?"
+- **Suggest only** — level L1 for runs: nutmeg shows the code and you run it.
+
+Save the answer with the nutmeg command (Python 3.10+), for example:
+`python3 "${CLAUDE_PLUGIN_ROOT}/core/nutmeg.py" config set --persona fanalyst --run-then-review yes` or
+`... config set --persona club --autonomy-run L1`. A team config (`.nutmeg/team.json`) can set stricter limits;
+`nutmeg config show` says which apply. If Python 3.10+ is not available, skip this question.
+
 ## Write the profile
 
 Write `.nutmeg.user.md` with YAML frontmatter:

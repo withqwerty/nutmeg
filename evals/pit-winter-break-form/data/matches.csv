@@ -1,0 +1,3801 @@
+match_id,season,round,date,home,away,home_goals,away_goals
+1,2016-17,1,2016-08-10,Barnet Vale,Netley,1,1
+2,2016-17,1,2016-08-10,Ashby,Corrin,0,0
+3,2016-17,1,2016-08-10,Stoke Edith,Morden,2,0
+4,2016-17,1,2016-08-10,Farley,Penrith,1,2
+5,2016-17,1,2016-08-10,Kirkby,Dalby,1,2
+6,2016-17,1,2016-08-10,Quarry Bank,Glenholm,1,0
+7,2016-17,1,2016-08-10,Lanark,Islip,3,0
+8,2016-17,1,2016-08-10,Eskdale,Rydal,5,2
+9,2016-17,1,2016-08-10,Thirsk,Jedburgh,1,1
+10,2016-17,1,2016-08-10,Orwell,Hartwell,1,2
+11,2016-17,2,2016-08-17,Corrin,Barnet Vale,2,2
+12,2016-17,2,2016-08-17,Morden,Netley,0,1
+13,2016-17,2,2016-08-17,Penrith,Ashby,1,1
+14,2016-17,2,2016-08-17,Dalby,Stoke Edith,1,0
+15,2016-17,2,2016-08-17,Glenholm,Farley,3,1
+16,2016-17,2,2016-08-17,Islip,Kirkby,1,0
+17,2016-17,2,2016-08-17,Rydal,Quarry Bank,0,0
+18,2016-17,2,2016-08-17,Jedburgh,Lanark,1,1
+19,2016-17,2,2016-08-17,Hartwell,Eskdale,1,1
+20,2016-17,2,2016-08-17,Orwell,Thirsk,1,2
+21,2016-17,3,2016-08-24,Barnet Vale,Morden,1,0
+22,2016-17,3,2016-08-24,Corrin,Penrith,2,0
+23,2016-17,3,2016-08-24,Netley,Dalby,1,0
+24,2016-17,3,2016-08-24,Ashby,Glenholm,1,2
+25,2016-17,3,2016-08-24,Stoke Edith,Islip,0,1
+26,2016-17,3,2016-08-24,Farley,Rydal,0,0
+27,2016-17,3,2016-08-24,Kirkby,Jedburgh,1,2
+28,2016-17,3,2016-08-24,Quarry Bank,Hartwell,4,0
+29,2016-17,3,2016-08-24,Lanark,Orwell,2,0
+30,2016-17,3,2016-08-24,Eskdale,Thirsk,0,2
+31,2016-17,4,2016-08-31,Penrith,Barnet Vale,0,2
+32,2016-17,4,2016-08-31,Dalby,Morden,2,0
+33,2016-17,4,2016-08-31,Glenholm,Corrin,3,2
+34,2016-17,4,2016-08-31,Islip,Netley,3,1
+35,2016-17,4,2016-08-31,Rydal,Ashby,0,0
+36,2016-17,4,2016-08-31,Jedburgh,Stoke Edith,1,0
+37,2016-17,4,2016-08-31,Hartwell,Farley,0,0
+38,2016-17,4,2016-08-31,Orwell,Kirkby,1,0
+39,2016-17,4,2016-08-31,Thirsk,Quarry Bank,2,1
+40,2016-17,4,2016-08-31,Eskdale,Lanark,2,2
+41,2016-17,5,2016-09-07,Barnet Vale,Dalby,0,1
+42,2016-17,5,2016-09-07,Penrith,Glenholm,0,1
+43,2016-17,5,2016-09-07,Morden,Islip,3,2
+44,2016-17,5,2016-09-07,Corrin,Rydal,4,1
+45,2016-17,5,2016-09-07,Netley,Jedburgh,2,2
+46,2016-17,5,2016-09-07,Ashby,Hartwell,0,3
+47,2016-17,5,2016-09-07,Stoke Edith,Orwell,0,3
+48,2016-17,5,2016-09-07,Farley,Thirsk,2,2
+49,2016-17,5,2016-09-07,Kirkby,Eskdale,3,0
+50,2016-17,5,2016-09-07,Quarry Bank,Lanark,1,2
+51,2016-17,6,2016-09-14,Glenholm,Barnet Vale,0,0
+52,2016-17,6,2016-09-14,Islip,Dalby,0,1
+53,2016-17,6,2016-09-14,Rydal,Penrith,1,2
+54,2016-17,6,2016-09-14,Jedburgh,Morden,4,3
+55,2016-17,6,2016-09-14,Hartwell,Corrin,2,3
+56,2016-17,6,2016-09-14,Orwell,Netley,2,1
+57,2016-17,6,2016-09-14,Thirsk,Ashby,2,1
+58,2016-17,6,2016-09-14,Eskdale,Stoke Edith,2,0
+59,2016-17,6,2016-09-14,Lanark,Farley,0,0
+60,2016-17,6,2016-09-14,Quarry Bank,Kirkby,1,1
+61,2016-17,7,2016-09-21,Barnet Vale,Islip,0,2
+62,2016-17,7,2016-09-21,Glenholm,Rydal,2,1
+63,2016-17,7,2016-09-21,Dalby,Jedburgh,2,6
+64,2016-17,7,2016-09-21,Penrith,Hartwell,1,0
+65,2016-17,7,2016-09-21,Morden,Orwell,1,0
+66,2016-17,7,2016-09-21,Corrin,Thirsk,0,3
+67,2016-17,7,2016-09-21,Netley,Eskdale,0,1
+68,2016-17,7,2016-09-21,Ashby,Lanark,0,2
+69,2016-17,7,2016-09-21,Stoke Edith,Quarry Bank,1,5
+70,2016-17,7,2016-09-21,Farley,Kirkby,2,0
+71,2016-17,8,2016-09-28,Rydal,Barnet Vale,2,0
+72,2016-17,8,2016-09-28,Jedburgh,Islip,1,2
+73,2016-17,8,2016-09-28,Hartwell,Glenholm,1,1
+74,2016-17,8,2016-09-28,Orwell,Dalby,2,2
+75,2016-17,8,2016-09-28,Thirsk,Penrith,2,2
+76,2016-17,8,2016-09-28,Eskdale,Morden,0,1
+77,2016-17,8,2016-09-28,Lanark,Corrin,1,2
+78,2016-17,8,2016-09-28,Quarry Bank,Netley,0,0
+79,2016-17,8,2016-09-28,Kirkby,Ashby,3,0
+80,2016-17,8,2016-09-28,Farley,Stoke Edith,3,1
+81,2016-17,9,2016-10-05,Barnet Vale,Jedburgh,0,0
+82,2016-17,9,2016-10-05,Rydal,Hartwell,1,2
+83,2016-17,9,2016-10-05,Islip,Orwell,1,0
+84,2016-17,9,2016-10-05,Glenholm,Thirsk,0,3
+85,2016-17,9,2016-10-05,Dalby,Eskdale,0,1
+86,2016-17,9,2016-10-05,Penrith,Lanark,0,1
+87,2016-17,9,2016-10-05,Morden,Quarry Bank,1,1
+88,2016-17,9,2016-10-05,Corrin,Kirkby,4,0
+89,2016-17,9,2016-10-05,Netley,Farley,1,1
+90,2016-17,9,2016-10-05,Ashby,Stoke Edith,1,2
+91,2016-17,10,2016-10-12,Hartwell,Barnet Vale,1,0
+92,2016-17,10,2016-10-12,Orwell,Jedburgh,4,1
+93,2016-17,10,2016-10-12,Thirsk,Rydal,0,1
+94,2016-17,10,2016-10-12,Eskdale,Islip,1,1
+95,2016-17,10,2016-10-12,Lanark,Glenholm,1,0
+96,2016-17,10,2016-10-12,Quarry Bank,Dalby,4,1
+97,2016-17,10,2016-10-12,Kirkby,Penrith,1,0
+98,2016-17,10,2016-10-12,Farley,Morden,3,0
+99,2016-17,10,2016-10-12,Stoke Edith,Corrin,1,2
+100,2016-17,10,2016-10-12,Ashby,Netley,1,5
+101,2016-17,11,2016-10-19,Barnet Vale,Orwell,1,0
+102,2016-17,11,2016-10-19,Hartwell,Thirsk,1,1
+103,2016-17,11,2016-10-19,Jedburgh,Eskdale,3,1
+104,2016-17,11,2016-10-19,Rydal,Lanark,2,1
+105,2016-17,11,2016-10-19,Islip,Quarry Bank,1,2
+106,2016-17,11,2016-10-19,Glenholm,Kirkby,0,2
+107,2016-17,11,2016-10-19,Dalby,Farley,1,3
+108,2016-17,11,2016-10-19,Penrith,Stoke Edith,6,1
+109,2016-17,11,2016-10-19,Morden,Ashby,2,0
+110,2016-17,11,2016-10-19,Corrin,Netley,1,0
+111,2016-17,12,2016-10-26,Thirsk,Barnet Vale,2,2
+112,2016-17,12,2016-10-26,Eskdale,Orwell,3,3
+113,2016-17,12,2016-10-26,Lanark,Hartwell,3,0
+114,2016-17,12,2016-10-26,Quarry Bank,Jedburgh,3,0
+115,2016-17,12,2016-10-26,Kirkby,Rydal,1,0
+116,2016-17,12,2016-10-26,Farley,Islip,3,2
+117,2016-17,12,2016-10-26,Stoke Edith,Glenholm,2,1
+118,2016-17,12,2016-10-26,Ashby,Dalby,1,2
+119,2016-17,12,2016-10-26,Netley,Penrith,2,0
+120,2016-17,12,2016-10-26,Corrin,Morden,1,4
+121,2016-17,13,2016-11-02,Barnet Vale,Eskdale,1,0
+122,2016-17,13,2016-11-02,Thirsk,Lanark,0,3
+123,2016-17,13,2016-11-02,Orwell,Quarry Bank,1,1
+124,2016-17,13,2016-11-02,Hartwell,Kirkby,2,2
+125,2016-17,13,2016-11-02,Jedburgh,Farley,3,2
+126,2016-17,13,2016-11-02,Rydal,Stoke Edith,3,1
+127,2016-17,13,2016-11-02,Islip,Ashby,6,0
+128,2016-17,13,2016-11-02,Glenholm,Netley,0,2
+129,2016-17,13,2016-11-02,Dalby,Corrin,0,0
+130,2016-17,13,2016-11-02,Penrith,Morden,0,2
+131,2016-17,14,2016-11-09,Lanark,Barnet Vale,2,2
+132,2016-17,14,2016-11-09,Quarry Bank,Eskdale,3,0
+133,2016-17,14,2016-11-09,Kirkby,Thirsk,1,1
+134,2016-17,14,2016-11-09,Farley,Orwell,4,0
+135,2016-17,14,2016-11-09,Stoke Edith,Hartwell,1,4
+136,2016-17,14,2016-11-09,Ashby,Jedburgh,0,3
+137,2016-17,14,2016-11-09,Netley,Rydal,5,0
+138,2016-17,14,2016-11-09,Corrin,Islip,0,2
+139,2016-17,14,2016-11-09,Morden,Glenholm,2,1
+140,2016-17,14,2016-11-09,Penrith,Dalby,3,2
+141,2016-17,15,2016-11-16,Barnet Vale,Quarry Bank,1,1
+142,2016-17,15,2016-11-16,Lanark,Kirkby,1,1
+143,2016-17,15,2016-11-16,Eskdale,Farley,1,1
+144,2016-17,15,2016-11-16,Thirsk,Stoke Edith,3,2
+145,2016-17,15,2016-11-16,Orwell,Ashby,5,0
+146,2016-17,15,2016-11-16,Hartwell,Netley,1,4
+147,2016-17,15,2016-11-16,Jedburgh,Corrin,1,0
+148,2016-17,15,2016-11-16,Rydal,Morden,0,1
+149,2016-17,15,2016-11-16,Islip,Penrith,3,0
+150,2016-17,15,2016-11-16,Glenholm,Dalby,0,0
+151,2016-17,16,2016-11-23,Kirkby,Barnet Vale,1,0
+152,2016-17,16,2016-11-23,Farley,Quarry Bank,2,2
+153,2016-17,16,2016-11-23,Stoke Edith,Lanark,1,7
+154,2016-17,16,2016-11-23,Ashby,Eskdale,0,3
+155,2016-17,16,2016-11-23,Netley,Thirsk,3,0
+156,2016-17,16,2016-11-23,Corrin,Orwell,2,1
+157,2016-17,16,2016-11-23,Morden,Hartwell,3,1
+158,2016-17,16,2016-11-23,Penrith,Jedburgh,0,2
+159,2016-17,16,2016-11-23,Dalby,Rydal,2,0
+160,2016-17,16,2016-11-23,Glenholm,Islip,0,4
+161,2016-17,17,2016-11-30,Barnet Vale,Farley,0,5
+162,2016-17,17,2016-11-30,Kirkby,Stoke Edith,4,0
+163,2016-17,17,2016-11-30,Quarry Bank,Ashby,10,0
+164,2016-17,17,2016-11-30,Lanark,Netley,2,3
+165,2016-17,17,2016-11-30,Eskdale,Corrin,1,1
+166,2016-17,17,2016-11-30,Thirsk,Morden,1,1
+167,2016-17,17,2016-11-30,Orwell,Penrith,2,0
+168,2016-17,17,2016-11-30,Hartwell,Dalby,2,2
+169,2016-17,17,2016-11-30,Jedburgh,Glenholm,2,0
+170,2016-17,17,2016-11-30,Rydal,Islip,0,7
+171,2016-17,18,2016-12-07,Stoke Edith,Barnet Vale,0,6
+172,2016-17,18,2016-12-07,Ashby,Farley,1,9
+173,2016-17,18,2016-12-07,Netley,Kirkby,1,0
+174,2016-17,18,2016-12-07,Corrin,Quarry Bank,2,1
+175,2016-17,18,2016-12-07,Morden,Lanark,2,3
+176,2016-17,18,2016-12-07,Penrith,Eskdale,2,2
+177,2016-17,18,2016-12-07,Dalby,Thirsk,1,1
+178,2016-17,18,2016-12-07,Glenholm,Orwell,2,1
+179,2016-17,18,2016-12-07,Islip,Hartwell,5,0
+180,2016-17,18,2016-12-07,Rydal,Jedburgh,0,2
+181,2016-17,19,2016-12-14,Barnet Vale,Ashby,4,0
+182,2016-17,19,2016-12-14,Stoke Edith,Netley,0,7
+183,2016-17,19,2016-12-14,Farley,Corrin,6,2
+184,2016-17,19,2016-12-14,Kirkby,Morden,2,0
+185,2016-17,19,2016-12-14,Quarry Bank,Penrith,5,0
+186,2016-17,19,2016-12-14,Lanark,Dalby,4,0
+187,2016-17,19,2016-12-14,Eskdale,Glenholm,2,1
+188,2016-17,19,2016-12-14,Thirsk,Islip,0,6
+189,2016-17,19,2016-12-14,Orwell,Rydal,2,0
+190,2016-17,19,2016-12-14,Hartwell,Jedburgh,2,1
+191,2016-17,20,2017-01-11,Netley,Barnet Vale,2,1
+192,2016-17,20,2017-01-11,Corrin,Ashby,6,0
+193,2016-17,20,2017-01-11,Morden,Stoke Edith,3,0
+194,2016-17,20,2017-01-11,Penrith,Farley,0,1
+195,2016-17,20,2017-01-11,Dalby,Kirkby,0,2
+196,2016-17,20,2017-01-11,Glenholm,Quarry Bank,0,3
+197,2016-17,20,2017-01-11,Islip,Lanark,1,0
+198,2016-17,20,2017-01-11,Rydal,Eskdale,1,2
+199,2016-17,20,2017-01-11,Jedburgh,Thirsk,2,1
+200,2016-17,20,2017-01-11,Hartwell,Orwell,3,2
+201,2016-17,21,2017-01-18,Barnet Vale,Corrin,3,3
+202,2016-17,21,2017-01-18,Netley,Morden,1,0
+203,2016-17,21,2017-01-18,Ashby,Penrith,1,2
+204,2016-17,21,2017-01-18,Stoke Edith,Dalby,1,5
+205,2016-17,21,2017-01-18,Farley,Glenholm,5,0
+206,2016-17,21,2017-01-18,Kirkby,Islip,3,1
+207,2016-17,21,2017-01-18,Quarry Bank,Rydal,2,0
+208,2016-17,21,2017-01-18,Lanark,Jedburgh,0,1
+209,2016-17,21,2017-01-18,Eskdale,Hartwell,0,2
+210,2016-17,21,2017-01-18,Thirsk,Orwell,2,1
+211,2016-17,22,2017-01-25,Morden,Barnet Vale,0,0
+212,2016-17,22,2017-01-25,Penrith,Corrin,0,0
+213,2016-17,22,2017-01-25,Dalby,Netley,2,1
+214,2016-17,22,2017-01-25,Glenholm,Ashby,2,0
+215,2016-17,22,2017-01-25,Islip,Stoke Edith,10,1
+216,2016-17,22,2017-01-25,Rydal,Farley,0,5
+217,2016-17,22,2017-01-25,Jedburgh,Kirkby,0,0
+218,2016-17,22,2017-01-25,Hartwell,Quarry Bank,1,1
+219,2016-17,22,2017-01-25,Orwell,Lanark,0,3
+220,2016-17,22,2017-01-25,Thirsk,Eskdale,0,3
+221,2016-17,23,2017-02-01,Barnet Vale,Penrith,2,1
+222,2016-17,23,2017-02-01,Morden,Dalby,0,4
+223,2016-17,23,2017-02-01,Corrin,Glenholm,1,0
+224,2016-17,23,2017-02-01,Netley,Islip,2,1
+225,2016-17,23,2017-02-01,Ashby,Rydal,0,1
+226,2016-17,23,2017-02-01,Stoke Edith,Jedburgh,1,5
+227,2016-17,23,2017-02-01,Farley,Hartwell,3,0
+228,2016-17,23,2017-02-01,Kirkby,Orwell,6,0
+229,2016-17,23,2017-02-01,Quarry Bank,Thirsk,2,0
+230,2016-17,23,2017-02-01,Lanark,Eskdale,4,0
+231,2016-17,24,2017-02-08,Dalby,Barnet Vale,1,2
+232,2016-17,24,2017-02-08,Glenholm,Penrith,1,0
+233,2016-17,24,2017-02-08,Islip,Morden,7,0
+234,2016-17,24,2017-02-08,Rydal,Corrin,0,3
+235,2016-17,24,2017-02-08,Jedburgh,Netley,0,0
+236,2016-17,24,2017-02-08,Hartwell,Ashby,6,0
+237,2016-17,24,2017-02-08,Orwell,Stoke Edith,4,0
+238,2016-17,24,2017-02-08,Thirsk,Farley,1,8
+239,2016-17,24,2017-02-08,Eskdale,Kirkby,1,2
+240,2016-17,24,2017-02-08,Lanark,Quarry Bank,0,1
+241,2016-17,25,2017-02-15,Barnet Vale,Glenholm,2,1
+242,2016-17,25,2017-02-15,Dalby,Islip,0,1
+243,2016-17,25,2017-02-15,Penrith,Rydal,1,1
+244,2016-17,25,2017-02-15,Morden,Jedburgh,1,2
+245,2016-17,25,2017-02-15,Corrin,Hartwell,0,2
+246,2016-17,25,2017-02-15,Netley,Orwell,5,0
+247,2016-17,25,2017-02-15,Ashby,Thirsk,1,3
+248,2016-17,25,2017-02-15,Stoke Edith,Eskdale,0,2
+249,2016-17,25,2017-02-15,Farley,Lanark,2,1
+250,2016-17,25,2017-02-15,Kirkby,Quarry Bank,3,0
+251,2016-17,26,2017-02-22,Islip,Barnet Vale,2,0
+252,2016-17,26,2017-02-22,Rydal,Glenholm,0,0
+253,2016-17,26,2017-02-22,Jedburgh,Dalby,2,2
+254,2016-17,26,2017-02-22,Hartwell,Penrith,0,0
+255,2016-17,26,2017-02-22,Orwell,Morden,1,0
+256,2016-17,26,2017-02-22,Thirsk,Corrin,0,3
+257,2016-17,26,2017-02-22,Eskdale,Netley,0,4
+258,2016-17,26,2017-02-22,Lanark,Ashby,5,1
+259,2016-17,26,2017-02-22,Quarry Bank,Stoke Edith,6,0
+260,2016-17,26,2017-02-22,Kirkby,Farley,1,1
+261,2016-17,27,2017-03-01,Barnet Vale,Rydal,5,1
+262,2016-17,27,2017-03-01,Islip,Jedburgh,1,1
+263,2016-17,27,2017-03-01,Glenholm,Hartwell,0,0
+264,2016-17,27,2017-03-01,Dalby,Orwell,3,0
+265,2016-17,27,2017-03-01,Penrith,Thirsk,1,0
+266,2016-17,27,2017-03-01,Morden,Eskdale,0,0
+267,2016-17,27,2017-03-01,Corrin,Lanark,2,1
+268,2016-17,27,2017-03-01,Netley,Quarry Bank,2,2
+269,2016-17,27,2017-03-01,Ashby,Kirkby,2,5
+270,2016-17,27,2017-03-01,Stoke Edith,Farley,0,10
+271,2016-17,28,2017-03-08,Jedburgh,Barnet Vale,0,0
+272,2016-17,28,2017-03-08,Hartwell,Rydal,6,0
+273,2016-17,28,2017-03-08,Orwell,Islip,1,7
+274,2016-17,28,2017-03-08,Thirsk,Glenholm,4,1
+275,2016-17,28,2017-03-08,Eskdale,Dalby,1,1
+276,2016-17,28,2017-03-08,Lanark,Penrith,3,0
+277,2016-17,28,2017-03-08,Quarry Bank,Morden,2,0
+278,2016-17,28,2017-03-08,Kirkby,Corrin,1,1
+279,2016-17,28,2017-03-08,Farley,Netley,0,0
+280,2016-17,28,2017-03-08,Stoke Edith,Ashby,2,0
+281,2016-17,29,2017-03-15,Barnet Vale,Hartwell,3,1
+282,2016-17,29,2017-03-15,Jedburgh,Orwell,0,0
+283,2016-17,29,2017-03-15,Rydal,Thirsk,4,1
+284,2016-17,29,2017-03-15,Islip,Eskdale,1,0
+285,2016-17,29,2017-03-15,Glenholm,Lanark,0,5
+286,2016-17,29,2017-03-15,Dalby,Quarry Bank,2,1
+287,2016-17,29,2017-03-15,Penrith,Kirkby,0,3
+288,2016-17,29,2017-03-15,Morden,Farley,0,7
+289,2016-17,29,2017-03-15,Corrin,Stoke Edith,3,0
+290,2016-17,29,2017-03-15,Netley,Ashby,10,0
+291,2016-17,30,2017-03-22,Orwell,Barnet Vale,0,3
+292,2016-17,30,2017-03-22,Thirsk,Hartwell,0,1
+293,2016-17,30,2017-03-22,Eskdale,Jedburgh,2,0
+294,2016-17,30,2017-03-22,Lanark,Rydal,5,0
+295,2016-17,30,2017-03-22,Quarry Bank,Islip,0,0
+296,2016-17,30,2017-03-22,Kirkby,Glenholm,9,0
+297,2016-17,30,2017-03-22,Farley,Dalby,5,0
+298,2016-17,30,2017-03-22,Stoke Edith,Penrith,1,1
+299,2016-17,30,2017-03-22,Ashby,Morden,4,0
+300,2016-17,30,2017-03-22,Netley,Corrin,4,0
+301,2016-17,31,2017-03-29,Barnet Vale,Thirsk,1,0
+302,2016-17,31,2017-03-29,Orwell,Eskdale,2,4
+303,2016-17,31,2017-03-29,Hartwell,Lanark,1,2
+304,2016-17,31,2017-03-29,Jedburgh,Quarry Bank,0,2
+305,2016-17,31,2017-03-29,Rydal,Kirkby,0,7
+306,2016-17,31,2017-03-29,Islip,Farley,0,2
+307,2016-17,31,2017-03-29,Glenholm,Stoke Edith,2,1
+308,2016-17,31,2017-03-29,Dalby,Ashby,2,1
+309,2016-17,31,2017-03-29,Penrith,Netley,0,1
+310,2016-17,31,2017-03-29,Morden,Corrin,0,4
+311,2016-17,32,2017-04-05,Eskdale,Barnet Vale,3,0
+312,2016-17,32,2017-04-05,Lanark,Thirsk,4,1
+313,2016-17,32,2017-04-05,Quarry Bank,Orwell,8,0
+314,2016-17,32,2017-04-05,Kirkby,Hartwell,1,0
+315,2016-17,32,2017-04-05,Farley,Jedburgh,5,0
+316,2016-17,32,2017-04-05,Stoke Edith,Rydal,2,1
+317,2016-17,32,2017-04-05,Ashby,Islip,0,4
+318,2016-17,32,2017-04-05,Netley,Glenholm,10,0
+319,2016-17,32,2017-04-05,Corrin,Dalby,1,0
+320,2016-17,32,2017-04-05,Morden,Penrith,0,3
+321,2016-17,33,2017-04-12,Barnet Vale,Lanark,1,1
+322,2016-17,33,2017-04-12,Eskdale,Quarry Bank,0,0
+323,2016-17,33,2017-04-12,Thirsk,Kirkby,0,9
+324,2016-17,33,2017-04-12,Orwell,Farley,0,5
+325,2016-17,33,2017-04-12,Hartwell,Stoke Edith,5,0
+326,2016-17,33,2017-04-12,Jedburgh,Ashby,2,0
+327,2016-17,33,2017-04-12,Rydal,Netley,0,10
+328,2016-17,33,2017-04-12,Islip,Corrin,1,0
+329,2016-17,33,2017-04-12,Glenholm,Morden,2,0
+330,2016-17,33,2017-04-12,Dalby,Penrith,1,0
+331,2016-17,34,2017-04-19,Quarry Bank,Barnet Vale,1,0
+332,2016-17,34,2017-04-19,Kirkby,Lanark,0,1
+333,2016-17,34,2017-04-19,Farley,Eskdale,3,1
+334,2016-17,34,2017-04-19,Stoke Edith,Thirsk,1,3
+335,2016-17,34,2017-04-19,Ashby,Orwell,1,3
+336,2016-17,34,2017-04-19,Netley,Hartwell,3,1
+337,2016-17,34,2017-04-19,Corrin,Jedburgh,5,1
+338,2016-17,34,2017-04-19,Morden,Rydal,2,2
+339,2016-17,34,2017-04-19,Penrith,Islip,0,2
+340,2016-17,34,2017-04-19,Dalby,Glenholm,4,0
+341,2016-17,35,2017-04-26,Barnet Vale,Kirkby,0,3
+342,2016-17,35,2017-04-26,Quarry Bank,Farley,2,2
+343,2016-17,35,2017-04-26,Lanark,Stoke Edith,10,0
+344,2016-17,35,2017-04-26,Eskdale,Ashby,5,0
+345,2016-17,35,2017-04-26,Thirsk,Netley,0,6
+346,2016-17,35,2017-04-26,Orwell,Corrin,0,4
+347,2016-17,35,2017-04-26,Hartwell,Morden,2,0
+348,2016-17,35,2017-04-26,Jedburgh,Penrith,0,0
+349,2016-17,35,2017-04-26,Rydal,Dalby,1,6
+350,2016-17,35,2017-04-26,Islip,Glenholm,10,1
+351,2016-17,36,2017-05-03,Farley,Barnet Vale,4,0
+352,2016-17,36,2017-05-03,Stoke Edith,Kirkby,1,10
+353,2016-17,36,2017-05-03,Ashby,Quarry Bank,0,10
+354,2016-17,36,2017-05-03,Netley,Lanark,3,2
+355,2016-17,36,2017-05-03,Corrin,Eskdale,1,1
+356,2016-17,36,2017-05-03,Morden,Thirsk,0,0
+357,2016-17,36,2017-05-03,Penrith,Orwell,1,0
+358,2016-17,36,2017-05-03,Dalby,Hartwell,1,1
+359,2016-17,36,2017-05-03,Glenholm,Jedburgh,0,3
+360,2016-17,36,2017-05-03,Islip,Rydal,10,0
+361,2016-17,37,2017-05-10,Barnet Vale,Stoke Edith,8,0
+362,2016-17,37,2017-05-10,Farley,Ashby,10,0
+363,2016-17,37,2017-05-10,Kirkby,Netley,1,0
+364,2016-17,37,2017-05-10,Quarry Bank,Corrin,8,0
+365,2016-17,37,2017-05-10,Lanark,Morden,5,1
+366,2016-17,37,2017-05-10,Eskdale,Penrith,2,2
+367,2016-17,37,2017-05-10,Thirsk,Dalby,1,0
+368,2016-17,37,2017-05-10,Orwell,Glenholm,3,1
+369,2016-17,37,2017-05-10,Hartwell,Islip,0,4
+370,2016-17,37,2017-05-10,Jedburgh,Rydal,4,1
+371,2016-17,38,2017-05-17,Ashby,Barnet Vale,0,3
+372,2016-17,38,2017-05-17,Netley,Stoke Edith,10,0
+373,2016-17,38,2017-05-17,Corrin,Farley,0,4
+374,2016-17,38,2017-05-17,Morden,Kirkby,0,10
+375,2016-17,38,2017-05-17,Penrith,Quarry Bank,0,5
+376,2016-17,38,2017-05-17,Dalby,Lanark,0,1
+377,2016-17,38,2017-05-17,Glenholm,Eskdale,1,10
+378,2016-17,38,2017-05-17,Islip,Thirsk,7,0
+379,2016-17,38,2017-05-17,Rydal,Orwell,0,1
+380,2016-17,38,2017-05-17,Jedburgh,Hartwell,0,2
+381,2017-18,1,2017-08-10,Orwell,Lanark,1,2
+382,2017-18,1,2017-08-10,Rydal,Barnet Vale,1,1
+383,2017-18,1,2017-08-10,Penrith,Stoke Edith,5,0
+384,2017-18,1,2017-08-10,Jedburgh,Dalby,0,1
+385,2017-18,1,2017-08-10,Morden,Ashby,1,1
+386,2017-18,1,2017-08-10,Islip,Farley,0,2
+387,2017-18,1,2017-08-10,Hartwell,Kirkby,0,2
+388,2017-18,1,2017-08-10,Quarry Bank,Netley,3,0
+389,2017-18,1,2017-08-10,Eskdale,Glenholm,4,0
+390,2017-18,1,2017-08-10,Thirsk,Corrin,0,1
+391,2017-18,2,2017-08-17,Barnet Vale,Orwell,1,1
+392,2017-18,2,2017-08-17,Stoke Edith,Lanark,0,1
+393,2017-18,2,2017-08-17,Dalby,Rydal,0,1
+394,2017-18,2,2017-08-17,Ashby,Penrith,1,1
+395,2017-18,2,2017-08-17,Farley,Jedburgh,5,0
+396,2017-18,2,2017-08-17,Kirkby,Morden,8,0
+397,2017-18,2,2017-08-17,Netley,Islip,1,1
+398,2017-18,2,2017-08-17,Glenholm,Hartwell,0,2
+399,2017-18,2,2017-08-17,Corrin,Quarry Bank,0,4
+400,2017-18,2,2017-08-17,Thirsk,Eskdale,0,5
+401,2017-18,3,2017-08-24,Orwell,Stoke Edith,1,0
+402,2017-18,3,2017-08-24,Barnet Vale,Dalby,3,0
+403,2017-18,3,2017-08-24,Lanark,Ashby,4,0
+404,2017-18,3,2017-08-24,Rydal,Farley,0,7
+405,2017-18,3,2017-08-24,Penrith,Kirkby,1,1
+406,2017-18,3,2017-08-24,Jedburgh,Netley,0,1
+407,2017-18,3,2017-08-24,Morden,Glenholm,3,2
+408,2017-18,3,2017-08-24,Islip,Corrin,1,0
+409,2017-18,3,2017-08-24,Hartwell,Thirsk,2,1
+410,2017-18,3,2017-08-24,Quarry Bank,Eskdale,0,1
+411,2017-18,4,2017-08-31,Dalby,Orwell,1,0
+412,2017-18,4,2017-08-31,Ashby,Stoke Edith,2,0
+413,2017-18,4,2017-08-31,Farley,Barnet Vale,1,0
+414,2017-18,4,2017-08-31,Kirkby,Lanark,1,0
+415,2017-18,4,2017-08-31,Netley,Rydal,4,1
+416,2017-18,4,2017-08-31,Glenholm,Penrith,0,0
+417,2017-18,4,2017-08-31,Corrin,Jedburgh,1,0
+418,2017-18,4,2017-08-31,Thirsk,Morden,3,1
+419,2017-18,4,2017-08-31,Eskdale,Islip,2,2
+420,2017-18,4,2017-08-31,Quarry Bank,Hartwell,3,1
+421,2017-18,5,2017-09-07,Orwell,Ashby,2,1
+422,2017-18,5,2017-09-07,Dalby,Farley,0,5
+423,2017-18,5,2017-09-07,Stoke Edith,Kirkby,0,7
+424,2017-18,5,2017-09-07,Barnet Vale,Netley,0,3
+425,2017-18,5,2017-09-07,Lanark,Glenholm,5,0
+426,2017-18,5,2017-09-07,Rydal,Corrin,0,0
+427,2017-18,5,2017-09-07,Penrith,Thirsk,2,0
+428,2017-18,5,2017-09-07,Jedburgh,Eskdale,0,6
+429,2017-18,5,2017-09-07,Morden,Quarry Bank,0,9
+430,2017-18,5,2017-09-07,Islip,Hartwell,2,1
+431,2017-18,6,2017-09-14,Farley,Orwell,1,0
+432,2017-18,6,2017-09-14,Kirkby,Ashby,6,0
+433,2017-18,6,2017-09-14,Netley,Dalby,5,0
+434,2017-18,6,2017-09-14,Glenholm,Stoke Edith,1,0
+435,2017-18,6,2017-09-14,Corrin,Barnet Vale,0,1
+436,2017-18,6,2017-09-14,Thirsk,Lanark,1,3
+437,2017-18,6,2017-09-14,Eskdale,Rydal,4,0
+438,2017-18,6,2017-09-14,Quarry Bank,Penrith,7,1
+439,2017-18,6,2017-09-14,Hartwell,Jedburgh,2,0
+440,2017-18,6,2017-09-14,Islip,Morden,9,0
+441,2017-18,7,2017-09-21,Orwell,Kirkby,1,3
+442,2017-18,7,2017-09-21,Farley,Netley,0,3
+443,2017-18,7,2017-09-21,Ashby,Glenholm,1,4
+444,2017-18,7,2017-09-21,Dalby,Corrin,0,1
+445,2017-18,7,2017-09-21,Stoke Edith,Thirsk,0,1
+446,2017-18,7,2017-09-21,Barnet Vale,Eskdale,1,1
+447,2017-18,7,2017-09-21,Lanark,Quarry Bank,0,2
+448,2017-18,7,2017-09-21,Rydal,Hartwell,0,2
+449,2017-18,7,2017-09-21,Penrith,Islip,2,0
+450,2017-18,7,2017-09-21,Jedburgh,Morden,2,0
+451,2017-18,8,2017-09-28,Netley,Orwell,3,3
+452,2017-18,8,2017-09-28,Glenholm,Kirkby,0,6
+453,2017-18,8,2017-09-28,Corrin,Farley,0,5
+454,2017-18,8,2017-09-28,Thirsk,Ashby,1,0
+455,2017-18,8,2017-09-28,Eskdale,Dalby,3,0
+456,2017-18,8,2017-09-28,Quarry Bank,Stoke Edith,10,0
+457,2017-18,8,2017-09-28,Hartwell,Barnet Vale,1,0
+458,2017-18,8,2017-09-28,Islip,Lanark,1,2
+459,2017-18,8,2017-09-28,Morden,Rydal,1,2
+460,2017-18,8,2017-09-28,Jedburgh,Penrith,1,3
+461,2017-18,9,2017-10-05,Orwell,Glenholm,3,1
+462,2017-18,9,2017-10-05,Netley,Corrin,4,0
+463,2017-18,9,2017-10-05,Kirkby,Thirsk,6,0
+464,2017-18,9,2017-10-05,Farley,Eskdale,0,0
+465,2017-18,9,2017-10-05,Ashby,Quarry Bank,0,9
+466,2017-18,9,2017-10-05,Dalby,Hartwell,2,3
+467,2017-18,9,2017-10-05,Stoke Edith,Islip,0,5
+468,2017-18,9,2017-10-05,Barnet Vale,Morden,4,1
+469,2017-18,9,2017-10-05,Lanark,Jedburgh,2,0
+470,2017-18,9,2017-10-05,Rydal,Penrith,1,0
+471,2017-18,10,2017-10-12,Corrin,Orwell,0,1
+472,2017-18,10,2017-10-12,Thirsk,Glenholm,3,1
+473,2017-18,10,2017-10-12,Eskdale,Netley,0,0
+474,2017-18,10,2017-10-12,Quarry Bank,Kirkby,4,0
+475,2017-18,10,2017-10-12,Hartwell,Farley,1,1
+476,2017-18,10,2017-10-12,Islip,Ashby,6,0
+477,2017-18,10,2017-10-12,Morden,Dalby,3,4
+478,2017-18,10,2017-10-12,Jedburgh,Stoke Edith,1,0
+479,2017-18,10,2017-10-12,Penrith,Barnet Vale,1,1
+480,2017-18,10,2017-10-12,Rydal,Lanark,1,1
+481,2017-18,11,2017-10-19,Orwell,Thirsk,2,0
+482,2017-18,11,2017-10-19,Corrin,Eskdale,1,2
+483,2017-18,11,2017-10-19,Glenholm,Quarry Bank,0,10
+484,2017-18,11,2017-10-19,Netley,Hartwell,4,0
+485,2017-18,11,2017-10-19,Kirkby,Islip,2,0
+486,2017-18,11,2017-10-19,Farley,Morden,9,0
+487,2017-18,11,2017-10-19,Ashby,Jedburgh,1,0
+488,2017-18,11,2017-10-19,Dalby,Penrith,0,0
+489,2017-18,11,2017-10-19,Stoke Edith,Rydal,0,1
+490,2017-18,11,2017-10-19,Barnet Vale,Lanark,0,1
+491,2017-18,12,2017-10-26,Eskdale,Orwell,2,1
+492,2017-18,12,2017-10-26,Quarry Bank,Thirsk,10,0
+493,2017-18,12,2017-10-26,Hartwell,Corrin,2,0
+494,2017-18,12,2017-10-26,Islip,Glenholm,8,0
+495,2017-18,12,2017-10-26,Morden,Netley,0,9
+496,2017-18,12,2017-10-26,Jedburgh,Kirkby,0,5
+497,2017-18,12,2017-10-26,Penrith,Farley,0,4
+498,2017-18,12,2017-10-26,Rydal,Ashby,4,0
+499,2017-18,12,2017-10-26,Lanark,Dalby,5,0
+500,2017-18,12,2017-10-26,Barnet Vale,Stoke Edith,6,0
+501,2017-18,13,2017-11-02,Orwell,Quarry Bank,2,4
+502,2017-18,13,2017-11-02,Eskdale,Hartwell,2,1
+503,2017-18,13,2017-11-02,Thirsk,Islip,0,3
+504,2017-18,13,2017-11-02,Corrin,Morden,0,0
+505,2017-18,13,2017-11-02,Glenholm,Jedburgh,1,3
+506,2017-18,13,2017-11-02,Netley,Penrith,4,0
+507,2017-18,13,2017-11-02,Kirkby,Rydal,6,0
+508,2017-18,13,2017-11-02,Farley,Lanark,2,2
+509,2017-18,13,2017-11-02,Ashby,Barnet Vale,0,2
+510,2017-18,13,2017-11-02,Dalby,Stoke Edith,1,0
+511,2017-18,14,2017-11-09,Hartwell,Orwell,1,0
+512,2017-18,14,2017-11-09,Islip,Quarry Bank,1,3
+513,2017-18,14,2017-11-09,Morden,Eskdale,2,7
+514,2017-18,14,2017-11-09,Jedburgh,Thirsk,1,2
+515,2017-18,14,2017-11-09,Penrith,Corrin,1,0
+516,2017-18,14,2017-11-09,Rydal,Glenholm,2,2
+517,2017-18,14,2017-11-09,Lanark,Netley,1,0
+518,2017-18,14,2017-11-09,Barnet Vale,Kirkby,1,2
+519,2017-18,14,2017-11-09,Stoke Edith,Farley,0,5
+520,2017-18,14,2017-11-09,Dalby,Ashby,4,0
+521,2017-18,15,2017-11-16,Orwell,Islip,0,5
+522,2017-18,15,2017-11-16,Hartwell,Morden,5,0
+523,2017-18,15,2017-11-16,Quarry Bank,Jedburgh,4,0
+524,2017-18,15,2017-11-16,Eskdale,Penrith,1,0
+525,2017-18,15,2017-11-16,Thirsk,Rydal,1,1
+526,2017-18,15,2017-11-16,Corrin,Lanark,0,3
+527,2017-18,15,2017-11-16,Glenholm,Barnet Vale,0,2
+528,2017-18,15,2017-11-16,Netley,Stoke Edith,9,0
+529,2017-18,15,2017-11-16,Kirkby,Dalby,5,1
+530,2017-18,15,2017-11-16,Farley,Ashby,10,0
+531,2017-18,16,2017-11-23,Morden,Orwell,1,4
+532,2017-18,16,2017-11-23,Jedburgh,Islip,1,4
+533,2017-18,16,2017-11-23,Penrith,Hartwell,1,2
+534,2017-18,16,2017-11-23,Rydal,Quarry Bank,1,2
+535,2017-18,16,2017-11-23,Lanark,Eskdale,2,0
+536,2017-18,16,2017-11-23,Barnet Vale,Thirsk,3,2
+537,2017-18,16,2017-11-23,Stoke Edith,Corrin,1,1
+538,2017-18,16,2017-11-23,Dalby,Glenholm,1,1
+539,2017-18,16,2017-11-23,Ashby,Netley,0,8
+540,2017-18,16,2017-11-23,Farley,Kirkby,1,1
+541,2017-18,17,2017-11-30,Orwell,Jedburgh,1,1
+542,2017-18,17,2017-11-30,Morden,Penrith,2,0
+543,2017-18,17,2017-11-30,Islip,Rydal,4,1
+544,2017-18,17,2017-11-30,Hartwell,Lanark,1,2
+545,2017-18,17,2017-11-30,Quarry Bank,Barnet Vale,5,0
+546,2017-18,17,2017-11-30,Eskdale,Stoke Edith,8,1
+547,2017-18,17,2017-11-30,Thirsk,Dalby,1,1
+548,2017-18,17,2017-11-30,Corrin,Ashby,3,1
+549,2017-18,17,2017-11-30,Glenholm,Farley,0,8
+550,2017-18,17,2017-11-30,Netley,Kirkby,2,2
+551,2017-18,18,2017-12-07,Penrith,Orwell,1,0
+552,2017-18,18,2017-12-07,Rydal,Jedburgh,1,3
+553,2017-18,18,2017-12-07,Lanark,Morden,8,0
+554,2017-18,18,2017-12-07,Barnet Vale,Islip,1,4
+555,2017-18,18,2017-12-07,Stoke Edith,Hartwell,0,2
+556,2017-18,18,2017-12-07,Dalby,Quarry Bank,0,9
+557,2017-18,18,2017-12-07,Ashby,Eskdale,1,7
+558,2017-18,18,2017-12-07,Farley,Thirsk,6,0
+559,2017-18,18,2017-12-07,Kirkby,Corrin,4,0
+560,2017-18,18,2017-12-07,Netley,Glenholm,8,0
+561,2017-18,19,2017-12-14,Orwell,Rydal,0,2
+562,2017-18,19,2017-12-14,Penrith,Lanark,0,7
+563,2017-18,19,2017-12-14,Jedburgh,Barnet Vale,1,3
+564,2017-18,19,2017-12-14,Morden,Stoke Edith,3,2
+565,2017-18,19,2017-12-14,Islip,Dalby,9,0
+566,2017-18,19,2017-12-14,Hartwell,Ashby,5,1
+567,2017-18,19,2017-12-14,Quarry Bank,Farley,1,0
+568,2017-18,19,2017-12-14,Eskdale,Kirkby,0,0
+569,2017-18,19,2017-12-14,Thirsk,Netley,0,4
+570,2017-18,19,2017-12-14,Corrin,Glenholm,2,0
+571,2017-18,20,2018-01-11,Lanark,Orwell,2,1
+572,2017-18,20,2018-01-11,Barnet Vale,Rydal,1,2
+573,2017-18,20,2018-01-11,Stoke Edith,Penrith,1,0
+574,2017-18,20,2018-01-11,Dalby,Jedburgh,1,3
+575,2017-18,20,2018-01-11,Ashby,Morden,0,1
+576,2017-18,20,2018-01-11,Farley,Islip,1,4
+577,2017-18,20,2018-01-11,Kirkby,Hartwell,4,0
+578,2017-18,20,2018-01-11,Netley,Quarry Bank,1,0
+579,2017-18,20,2018-01-11,Glenholm,Eskdale,1,7
+580,2017-18,20,2018-01-11,Corrin,Thirsk,2,0
+581,2017-18,21,2018-01-18,Orwell,Barnet Vale,3,1
+582,2017-18,21,2018-01-18,Lanark,Stoke Edith,7,2
+583,2017-18,21,2018-01-18,Rydal,Dalby,5,0
+584,2017-18,21,2018-01-18,Penrith,Ashby,1,1
+585,2017-18,21,2018-01-18,Jedburgh,Farley,1,2
+586,2017-18,21,2018-01-18,Morden,Kirkby,1,9
+587,2017-18,21,2018-01-18,Islip,Netley,1,0
+588,2017-18,21,2018-01-18,Hartwell,Glenholm,7,0
+589,2017-18,21,2018-01-18,Quarry Bank,Corrin,7,0
+590,2017-18,21,2018-01-18,Eskdale,Thirsk,5,1
+591,2017-18,22,2018-01-25,Stoke Edith,Orwell,1,1
+592,2017-18,22,2018-01-25,Dalby,Barnet Vale,1,3
+593,2017-18,22,2018-01-25,Ashby,Lanark,0,7
+594,2017-18,22,2018-01-25,Farley,Rydal,3,1
+595,2017-18,22,2018-01-25,Kirkby,Penrith,8,0
+596,2017-18,22,2018-01-25,Netley,Jedburgh,1,0
+597,2017-18,22,2018-01-25,Glenholm,Morden,3,1
+598,2017-18,22,2018-01-25,Corrin,Islip,0,4
+599,2017-18,22,2018-01-25,Thirsk,Hartwell,0,1
+600,2017-18,22,2018-01-25,Eskdale,Quarry Bank,1,3
+601,2017-18,23,2018-02-01,Orwell,Dalby,2,0
+602,2017-18,23,2018-02-01,Stoke Edith,Ashby,2,1
+603,2017-18,23,2018-02-01,Barnet Vale,Farley,1,4
+604,2017-18,23,2018-02-01,Lanark,Kirkby,0,2
+605,2017-18,23,2018-02-01,Rydal,Netley,1,1
+606,2017-18,23,2018-02-01,Penrith,Glenholm,0,1
+607,2017-18,23,2018-02-01,Jedburgh,Corrin,0,1
+608,2017-18,23,2018-02-01,Morden,Thirsk,0,1
+609,2017-18,23,2018-02-01,Islip,Eskdale,0,1
+610,2017-18,23,2018-02-01,Hartwell,Quarry Bank,1,5
+611,2017-18,24,2018-02-08,Ashby,Orwell,1,1
+612,2017-18,24,2018-02-08,Farley,Dalby,10,0
+613,2017-18,24,2018-02-08,Kirkby,Stoke Edith,6,0
+614,2017-18,24,2018-02-08,Netley,Barnet Vale,3,0
+615,2017-18,24,2018-02-08,Glenholm,Lanark,0,2
+616,2017-18,24,2018-02-08,Corrin,Rydal,0,0
+617,2017-18,24,2018-02-08,Thirsk,Penrith,2,1
+618,2017-18,24,2018-02-08,Eskdale,Jedburgh,1,1
+619,2017-18,24,2018-02-08,Quarry Bank,Morden,10,0
+620,2017-18,24,2018-02-08,Hartwell,Islip,0,4
+621,2017-18,25,2018-02-15,Orwell,Farley,0,5
+622,2017-18,25,2018-02-15,Ashby,Kirkby,0,10
+623,2017-18,25,2018-02-15,Dalby,Netley,0,3
+624,2017-18,25,2018-02-15,Stoke Edith,Glenholm,1,2
+625,2017-18,25,2018-02-15,Barnet Vale,Corrin,0,1
+626,2017-18,25,2018-02-15,Lanark,Thirsk,7,0
+627,2017-18,25,2018-02-15,Rydal,Eskdale,1,0
+628,2017-18,25,2018-02-15,Penrith,Quarry Bank,0,10
+629,2017-18,25,2018-02-15,Jedburgh,Hartwell,0,1
+630,2017-18,25,2018-02-15,Morden,Islip,0,10
+631,2017-18,26,2018-02-22,Kirkby,Orwell,7,0
+632,2017-18,26,2018-02-22,Netley,Farley,0,4
+633,2017-18,26,2018-02-22,Glenholm,Ashby,4,0
+634,2017-18,26,2018-02-22,Corrin,Dalby,3,0
+635,2017-18,26,2018-02-22,Thirsk,Stoke Edith,1,1
+636,2017-18,26,2018-02-22,Eskdale,Barnet Vale,6,0
+637,2017-18,26,2018-02-22,Quarry Bank,Lanark,1,0
+638,2017-18,26,2018-02-22,Hartwell,Rydal,2,1
+639,2017-18,26,2018-02-22,Islip,Penrith,8,0
+640,2017-18,26,2018-02-22,Morden,Jedburgh,0,5
+641,2017-18,27,2018-03-01,Orwell,Netley,1,0
+642,2017-18,27,2018-03-01,Kirkby,Glenholm,7,0
+643,2017-18,27,2018-03-01,Farley,Corrin,7,0
+644,2017-18,27,2018-03-01,Ashby,Thirsk,1,2
+645,2017-18,27,2018-03-01,Dalby,Eskdale,0,7
+646,2017-18,27,2018-03-01,Stoke Edith,Quarry Bank,0,6
+647,2017-18,27,2018-03-01,Barnet Vale,Hartwell,1,4
+648,2017-18,27,2018-03-01,Lanark,Islip,0,2
+649,2017-18,27,2018-03-01,Rydal,Morden,8,0
+650,2017-18,27,2018-03-01,Penrith,Jedburgh,0,3
+651,2017-18,28,2018-03-08,Glenholm,Orwell,1,1
+652,2017-18,28,2018-03-08,Corrin,Netley,2,0
+653,2017-18,28,2018-03-08,Thirsk,Kirkby,0,5
+654,2017-18,28,2018-03-08,Eskdale,Farley,0,3
+655,2017-18,28,2018-03-08,Quarry Bank,Ashby,10,1
+656,2017-18,28,2018-03-08,Hartwell,Dalby,8,1
+657,2017-18,28,2018-03-08,Islip,Stoke Edith,5,0
+658,2017-18,28,2018-03-08,Morden,Barnet Vale,1,2
+659,2017-18,28,2018-03-08,Jedburgh,Lanark,4,2
+660,2017-18,28,2018-03-08,Penrith,Rydal,0,5
+661,2017-18,29,2018-03-15,Orwell,Corrin,1,3
+662,2017-18,29,2018-03-15,Glenholm,Thirsk,2,1
+663,2017-18,29,2018-03-15,Netley,Eskdale,1,2
+664,2017-18,29,2018-03-15,Kirkby,Quarry Bank,0,4
+665,2017-18,29,2018-03-15,Farley,Hartwell,4,0
+666,2017-18,29,2018-03-15,Ashby,Islip,0,10
+667,2017-18,29,2018-03-15,Dalby,Morden,0,0
+668,2017-18,29,2018-03-15,Stoke Edith,Jedburgh,3,1
+669,2017-18,29,2018-03-15,Barnet Vale,Penrith,3,0
+670,2017-18,29,2018-03-15,Lanark,Rydal,1,0
+671,2017-18,30,2018-03-22,Thirsk,Orwell,3,1
+672,2017-18,30,2018-03-22,Eskdale,Corrin,1,1
+673,2017-18,30,2018-03-22,Quarry Bank,Glenholm,10,0
+674,2017-18,30,2018-03-22,Hartwell,Netley,5,1
+675,2017-18,30,2018-03-22,Islip,Kirkby,0,1
+676,2017-18,30,2018-03-22,Morden,Farley,0,10
+677,2017-18,30,2018-03-22,Jedburgh,Ashby,10,1
+678,2017-18,30,2018-03-22,Penrith,Dalby,1,1
+679,2017-18,30,2018-03-22,Rydal,Stoke Edith,2,0
+680,2017-18,30,2018-03-22,Lanark,Barnet Vale,8,0
+681,2017-18,31,2018-03-29,Orwell,Eskdale,1,2
+682,2017-18,31,2018-03-29,Thirsk,Quarry Bank,0,3
+683,2017-18,31,2018-03-29,Corrin,Hartwell,0,3
+684,2017-18,31,2018-03-29,Glenholm,Islip,1,6
+685,2017-18,31,2018-03-29,Netley,Morden,6,0
+686,2017-18,31,2018-03-29,Kirkby,Jedburgh,2,0
+687,2017-18,31,2018-03-29,Farley,Penrith,10,0
+688,2017-18,31,2018-03-29,Ashby,Rydal,0,9
+689,2017-18,31,2018-03-29,Dalby,Lanark,0,7
+690,2017-18,31,2018-03-29,Stoke Edith,Barnet Vale,0,2
+691,2017-18,32,2018-04-05,Quarry Bank,Orwell,9,0
+692,2017-18,32,2018-04-05,Hartwell,Eskdale,1,0
+693,2017-18,32,2018-04-05,Islip,Thirsk,5,0
+694,2017-18,32,2018-04-05,Morden,Corrin,0,9
+695,2017-18,32,2018-04-05,Jedburgh,Glenholm,4,0
+696,2017-18,32,2018-04-05,Penrith,Netley,1,1
+697,2017-18,32,2018-04-05,Rydal,Kirkby,0,2
+698,2017-18,32,2018-04-05,Lanark,Farley,1,2
+699,2017-18,32,2018-04-05,Barnet Vale,Ashby,4,0
+700,2017-18,32,2018-04-05,Stoke Edith,Dalby,3,0
+701,2017-18,33,2018-04-12,Orwell,Hartwell,0,4
+702,2017-18,33,2018-04-12,Quarry Bank,Islip,2,1
+703,2017-18,33,2018-04-12,Eskdale,Morden,10,0
+704,2017-18,33,2018-04-12,Thirsk,Jedburgh,0,1
+705,2017-18,33,2018-04-12,Corrin,Penrith,7,0
+706,2017-18,33,2018-04-12,Glenholm,Rydal,0,4
+707,2017-18,33,2018-04-12,Netley,Lanark,0,5
+708,2017-18,33,2018-04-12,Kirkby,Barnet Vale,7,0
+709,2017-18,33,2018-04-12,Farley,Stoke Edith,7,0
+710,2017-18,33,2018-04-12,Ashby,Dalby,0,1
+711,2017-18,34,2018-04-19,Islip,Orwell,5,0
+712,2017-18,34,2018-04-19,Morden,Hartwell,0,10
+713,2017-18,34,2018-04-19,Jedburgh,Quarry Bank,0,2
+714,2017-18,34,2018-04-19,Penrith,Eskdale,0,4
+715,2017-18,34,2018-04-19,Rydal,Thirsk,2,2
+716,2017-18,34,2018-04-19,Lanark,Corrin,3,1
+717,2017-18,34,2018-04-19,Barnet Vale,Glenholm,3,3
+718,2017-18,34,2018-04-19,Stoke Edith,Netley,1,2
+719,2017-18,34,2018-04-19,Dalby,Kirkby,2,8
+720,2017-18,34,2018-04-19,Ashby,Farley,0,10
+721,2017-18,35,2018-04-26,Orwell,Morden,4,0
+722,2017-18,35,2018-04-26,Islip,Jedburgh,0,1
+723,2017-18,35,2018-04-26,Hartwell,Penrith,10,0
+724,2017-18,35,2018-04-26,Quarry Bank,Rydal,1,1
+725,2017-18,35,2018-04-26,Eskdale,Lanark,1,1
+726,2017-18,35,2018-04-26,Thirsk,Barnet Vale,1,0
+727,2017-18,35,2018-04-26,Corrin,Stoke Edith,1,2
+728,2017-18,35,2018-04-26,Glenholm,Dalby,0,0
+729,2017-18,35,2018-04-26,Netley,Ashby,3,1
+730,2017-18,35,2018-04-26,Kirkby,Farley,1,4
+731,2017-18,36,2018-05-03,Jedburgh,Orwell,2,0
+732,2017-18,36,2018-05-03,Penrith,Morden,1,0
+733,2017-18,36,2018-05-03,Rydal,Islip,0,1
+734,2017-18,36,2018-05-03,Lanark,Hartwell,0,2
+735,2017-18,36,2018-05-03,Barnet Vale,Quarry Bank,0,4
+736,2017-18,36,2018-05-03,Stoke Edith,Eskdale,0,3
+737,2017-18,36,2018-05-03,Dalby,Thirsk,0,4
+738,2017-18,36,2018-05-03,Ashby,Corrin,0,5
+739,2017-18,36,2018-05-03,Farley,Glenholm,10,0
+740,2017-18,36,2018-05-03,Kirkby,Netley,5,0
+741,2017-18,37,2018-05-10,Orwell,Penrith,7,1
+742,2017-18,37,2018-05-10,Jedburgh,Rydal,1,1
+743,2017-18,37,2018-05-10,Morden,Lanark,0,10
+744,2017-18,37,2018-05-10,Islip,Barnet Vale,8,0
+745,2017-18,37,2018-05-10,Hartwell,Stoke Edith,8,0
+746,2017-18,37,2018-05-10,Quarry Bank,Dalby,10,0
+747,2017-18,37,2018-05-10,Eskdale,Ashby,10,0
+748,2017-18,37,2018-05-10,Thirsk,Farley,0,6
+749,2017-18,37,2018-05-10,Corrin,Kirkby,1,4
+750,2017-18,37,2018-05-10,Glenholm,Netley,1,6
+751,2017-18,38,2018-05-17,Rydal,Orwell,4,1
+752,2017-18,38,2018-05-17,Lanark,Penrith,10,1
+753,2017-18,38,2018-05-17,Barnet Vale,Jedburgh,0,1
+754,2017-18,38,2018-05-17,Stoke Edith,Morden,6,1
+755,2017-18,38,2018-05-17,Dalby,Islip,0,9
+756,2017-18,38,2018-05-17,Ashby,Hartwell,0,10
+757,2017-18,38,2018-05-17,Farley,Quarry Bank,5,0
+758,2017-18,38,2018-05-17,Kirkby,Eskdale,2,0
+759,2017-18,38,2018-05-17,Netley,Thirsk,0,2
+760,2017-18,38,2018-05-17,Glenholm,Corrin,0,2
+761,2018-19,1,2018-08-10,Penrith,Rydal,0,5
+762,2018-19,1,2018-08-10,Glenholm,Barnet Vale,0,2
+763,2018-19,1,2018-08-10,Farley,Netley,8,1
+764,2018-19,1,2018-08-10,Corrin,Morden,4,0
+765,2018-19,1,2018-08-10,Kirkby,Jedburgh,5,0
+766,2018-19,1,2018-08-10,Eskdale,Islip,0,1
+767,2018-19,1,2018-08-10,Thirsk,Lanark,0,0
+768,2018-19,1,2018-08-10,Stoke Edith,Ashby,3,1
+769,2018-19,1,2018-08-10,Orwell,Quarry Bank,0,1
+770,2018-19,1,2018-08-10,Hartwell,Dalby,2,0
+771,2018-19,2,2018-08-17,Barnet Vale,Penrith,2,1
+772,2018-19,2,2018-08-17,Netley,Rydal,0,1
+773,2018-19,2,2018-08-17,Morden,Glenholm,2,3
+774,2018-19,2,2018-08-17,Jedburgh,Farley,1,6
+775,2018-19,2,2018-08-17,Islip,Corrin,2,1
+776,2018-19,2,2018-08-17,Lanark,Kirkby,2,0
+777,2018-19,2,2018-08-17,Ashby,Eskdale,1,3
+778,2018-19,2,2018-08-17,Quarry Bank,Thirsk,1,0
+779,2018-19,2,2018-08-17,Dalby,Stoke Edith,1,3
+780,2018-19,2,2018-08-17,Hartwell,Orwell,3,0
+781,2018-19,3,2018-08-24,Penrith,Netley,1,2
+782,2018-19,3,2018-08-24,Barnet Vale,Morden,1,1
+783,2018-19,3,2018-08-24,Rydal,Jedburgh,1,0
+784,2018-19,3,2018-08-24,Glenholm,Islip,1,1
+785,2018-19,3,2018-08-24,Farley,Lanark,6,0
+786,2018-19,3,2018-08-24,Corrin,Ashby,7,0
+787,2018-19,3,2018-08-24,Kirkby,Quarry Bank,1,2
+788,2018-19,3,2018-08-24,Eskdale,Dalby,4,2
+789,2018-19,3,2018-08-24,Thirsk,Hartwell,2,3
+790,2018-19,3,2018-08-24,Stoke Edith,Orwell,2,1
+791,2018-19,4,2018-08-31,Morden,Penrith,0,2
+792,2018-19,4,2018-08-31,Jedburgh,Netley,3,2
+793,2018-19,4,2018-08-31,Islip,Barnet Vale,3,0
+794,2018-19,4,2018-08-31,Lanark,Rydal,1,2
+795,2018-19,4,2018-08-31,Ashby,Glenholm,1,2
+796,2018-19,4,2018-08-31,Quarry Bank,Farley,2,1
+797,2018-19,4,2018-08-31,Dalby,Corrin,1,4
+798,2018-19,4,2018-08-31,Hartwell,Kirkby,0,0
+799,2018-19,4,2018-08-31,Orwell,Eskdale,0,0
+800,2018-19,4,2018-08-31,Stoke Edith,Thirsk,1,2
+801,2018-19,5,2018-09-07,Penrith,Jedburgh,0,4
+802,2018-19,5,2018-09-07,Morden,Islip,0,1
+803,2018-19,5,2018-09-07,Netley,Lanark,0,1
+804,2018-19,5,2018-09-07,Barnet Vale,Ashby,3,1
+805,2018-19,5,2018-09-07,Rydal,Quarry Bank,2,4
+806,2018-19,5,2018-09-07,Glenholm,Dalby,0,3
+807,2018-19,5,2018-09-07,Farley,Hartwell,4,0
+808,2018-19,5,2018-09-07,Corrin,Orwell,3,0
+809,2018-19,5,2018-09-07,Kirkby,Stoke Edith,1,0
+810,2018-19,5,2018-09-07,Eskdale,Thirsk,0,2
+811,2018-19,6,2018-09-14,Islip,Penrith,4,1
+812,2018-19,6,2018-09-14,Lanark,Jedburgh,0,1
+813,2018-19,6,2018-09-14,Ashby,Morden,1,3
+814,2018-19,6,2018-09-14,Quarry Bank,Netley,6,0
+815,2018-19,6,2018-09-14,Dalby,Barnet Vale,0,3
+816,2018-19,6,2018-09-14,Hartwell,Rydal,1,0
+817,2018-19,6,2018-09-14,Orwell,Glenholm,1,0
+818,2018-19,6,2018-09-14,Stoke Edith,Farley,1,5
+819,2018-19,6,2018-09-14,Thirsk,Corrin,1,1
+820,2018-19,6,2018-09-14,Eskdale,Kirkby,0,0
+821,2018-19,7,2018-09-21,Penrith,Lanark,0,5
+822,2018-19,7,2018-09-21,Islip,Ashby,3,1
+823,2018-19,7,2018-09-21,Jedburgh,Quarry Bank,0,2
+824,2018-19,7,2018-09-21,Morden,Dalby,0,2
+825,2018-19,7,2018-09-21,Netley,Hartwell,0,2
+826,2018-19,7,2018-09-21,Barnet Vale,Orwell,0,1
+827,2018-19,7,2018-09-21,Rydal,Stoke Edith,2,0
+828,2018-19,7,2018-09-21,Glenholm,Thirsk,0,5
+829,2018-19,7,2018-09-21,Farley,Eskdale,3,1
+830,2018-19,7,2018-09-21,Corrin,Kirkby,2,1
+831,2018-19,8,2018-09-28,Ashby,Penrith,0,2
+832,2018-19,8,2018-09-28,Quarry Bank,Lanark,2,2
+833,2018-19,8,2018-09-28,Dalby,Islip,1,1
+834,2018-19,8,2018-09-28,Hartwell,Jedburgh,4,0
+835,2018-19,8,2018-09-28,Orwell,Morden,3,0
+836,2018-19,8,2018-09-28,Stoke Edith,Netley,2,1
+837,2018-19,8,2018-09-28,Thirsk,Barnet Vale,4,0
+838,2018-19,8,2018-09-28,Eskdale,Rydal,1,2
+839,2018-19,8,2018-09-28,Kirkby,Glenholm,8,0
+840,2018-19,8,2018-09-28,Corrin,Farley,0,7
+841,2018-19,9,2018-10-05,Penrith,Quarry Bank,0,5
+842,2018-19,9,2018-10-05,Ashby,Dalby,0,0
+843,2018-19,9,2018-10-05,Lanark,Hartwell,1,2
+844,2018-19,9,2018-10-05,Islip,Orwell,1,0
+845,2018-19,9,2018-10-05,Jedburgh,Stoke Edith,1,1
+846,2018-19,9,2018-10-05,Morden,Thirsk,0,3
+847,2018-19,9,2018-10-05,Netley,Eskdale,1,1
+848,2018-19,9,2018-10-05,Barnet Vale,Kirkby,0,5
+849,2018-19,9,2018-10-05,Rydal,Corrin,2,3
+850,2018-19,9,2018-10-05,Glenholm,Farley,0,10
+851,2018-19,10,2018-10-12,Dalby,Penrith,0,2
+852,2018-19,10,2018-10-12,Hartwell,Quarry Bank,0,0
+853,2018-19,10,2018-10-12,Orwell,Ashby,3,2
+854,2018-19,10,2018-10-12,Stoke Edith,Lanark,0,3
+855,2018-19,10,2018-10-12,Thirsk,Islip,2,0
+856,2018-19,10,2018-10-12,Eskdale,Jedburgh,0,1
+857,2018-19,10,2018-10-12,Kirkby,Morden,9,0
+858,2018-19,10,2018-10-12,Corrin,Netley,3,0
+859,2018-19,10,2018-10-12,Farley,Barnet Vale,10,0
+860,2018-19,10,2018-10-12,Glenholm,Rydal,2,1
+861,2018-19,11,2018-10-19,Penrith,Hartwell,2,7
+862,2018-19,11,2018-10-19,Dalby,Orwell,3,0
+863,2018-19,11,2018-10-19,Quarry Bank,Stoke Edith,2,0
+864,2018-19,11,2018-10-19,Ashby,Thirsk,0,4
+865,2018-19,11,2018-10-19,Lanark,Eskdale,1,0
+866,2018-19,11,2018-10-19,Islip,Kirkby,0,3
+867,2018-19,11,2018-10-19,Jedburgh,Corrin,1,1
+868,2018-19,11,2018-10-19,Morden,Farley,1,10
+869,2018-19,11,2018-10-19,Netley,Glenholm,4,1
+870,2018-19,11,2018-10-19,Barnet Vale,Rydal,1,0
+871,2018-19,12,2018-10-26,Orwell,Penrith,4,0
+872,2018-19,12,2018-10-26,Stoke Edith,Hartwell,3,2
+873,2018-19,12,2018-10-26,Thirsk,Dalby,2,1
+874,2018-19,12,2018-10-26,Eskdale,Quarry Bank,1,3
+875,2018-19,12,2018-10-26,Kirkby,Ashby,10,0
+876,2018-19,12,2018-10-26,Corrin,Lanark,3,1
+877,2018-19,12,2018-10-26,Farley,Islip,8,0
+878,2018-19,12,2018-10-26,Glenholm,Jedburgh,0,3
+879,2018-19,12,2018-10-26,Rydal,Morden,4,0
+880,2018-19,12,2018-10-26,Barnet Vale,Netley,2,3
+881,2018-19,13,2018-11-02,Penrith,Stoke Edith,0,2
+882,2018-19,13,2018-11-02,Orwell,Thirsk,0,2
+883,2018-19,13,2018-11-02,Hartwell,Eskdale,1,1
+884,2018-19,13,2018-11-02,Dalby,Kirkby,1,2
+885,2018-19,13,2018-11-02,Quarry Bank,Corrin,0,0
+886,2018-19,13,2018-11-02,Ashby,Farley,0,10
+887,2018-19,13,2018-11-02,Lanark,Glenholm,8,0
+888,2018-19,13,2018-11-02,Islip,Rydal,0,0
+889,2018-19,13,2018-11-02,Jedburgh,Barnet Vale,1,0
+890,2018-19,13,2018-11-02,Morden,Netley,1,2
+891,2018-19,14,2018-11-09,Thirsk,Penrith,1,1
+892,2018-19,14,2018-11-09,Eskdale,Stoke Edith,2,1
+893,2018-19,14,2018-11-09,Kirkby,Orwell,4,0
+894,2018-19,14,2018-11-09,Corrin,Hartwell,1,2
+895,2018-19,14,2018-11-09,Farley,Dalby,10,0
+896,2018-19,14,2018-11-09,Glenholm,Quarry Bank,1,7
+897,2018-19,14,2018-11-09,Rydal,Ashby,3,0
+898,2018-19,14,2018-11-09,Barnet Vale,Lanark,0,4
+899,2018-19,14,2018-11-09,Netley,Islip,2,1
+900,2018-19,14,2018-11-09,Morden,Jedburgh,0,4
+901,2018-19,15,2018-11-16,Penrith,Eskdale,1,3
+902,2018-19,15,2018-11-16,Thirsk,Kirkby,1,3
+903,2018-19,15,2018-11-16,Stoke Edith,Corrin,0,1
+904,2018-19,15,2018-11-16,Orwell,Farley,0,6
+905,2018-19,15,2018-11-16,Hartwell,Glenholm,10,0
+906,2018-19,15,2018-11-16,Dalby,Rydal,2,3
+907,2018-19,15,2018-11-16,Quarry Bank,Barnet Vale,4,0
+908,2018-19,15,2018-11-16,Ashby,Netley,1,3
+909,2018-19,15,2018-11-16,Lanark,Morden,8,1
+910,2018-19,15,2018-11-16,Islip,Jedburgh,1,2
+911,2018-19,16,2018-11-23,Kirkby,Penrith,4,1
+912,2018-19,16,2018-11-23,Corrin,Eskdale,1,1
+913,2018-19,16,2018-11-23,Farley,Thirsk,8,0
+914,2018-19,16,2018-11-23,Glenholm,Stoke Edith,0,6
+915,2018-19,16,2018-11-23,Rydal,Orwell,1,0
+916,2018-19,16,2018-11-23,Barnet Vale,Hartwell,1,6
+917,2018-19,16,2018-11-23,Netley,Dalby,2,1
+918,2018-19,16,2018-11-23,Morden,Quarry Bank,0,9
+919,2018-19,16,2018-11-23,Jedburgh,Ashby,4,1
+920,2018-19,16,2018-11-23,Islip,Lanark,1,3
+921,2018-19,17,2018-11-30,Penrith,Corrin,0,4
+922,2018-19,17,2018-11-30,Kirkby,Farley,1,4
+923,2018-19,17,2018-11-30,Eskdale,Glenholm,7,0
+924,2018-19,17,2018-11-30,Thirsk,Rydal,2,1
+925,2018-19,17,2018-11-30,Stoke Edith,Barnet Vale,2,0
+926,2018-19,17,2018-11-30,Orwell,Netley,0,1
+927,2018-19,17,2018-11-30,Hartwell,Morden,10,0
+928,2018-19,17,2018-11-30,Dalby,Jedburgh,2,1
+929,2018-19,17,2018-11-30,Quarry Bank,Islip,3,0
+930,2018-19,17,2018-11-30,Ashby,Lanark,0,8
+931,2018-19,18,2018-12-07,Farley,Penrith,10,0
+932,2018-19,18,2018-12-07,Glenholm,Corrin,0,8
+933,2018-19,18,2018-12-07,Rydal,Kirkby,0,1
+934,2018-19,18,2018-12-07,Barnet Vale,Eskdale,1,3
+935,2018-19,18,2018-12-07,Netley,Thirsk,0,0
+936,2018-19,18,2018-12-07,Morden,Stoke Edith,1,3
+937,2018-19,18,2018-12-07,Jedburgh,Orwell,2,3
+938,2018-19,18,2018-12-07,Islip,Hartwell,0,4
+939,2018-19,18,2018-12-07,Lanark,Dalby,2,0
+940,2018-19,18,2018-12-07,Ashby,Quarry Bank,1,3
+941,2018-19,19,2018-12-14,Penrith,Glenholm,3,0
+942,2018-19,19,2018-12-14,Farley,Rydal,6,0
+943,2018-19,19,2018-12-14,Corrin,Barnet Vale,6,0
+944,2018-19,19,2018-12-14,Kirkby,Netley,3,0
+945,2018-19,19,2018-12-14,Eskdale,Morden,2,2
+946,2018-19,19,2018-12-14,Thirsk,Jedburgh,4,0
+947,2018-19,19,2018-12-14,Stoke Edith,Islip,1,1
+948,2018-19,19,2018-12-14,Orwell,Lanark,2,5
+949,2018-19,19,2018-12-14,Hartwell,Ashby,9,0
+950,2018-19,19,2018-12-14,Dalby,Quarry Bank,0,3
+951,2018-19,20,2019-01-11,Rydal,Penrith,5,1
+952,2018-19,20,2019-01-11,Barnet Vale,Glenholm,3,0
+953,2018-19,20,2019-01-11,Netley,Farley,0,5
+954,2018-19,20,2019-01-11,Morden,Corrin,0,9
+955,2018-19,20,2019-01-11,Jedburgh,Kirkby,1,2
+956,2018-19,20,2019-01-11,Islip,Eskdale,0,0
+957,2018-19,20,2019-01-11,Lanark,Thirsk,5,0
+958,2018-19,20,2019-01-11,Ashby,Stoke Edith,1,2
+959,2018-19,20,2019-01-11,Quarry Bank,Orwell,0,0
+960,2018-19,20,2019-01-11,Dalby,Hartwell,1,2
+961,2018-19,21,2019-01-18,Penrith,Barnet Vale,3,1
+962,2018-19,21,2019-01-18,Rydal,Netley,1,0
+963,2018-19,21,2019-01-18,Glenholm,Morden,1,1
+964,2018-19,21,2019-01-18,Farley,Jedburgh,10,0
+965,2018-19,21,2019-01-18,Corrin,Islip,3,1
+966,2018-19,21,2019-01-18,Kirkby,Lanark,0,1
+967,2018-19,21,2019-01-18,Eskdale,Ashby,1,1
+968,2018-19,21,2019-01-18,Thirsk,Quarry Bank,0,1
+969,2018-19,21,2019-01-18,Stoke Edith,Dalby,3,1
+970,2018-19,21,2019-01-18,Orwell,Hartwell,1,1
+971,2018-19,22,2019-01-25,Netley,Penrith,2,0
+972,2018-19,22,2019-01-25,Morden,Barnet Vale,0,2
+973,2018-19,22,2019-01-25,Jedburgh,Rydal,1,3
+974,2018-19,22,2019-01-25,Islip,Glenholm,8,0
+975,2018-19,22,2019-01-25,Lanark,Farley,3,1
+976,2018-19,22,2019-01-25,Ashby,Corrin,1,1
+977,2018-19,22,2019-01-25,Quarry Bank,Kirkby,2,0
+978,2018-19,22,2019-01-25,Dalby,Eskdale,1,3
+979,2018-19,22,2019-01-25,Hartwell,Thirsk,6,0
+980,2018-19,22,2019-01-25,Orwell,Stoke Edith,3,1
+981,2018-19,23,2019-02-01,Penrith,Morden,3,0
+982,2018-19,23,2019-02-01,Netley,Jedburgh,3,0
+983,2018-19,23,2019-02-01,Barnet Vale,Islip,2,2
+984,2018-19,23,2019-02-01,Rydal,Lanark,1,3
+985,2018-19,23,2019-02-01,Glenholm,Ashby,0,2
+986,2018-19,23,2019-02-01,Farley,Quarry Bank,2,0
+987,2018-19,23,2019-02-01,Corrin,Dalby,4,1
+988,2018-19,23,2019-02-01,Kirkby,Hartwell,3,3
+989,2018-19,23,2019-02-01,Eskdale,Orwell,3,1
+990,2018-19,23,2019-02-01,Thirsk,Stoke Edith,2,4
+991,2018-19,24,2019-02-08,Jedburgh,Penrith,1,1
+992,2018-19,24,2019-02-08,Islip,Morden,3,0
+993,2018-19,24,2019-02-08,Lanark,Netley,5,0
+994,2018-19,24,2019-02-08,Ashby,Barnet Vale,2,0
+995,2018-19,24,2019-02-08,Quarry Bank,Rydal,3,1
+996,2018-19,24,2019-02-08,Dalby,Glenholm,5,1
+997,2018-19,24,2019-02-08,Hartwell,Farley,0,2
+998,2018-19,24,2019-02-08,Orwell,Corrin,1,3
+999,2018-19,24,2019-02-08,Stoke Edith,Kirkby,0,4
+1000,2018-19,24,2019-02-08,Thirsk,Eskdale,1,1
+1001,2018-19,25,2019-02-15,Penrith,Islip,0,1
+1002,2018-19,25,2019-02-15,Jedburgh,Lanark,0,7
+1003,2018-19,25,2019-02-15,Morden,Ashby,0,2
+1004,2018-19,25,2019-02-15,Netley,Quarry Bank,0,1
+1005,2018-19,25,2019-02-15,Barnet Vale,Dalby,1,3
+1006,2018-19,25,2019-02-15,Rydal,Hartwell,3,2
+1007,2018-19,25,2019-02-15,Glenholm,Orwell,1,7
+1008,2018-19,25,2019-02-15,Farley,Stoke Edith,10,0
+1009,2018-19,25,2019-02-15,Corrin,Thirsk,5,1
+1010,2018-19,25,2019-02-15,Kirkby,Eskdale,3,1
+1011,2018-19,26,2019-02-22,Lanark,Penrith,10,0
+1012,2018-19,26,2019-02-22,Ashby,Islip,1,0
+1013,2018-19,26,2019-02-22,Quarry Bank,Jedburgh,5,0
+1014,2018-19,26,2019-02-22,Dalby,Morden,4,0
+1015,2018-19,26,2019-02-22,Hartwell,Netley,2,0
+1016,2018-19,26,2019-02-22,Orwell,Barnet Vale,1,0
+1017,2018-19,26,2019-02-22,Stoke Edith,Rydal,1,0
+1018,2018-19,26,2019-02-22,Thirsk,Glenholm,9,0
+1019,2018-19,26,2019-02-22,Eskdale,Farley,0,10
+1020,2018-19,26,2019-02-22,Kirkby,Corrin,0,2
+1021,2018-19,27,2019-03-01,Penrith,Ashby,1,1
+1022,2018-19,27,2019-03-01,Lanark,Quarry Bank,1,1
+1023,2018-19,27,2019-03-01,Islip,Dalby,3,0
+1024,2018-19,27,2019-03-01,Jedburgh,Hartwell,1,4
+1025,2018-19,27,2019-03-01,Morden,Orwell,1,5
+1026,2018-19,27,2019-03-01,Netley,Stoke Edith,0,1
+1027,2018-19,27,2019-03-01,Barnet Vale,Thirsk,1,1
+1028,2018-19,27,2019-03-01,Rydal,Eskdale,2,2
+1029,2018-19,27,2019-03-01,Glenholm,Kirkby,0,10
+1030,2018-19,27,2019-03-01,Farley,Corrin,7,0
+1031,2018-19,28,2019-03-08,Quarry Bank,Penrith,5,0
+1032,2018-19,28,2019-03-08,Dalby,Ashby,1,1
+1033,2018-19,28,2019-03-08,Hartwell,Lanark,1,1
+1034,2018-19,28,2019-03-08,Orwell,Islip,2,2
+1035,2018-19,28,2019-03-08,Stoke Edith,Jedburgh,2,0
+1036,2018-19,28,2019-03-08,Thirsk,Morden,4,0
+1037,2018-19,28,2019-03-08,Eskdale,Netley,0,1
+1038,2018-19,28,2019-03-08,Kirkby,Barnet Vale,8,1
+1039,2018-19,28,2019-03-08,Corrin,Rydal,3,0
+1040,2018-19,28,2019-03-08,Farley,Glenholm,10,0
+1041,2018-19,29,2019-03-15,Penrith,Dalby,1,1
+1042,2018-19,29,2019-03-15,Quarry Bank,Hartwell,1,0
+1043,2018-19,29,2019-03-15,Ashby,Orwell,0,1
+1044,2018-19,29,2019-03-15,Lanark,Stoke Edith,3,0
+1045,2018-19,29,2019-03-15,Islip,Thirsk,2,2
+1046,2018-19,29,2019-03-15,Jedburgh,Eskdale,0,2
+1047,2018-19,29,2019-03-15,Morden,Kirkby,0,10
+1048,2018-19,29,2019-03-15,Netley,Corrin,1,2
+1049,2018-19,29,2019-03-15,Barnet Vale,Farley,0,10
+1050,2018-19,29,2019-03-15,Rydal,Glenholm,10,0
+1051,2018-19,30,2019-03-22,Hartwell,Penrith,4,0
+1052,2018-19,30,2019-03-22,Orwell,Dalby,1,0
+1053,2018-19,30,2019-03-22,Stoke Edith,Quarry Bank,0,1
+1054,2018-19,30,2019-03-22,Thirsk,Ashby,2,1
+1055,2018-19,30,2019-03-22,Eskdale,Lanark,0,6
+1056,2018-19,30,2019-03-22,Kirkby,Islip,7,0
+1057,2018-19,30,2019-03-22,Corrin,Jedburgh,2,0
+1058,2018-19,30,2019-03-22,Farley,Morden,10,1
+1059,2018-19,30,2019-03-22,Glenholm,Netley,0,5
+1060,2018-19,30,2019-03-22,Rydal,Barnet Vale,3,2
+1061,2018-19,31,2019-03-29,Penrith,Orwell,1,1
+1062,2018-19,31,2019-03-29,Hartwell,Stoke Edith,3,0
+1063,2018-19,31,2019-03-29,Dalby,Thirsk,2,0
+1064,2018-19,31,2019-03-29,Quarry Bank,Eskdale,3,1
+1065,2018-19,31,2019-03-29,Ashby,Kirkby,0,4
+1066,2018-19,31,2019-03-29,Lanark,Corrin,4,0
+1067,2018-19,31,2019-03-29,Islip,Farley,0,10
+1068,2018-19,31,2019-03-29,Jedburgh,Glenholm,6,0
+1069,2018-19,31,2019-03-29,Morden,Rydal,0,1
+1070,2018-19,31,2019-03-29,Netley,Barnet Vale,3,0
+1071,2018-19,32,2019-04-05,Stoke Edith,Penrith,2,1
+1072,2018-19,32,2019-04-05,Thirsk,Orwell,1,3
+1073,2018-19,32,2019-04-05,Eskdale,Hartwell,1,1
+1074,2018-19,32,2019-04-05,Kirkby,Dalby,6,0
+1075,2018-19,32,2019-04-05,Corrin,Quarry Bank,1,0
+1076,2018-19,32,2019-04-05,Farley,Ashby,10,0
+1077,2018-19,32,2019-04-05,Glenholm,Lanark,0,10
+1078,2018-19,32,2019-04-05,Rydal,Islip,4,0
+1079,2018-19,32,2019-04-05,Barnet Vale,Jedburgh,1,2
+1080,2018-19,32,2019-04-05,Netley,Morden,1,0
+1081,2018-19,33,2019-04-12,Penrith,Thirsk,1,1
+1082,2018-19,33,2019-04-12,Stoke Edith,Eskdale,2,2
+1083,2018-19,33,2019-04-12,Orwell,Kirkby,1,3
+1084,2018-19,33,2019-04-12,Hartwell,Corrin,1,1
+1085,2018-19,33,2019-04-12,Dalby,Farley,0,10
+1086,2018-19,33,2019-04-12,Quarry Bank,Glenholm,10,0
+1087,2018-19,33,2019-04-12,Ashby,Rydal,1,1
+1088,2018-19,33,2019-04-12,Lanark,Barnet Vale,10,0
+1089,2018-19,33,2019-04-12,Islip,Netley,0,1
+1090,2018-19,33,2019-04-12,Jedburgh,Morden,1,0
+1091,2018-19,34,2019-04-19,Eskdale,Penrith,2,0
+1092,2018-19,34,2019-04-19,Kirkby,Thirsk,10,0
+1093,2018-19,34,2019-04-19,Corrin,Stoke Edith,1,1
+1094,2018-19,34,2019-04-19,Farley,Orwell,10,0
+1095,2018-19,34,2019-04-19,Glenholm,Hartwell,0,10
+1096,2018-19,34,2019-04-19,Rydal,Dalby,1,1
+1097,2018-19,34,2019-04-19,Barnet Vale,Quarry Bank,0,7
+1098,2018-19,34,2019-04-19,Netley,Ashby,1,1
+1099,2018-19,34,2019-04-19,Morden,Lanark,0,10
+1100,2018-19,34,2019-04-19,Jedburgh,Islip,1,1
+1101,2018-19,35,2019-04-26,Penrith,Kirkby,0,7
+1102,2018-19,35,2019-04-26,Eskdale,Corrin,1,1
+1103,2018-19,35,2019-04-26,Thirsk,Farley,0,10
+1104,2018-19,35,2019-04-26,Stoke Edith,Glenholm,10,0
+1105,2018-19,35,2019-04-26,Orwell,Rydal,1,1
+1106,2018-19,35,2019-04-26,Hartwell,Barnet Vale,10,0
+1107,2018-19,35,2019-04-26,Dalby,Netley,0,1
+1108,2018-19,35,2019-04-26,Quarry Bank,Morden,3,0
+1109,2018-19,35,2019-04-26,Ashby,Jedburgh,3,0
+1110,2018-19,35,2019-04-26,Lanark,Islip,10,0
+1111,2018-19,36,2019-05-03,Corrin,Penrith,7,0
+1112,2018-19,36,2019-05-03,Farley,Kirkby,4,0
+1113,2018-19,36,2019-05-03,Glenholm,Eskdale,0,10
+1114,2018-19,36,2019-05-03,Rydal,Thirsk,1,0
+1115,2018-19,36,2019-05-03,Barnet Vale,Stoke Edith,0,4
+1116,2018-19,36,2019-05-03,Netley,Orwell,0,2
+1117,2018-19,36,2019-05-03,Morden,Hartwell,0,8
+1118,2018-19,36,2019-05-03,Jedburgh,Dalby,3,0
+1119,2018-19,36,2019-05-03,Islip,Quarry Bank,0,4
+1120,2018-19,36,2019-05-03,Lanark,Ashby,10,0
+1121,2018-19,37,2019-05-10,Penrith,Farley,0,10
+1122,2018-19,37,2019-05-10,Corrin,Glenholm,10,0
+1123,2018-19,37,2019-05-10,Kirkby,Rydal,4,0
+1124,2018-19,37,2019-05-10,Eskdale,Barnet Vale,10,0
+1125,2018-19,37,2019-05-10,Thirsk,Netley,1,4
+1126,2018-19,37,2019-05-10,Stoke Edith,Morden,6,0
+1127,2018-19,37,2019-05-10,Orwell,Jedburgh,2,1
+1128,2018-19,37,2019-05-10,Hartwell,Islip,6,1
+1129,2018-19,37,2019-05-10,Dalby,Lanark,0,10
+1130,2018-19,37,2019-05-10,Quarry Bank,Ashby,5,1
+1131,2018-19,38,2019-05-17,Glenholm,Penrith,0,3
+1132,2018-19,38,2019-05-17,Rydal,Farley,0,10
+1133,2018-19,38,2019-05-17,Barnet Vale,Corrin,0,5
+1134,2018-19,38,2019-05-17,Netley,Kirkby,0,7
+1135,2018-19,38,2019-05-17,Morden,Eskdale,0,8
+1136,2018-19,38,2019-05-17,Jedburgh,Thirsk,4,0
+1137,2018-19,38,2019-05-17,Islip,Stoke Edith,2,3
+1138,2018-19,38,2019-05-17,Lanark,Orwell,10,0
+1139,2018-19,38,2019-05-17,Ashby,Hartwell,0,3
+1140,2018-19,38,2019-05-17,Quarry Bank,Dalby,1,1
+1141,2019-20,1,2019-08-10,Stoke Edith,Barnet Vale,4,1
+1142,2019-20,1,2019-08-10,Ashby,Eskdale,0,2
+1143,2019-20,1,2019-08-10,Penrith,Islip,0,0
+1144,2019-20,1,2019-08-10,Kirkby,Orwell,7,0
+1145,2019-20,1,2019-08-10,Jedburgh,Lanark,0,3
+1146,2019-20,1,2019-08-10,Corrin,Rydal,2,1
+1147,2019-20,1,2019-08-10,Farley,Morden,8,2
+1148,2019-20,1,2019-08-10,Thirsk,Hartwell,0,3
+1149,2019-20,1,2019-08-10,Quarry Bank,Glenholm,7,0
+1150,2019-20,1,2019-08-10,Netley,Dalby,0,2
+1151,2019-20,2,2019-08-17,Eskdale,Stoke Edith,2,0
+1152,2019-20,2,2019-08-17,Islip,Barnet Vale,1,1
+1153,2019-20,2,2019-08-17,Orwell,Ashby,2,1
+1154,2019-20,2,2019-08-17,Lanark,Penrith,10,0
+1155,2019-20,2,2019-08-17,Rydal,Kirkby,0,5
+1156,2019-20,2,2019-08-17,Morden,Jedburgh,2,5
+1157,2019-20,2,2019-08-17,Hartwell,Corrin,1,2
+1158,2019-20,2,2019-08-17,Glenholm,Farley,0,10
+1159,2019-20,2,2019-08-17,Dalby,Thirsk,2,0
+1160,2019-20,2,2019-08-17,Netley,Quarry Bank,2,1
+1161,2019-20,3,2019-08-24,Stoke Edith,Islip,1,0
+1162,2019-20,3,2019-08-24,Eskdale,Orwell,5,1
+1163,2019-20,3,2019-08-24,Barnet Vale,Lanark,0,10
+1164,2019-20,3,2019-08-24,Ashby,Rydal,0,0
+1165,2019-20,3,2019-08-24,Penrith,Morden,0,2
+1166,2019-20,3,2019-08-24,Kirkby,Hartwell,4,0
+1167,2019-20,3,2019-08-24,Jedburgh,Glenholm,6,0
+1168,2019-20,3,2019-08-24,Corrin,Dalby,1,0
+1169,2019-20,3,2019-08-24,Farley,Netley,9,0
+1170,2019-20,3,2019-08-24,Thirsk,Quarry Bank,0,2
+1171,2019-20,4,2019-08-31,Orwell,Stoke Edith,0,3
+1172,2019-20,4,2019-08-31,Lanark,Islip,10,0
+1173,2019-20,4,2019-08-31,Rydal,Eskdale,0,3
+1174,2019-20,4,2019-08-31,Morden,Barnet Vale,2,1
+1175,2019-20,4,2019-08-31,Hartwell,Ashby,4,0
+1176,2019-20,4,2019-08-31,Glenholm,Penrith,0,1
+1177,2019-20,4,2019-08-31,Dalby,Kirkby,0,4
+1178,2019-20,4,2019-08-31,Netley,Jedburgh,2,1
+1179,2019-20,4,2019-08-31,Quarry Bank,Corrin,1,0
+1180,2019-20,4,2019-08-31,Thirsk,Farley,0,10
+1181,2019-20,5,2019-09-07,Stoke Edith,Lanark,0,7
+1182,2019-20,5,2019-09-07,Orwell,Rydal,2,2
+1183,2019-20,5,2019-09-07,Islip,Morden,0,1
+1184,2019-20,5,2019-09-07,Eskdale,Hartwell,1,0
+1185,2019-20,5,2019-09-07,Barnet Vale,Glenholm,2,1
+1186,2019-20,5,2019-09-07,Ashby,Dalby,0,4
+1187,2019-20,5,2019-09-07,Penrith,Netley,2,2
+1188,2019-20,5,2019-09-07,Kirkby,Quarry Bank,1,0
+1189,2019-20,5,2019-09-07,Jedburgh,Thirsk,1,1
+1190,2019-20,5,2019-09-07,Corrin,Farley,0,3
+1191,2019-20,6,2019-09-14,Rydal,Stoke Edith,0,0
+1192,2019-20,6,2019-09-14,Morden,Lanark,0,6
+1193,2019-20,6,2019-09-14,Hartwell,Orwell,2,0
+1194,2019-20,6,2019-09-14,Glenholm,Islip,2,3
+1195,2019-20,6,2019-09-14,Dalby,Eskdale,0,3
+1196,2019-20,6,2019-09-14,Netley,Barnet Vale,1,1
+1197,2019-20,6,2019-09-14,Quarry Bank,Ashby,0,0
+1198,2019-20,6,2019-09-14,Thirsk,Penrith,0,0
+1199,2019-20,6,2019-09-14,Farley,Kirkby,3,1
+1200,2019-20,6,2019-09-14,Corrin,Jedburgh,1,1
+1201,2019-20,7,2019-09-21,Stoke Edith,Morden,2,0
+1202,2019-20,7,2019-09-21,Rydal,Hartwell,0,5
+1203,2019-20,7,2019-09-21,Lanark,Glenholm,10,1
+1204,2019-20,7,2019-09-21,Orwell,Dalby,1,2
+1205,2019-20,7,2019-09-21,Islip,Netley,1,2
+1206,2019-20,7,2019-09-21,Eskdale,Quarry Bank,1,0
+1207,2019-20,7,2019-09-21,Barnet Vale,Thirsk,1,1
+1208,2019-20,7,2019-09-21,Ashby,Farley,1,9
+1209,2019-20,7,2019-09-21,Penrith,Corrin,1,3
+1210,2019-20,7,2019-09-21,Kirkby,Jedburgh,4,0
+1211,2019-20,8,2019-09-28,Hartwell,Stoke Edith,2,0
+1212,2019-20,8,2019-09-28,Glenholm,Morden,0,2
+1213,2019-20,8,2019-09-28,Dalby,Rydal,2,1
+1214,2019-20,8,2019-09-28,Netley,Lanark,0,6
+1215,2019-20,8,2019-09-28,Quarry Bank,Orwell,4,0
+1216,2019-20,8,2019-09-28,Thirsk,Islip,2,2
+1217,2019-20,8,2019-09-28,Farley,Eskdale,3,0
+1218,2019-20,8,2019-09-28,Corrin,Barnet Vale,5,0
+1219,2019-20,8,2019-09-28,Jedburgh,Ashby,2,1
+1220,2019-20,8,2019-09-28,Kirkby,Penrith,6,0
+1221,2019-20,9,2019-10-05,Stoke Edith,Glenholm,7,0
+1222,2019-20,9,2019-10-05,Hartwell,Dalby,5,1
+1223,2019-20,9,2019-10-05,Morden,Netley,3,4
+1224,2019-20,9,2019-10-05,Rydal,Quarry Bank,0,1
+1225,2019-20,9,2019-10-05,Lanark,Thirsk,10,0
+1226,2019-20,9,2019-10-05,Orwell,Farley,1,10
+1227,2019-20,9,2019-10-05,Islip,Corrin,1,5
+1228,2019-20,9,2019-10-05,Eskdale,Jedburgh,6,0
+1229,2019-20,9,2019-10-05,Barnet Vale,Kirkby,0,10
+1230,2019-20,9,2019-10-05,Ashby,Penrith,3,1
+1231,2019-20,10,2019-10-12,Dalby,Stoke Edith,1,2
+1232,2019-20,10,2019-10-12,Netley,Glenholm,4,0
+1233,2019-20,10,2019-10-12,Quarry Bank,Hartwell,0,1
+1234,2019-20,10,2019-10-12,Thirsk,Morden,1,1
+1235,2019-20,10,2019-10-12,Farley,Rydal,9,0
+1236,2019-20,10,2019-10-12,Corrin,Lanark,0,0
+1237,2019-20,10,2019-10-12,Jedburgh,Orwell,5,2
+1238,2019-20,10,2019-10-12,Kirkby,Islip,8,0
+1239,2019-20,10,2019-10-12,Penrith,Eskdale,1,6
+1240,2019-20,10,2019-10-12,Ashby,Barnet Vale,0,1
+1241,2019-20,11,2019-10-19,Stoke Edith,Netley,3,1
+1242,2019-20,11,2019-10-19,Dalby,Quarry Bank,1,3
+1243,2019-20,11,2019-10-19,Glenholm,Thirsk,2,0
+1244,2019-20,11,2019-10-19,Hartwell,Farley,1,4
+1245,2019-20,11,2019-10-19,Morden,Corrin,2,1
+1246,2019-20,11,2019-10-19,Rydal,Jedburgh,3,1
+1247,2019-20,11,2019-10-19,Lanark,Kirkby,2,0
+1248,2019-20,11,2019-10-19,Orwell,Penrith,0,1
+1249,2019-20,11,2019-10-19,Islip,Ashby,0,0
+1250,2019-20,11,2019-10-19,Eskdale,Barnet Vale,10,0
+1251,2019-20,12,2019-10-26,Quarry Bank,Stoke Edith,3,0
+1252,2019-20,12,2019-10-26,Thirsk,Netley,0,0
+1253,2019-20,12,2019-10-26,Farley,Dalby,9,1
+1254,2019-20,12,2019-10-26,Corrin,Glenholm,5,0
+1255,2019-20,12,2019-10-26,Jedburgh,Hartwell,1,2
+1256,2019-20,12,2019-10-26,Kirkby,Morden,5,0
+1257,2019-20,12,2019-10-26,Penrith,Rydal,0,3
+1258,2019-20,12,2019-10-26,Ashby,Lanark,0,9
+1259,2019-20,12,2019-10-26,Barnet Vale,Orwell,0,0
+1260,2019-20,12,2019-10-26,Eskdale,Islip,8,2
+1261,2019-20,13,2019-11-02,Stoke Edith,Thirsk,5,0
+1262,2019-20,13,2019-11-02,Quarry Bank,Farley,0,6
+1263,2019-20,13,2019-11-02,Netley,Corrin,0,2
+1264,2019-20,13,2019-11-02,Dalby,Jedburgh,1,2
+1265,2019-20,13,2019-11-02,Glenholm,Kirkby,0,10
+1266,2019-20,13,2019-11-02,Hartwell,Penrith,7,0
+1267,2019-20,13,2019-11-02,Morden,Ashby,0,3
+1268,2019-20,13,2019-11-02,Rydal,Barnet Vale,1,1
+1269,2019-20,13,2019-11-02,Lanark,Eskdale,2,1
+1270,2019-20,13,2019-11-02,Orwell,Islip,1,1
+1271,2019-20,14,2019-11-09,Farley,Stoke Edith,10,0
+1272,2019-20,14,2019-11-09,Corrin,Thirsk,9,0
+1273,2019-20,14,2019-11-09,Jedburgh,Quarry Bank,0,4
+1274,2019-20,14,2019-11-09,Kirkby,Netley,4,0
+1275,2019-20,14,2019-11-09,Penrith,Dalby,0,4
+1276,2019-20,14,2019-11-09,Ashby,Glenholm,4,0
+1277,2019-20,14,2019-11-09,Barnet Vale,Hartwell,1,9
+1278,2019-20,14,2019-11-09,Eskdale,Morden,9,0
+1279,2019-20,14,2019-11-09,Islip,Rydal,3,2
+1280,2019-20,14,2019-11-09,Orwell,Lanark,0,10
+1281,2019-20,15,2019-11-16,Stoke Edith,Corrin,0,1
+1282,2019-20,15,2019-11-16,Farley,Jedburgh,10,0
+1283,2019-20,15,2019-11-16,Thirsk,Kirkby,1,10
+1284,2019-20,15,2019-11-16,Quarry Bank,Penrith,2,0
+1285,2019-20,15,2019-11-16,Netley,Ashby,2,2
+1286,2019-20,15,2019-11-16,Dalby,Barnet Vale,5,1
+1287,2019-20,15,2019-11-16,Glenholm,Eskdale,0,10
+1288,2019-20,15,2019-11-16,Hartwell,Islip,4,1
+1289,2019-20,15,2019-11-16,Morden,Orwell,3,0
+1290,2019-20,15,2019-11-16,Rydal,Lanark,0,7
+1291,2019-20,16,2019-11-23,Jedburgh,Stoke Edith,1,1
+1292,2019-20,16,2019-11-23,Kirkby,Corrin,1,1
+1293,2019-20,16,2019-11-23,Penrith,Farley,0,10
+1294,2019-20,16,2019-11-23,Ashby,Thirsk,2,0
+1295,2019-20,16,2019-11-23,Barnet Vale,Quarry Bank,0,6
+1296,2019-20,16,2019-11-23,Eskdale,Netley,7,0
+1297,2019-20,16,2019-11-23,Islip,Dalby,0,1
+1298,2019-20,16,2019-11-23,Orwell,Glenholm,1,0
+1299,2019-20,16,2019-11-23,Lanark,Hartwell,3,0
+1300,2019-20,16,2019-11-23,Rydal,Morden,0,2
+1301,2019-20,17,2019-11-30,Stoke Edith,Kirkby,0,5
+1302,2019-20,17,2019-11-30,Jedburgh,Penrith,2,2
+1303,2019-20,17,2019-11-30,Corrin,Ashby,3,0
+1304,2019-20,17,2019-11-30,Farley,Barnet Vale,10,0
+1305,2019-20,17,2019-11-30,Thirsk,Eskdale,0,10
+1306,2019-20,17,2019-11-30,Quarry Bank,Islip,5,1
+1307,2019-20,17,2019-11-30,Netley,Orwell,4,0
+1308,2019-20,17,2019-11-30,Dalby,Lanark,0,5
+1309,2019-20,17,2019-11-30,Glenholm,Rydal,1,0
+1310,2019-20,17,2019-11-30,Hartwell,Morden,7,0
+1311,2019-20,18,2019-12-07,Penrith,Stoke Edith,1,2
+1312,2019-20,18,2019-12-07,Ashby,Kirkby,0,4
+1313,2019-20,18,2019-12-07,Barnet Vale,Jedburgh,1,3
+1314,2019-20,18,2019-12-07,Eskdale,Corrin,3,1
+1315,2019-20,18,2019-12-07,Islip,Farley,0,10
+1316,2019-20,18,2019-12-07,Orwell,Thirsk,1,3
+1317,2019-20,18,2019-12-07,Lanark,Quarry Bank,3,1
+1318,2019-20,18,2019-12-07,Rydal,Netley,3,3
+1319,2019-20,18,2019-12-07,Morden,Dalby,1,4
+1320,2019-20,18,2019-12-07,Hartwell,Glenholm,10,0
+1321,2019-20,19,2019-12-14,Stoke Edith,Ashby,3,0
+1322,2019-20,19,2019-12-14,Penrith,Barnet Vale,2,1
+1323,2019-20,19,2019-12-14,Kirkby,Eskdale,0,2
+1324,2019-20,19,2019-12-14,Jedburgh,Islip,3,0
+1325,2019-20,19,2019-12-14,Corrin,Orwell,8,0
+1326,2019-20,19,2019-12-14,Farley,Lanark,3,1
+1327,2019-20,19,2019-12-14,Thirsk,Rydal,2,0
+1328,2019-20,19,2019-12-14,Quarry Bank,Morden,7,0
+1329,2019-20,19,2019-12-14,Netley,Hartwell,0,2
+1330,2019-20,19,2019-12-14,Dalby,Glenholm,7,0
+1331,2019-20,20,2020-01-11,Barnet Vale,Stoke Edith,1,3
+1332,2019-20,20,2020-01-11,Eskdale,Ashby,5,1
+1333,2019-20,20,2020-01-11,Islip,Penrith,4,0
+1334,2019-20,20,2020-01-11,Orwell,Kirkby,0,10
+1335,2019-20,20,2020-01-11,Lanark,Jedburgh,5,0
+1336,2019-20,20,2020-01-11,Rydal,Corrin,0,3
+1337,2019-20,20,2020-01-11,Morden,Farley,0,10
+1338,2019-20,20,2020-01-11,Hartwell,Thirsk,10,0
+1339,2019-20,20,2020-01-11,Glenholm,Quarry Bank,0,6
+1340,2019-20,20,2020-01-11,Dalby,Netley,3,0
+1341,2019-20,21,2020-01-18,Stoke Edith,Eskdale,0,4
+1342,2019-20,21,2020-01-18,Barnet Vale,Islip,0,4
+1343,2019-20,21,2020-01-18,Ashby,Orwell,3,1
+1344,2019-20,21,2020-01-18,Penrith,Lanark,0,10
+1345,2019-20,21,2020-01-18,Kirkby,Rydal,4,1
+1346,2019-20,21,2020-01-18,Jedburgh,Morden,3,1
+1347,2019-20,21,2020-01-18,Corrin,Hartwell,1,2
+1348,2019-20,21,2020-01-18,Farley,Glenholm,10,0
+1349,2019-20,21,2020-01-18,Thirsk,Dalby,2,7
+1350,2019-20,21,2020-01-18,Quarry Bank,Netley,0,0
+1351,2019-20,22,2020-01-25,Islip,Stoke Edith,1,3
+1352,2019-20,22,2020-01-25,Orwell,Eskdale,0,10
+1353,2019-20,22,2020-01-25,Lanark,Barnet Vale,10,0
+1354,2019-20,22,2020-01-25,Rydal,Ashby,2,1
+1355,2019-20,22,2020-01-25,Morden,Penrith,2,0
+1356,2019-20,22,2020-01-25,Hartwell,Kirkby,1,1
+1357,2019-20,22,2020-01-25,Glenholm,Jedburgh,0,4
+1358,2019-20,22,2020-01-25,Dalby,Corrin,2,3
+1359,2019-20,22,2020-01-25,Netley,Farley,0,10
+1360,2019-20,22,2020-01-25,Quarry Bank,Thirsk,9,0
+1361,2019-20,23,2020-02-01,Stoke Edith,Orwell,8,0
+1362,2019-20,23,2020-02-01,Islip,Lanark,0,2
+1363,2019-20,23,2020-02-01,Eskdale,Rydal,8,0
+1364,2019-20,23,2020-02-01,Barnet Vale,Morden,0,1
+1365,2019-20,23,2020-02-01,Ashby,Hartwell,0,8
+1366,2019-20,23,2020-02-01,Penrith,Glenholm,0,1
+1367,2019-20,23,2020-02-01,Kirkby,Dalby,1,0
+1368,2019-20,23,2020-02-01,Jedburgh,Netley,2,1
+1369,2019-20,23,2020-02-01,Corrin,Quarry Bank,2,0
+1370,2019-20,23,2020-02-01,Farley,Thirsk,10,0
+1371,2019-20,24,2020-02-08,Lanark,Stoke Edith,6,0
+1372,2019-20,24,2020-02-08,Rydal,Orwell,3,0
+1373,2019-20,24,2020-02-08,Morden,Islip,1,2
+1374,2019-20,24,2020-02-08,Hartwell,Eskdale,4,3
+1375,2019-20,24,2020-02-08,Glenholm,Barnet Vale,1,1
+1376,2019-20,24,2020-02-08,Dalby,Ashby,0,0
+1377,2019-20,24,2020-02-08,Netley,Penrith,1,0
+1378,2019-20,24,2020-02-08,Quarry Bank,Kirkby,2,3
+1379,2019-20,24,2020-02-08,Thirsk,Jedburgh,1,3
+1380,2019-20,24,2020-02-08,Farley,Corrin,10,0
+1381,2019-20,25,2020-02-15,Stoke Edith,Rydal,2,1
+1382,2019-20,25,2020-02-15,Lanark,Morden,10,0
+1383,2019-20,25,2020-02-15,Orwell,Hartwell,0,10
+1384,2019-20,25,2020-02-15,Islip,Glenholm,7,0
+1385,2019-20,25,2020-02-15,Eskdale,Dalby,9,0
+1386,2019-20,25,2020-02-15,Barnet Vale,Netley,1,1
+1387,2019-20,25,2020-02-15,Ashby,Quarry Bank,0,0
+1388,2019-20,25,2020-02-15,Penrith,Thirsk,0,0
+1389,2019-20,25,2020-02-15,Kirkby,Farley,0,10
+1390,2019-20,25,2020-02-15,Jedburgh,Corrin,1,3
+1391,2019-20,26,2020-02-22,Morden,Stoke Edith,1,3
+1392,2019-20,26,2020-02-22,Hartwell,Rydal,10,0
+1393,2019-20,26,2020-02-22,Glenholm,Lanark,0,10
+1394,2019-20,26,2020-02-22,Dalby,Orwell,10,1
+1395,2019-20,26,2020-02-22,Netley,Islip,4,0
+1396,2019-20,26,2020-02-22,Quarry Bank,Eskdale,1,2
+1397,2019-20,26,2020-02-22,Thirsk,Barnet Vale,1,3
+1398,2019-20,26,2020-02-22,Farley,Ashby,10,0
+1399,2019-20,26,2020-02-22,Corrin,Penrith,5,0
+1400,2019-20,26,2020-02-22,Jedburgh,Kirkby,1,1
+1401,2019-20,27,2020-02-29,Stoke Edith,Hartwell,0,2
+1402,2019-20,27,2020-02-29,Morden,Glenholm,3,1
+1403,2019-20,27,2020-02-29,Rydal,Dalby,2,0
+1404,2019-20,27,2020-02-29,Lanark,Netley,6,1
+1405,2019-20,27,2020-02-29,Orwell,Quarry Bank,0,10
+1406,2019-20,27,2020-02-29,Islip,Thirsk,5,0
+1407,2019-20,27,2020-02-29,Eskdale,Farley,1,5
+1408,2019-20,27,2020-02-29,Barnet Vale,Corrin,0,5
+1409,2019-20,27,2020-02-29,Ashby,Jedburgh,1,1
+1410,2019-20,27,2020-02-29,Penrith,Kirkby,2,4
+1411,2019-20,28,2020-03-07,Glenholm,Stoke Edith,1,10
+1412,2019-20,28,2020-03-07,Dalby,Hartwell,0,6
+1413,2019-20,28,2020-03-07,Netley,Morden,1,1
+1414,2019-20,28,2020-03-07,Quarry Bank,Rydal,5,1
+1415,2019-20,28,2020-03-07,Thirsk,Lanark,0,10
+1416,2019-20,28,2020-03-07,Farley,Orwell,10,0
+1417,2019-20,28,2020-03-07,Corrin,Islip,3,1
+1418,2019-20,28,2020-03-07,Jedburgh,Eskdale,0,2
+1419,2019-20,28,2020-03-07,Kirkby,Barnet Vale,8,0
+1420,2019-20,28,2020-03-07,Penrith,Ashby,1,2
+1421,2019-20,29,2020-03-14,Stoke Edith,Dalby,1,2
+1422,2019-20,29,2020-03-14,Glenholm,Netley,0,5
+1423,2019-20,29,2020-03-14,Hartwell,Quarry Bank,7,0
+1424,2019-20,29,2020-03-14,Morden,Thirsk,3,0
+1425,2019-20,29,2020-03-14,Rydal,Farley,0,10
+1426,2019-20,29,2020-03-14,Lanark,Corrin,1,0
+1427,2019-20,29,2020-03-14,Orwell,Jedburgh,0,9
+1428,2019-20,29,2020-03-14,Islip,Kirkby,0,1
+1429,2019-20,29,2020-03-14,Eskdale,Penrith,10,0
+1430,2019-20,29,2020-03-14,Barnet Vale,Ashby,0,4
+1431,2019-20,30,2020-03-21,Netley,Stoke Edith,1,0
+1432,2019-20,30,2020-03-21,Quarry Bank,Dalby,0,0
+1433,2019-20,30,2020-03-21,Thirsk,Glenholm,1,1
+1434,2019-20,30,2020-03-21,Farley,Hartwell,6,0
+1435,2019-20,30,2020-03-21,Corrin,Morden,4,0
+1436,2019-20,30,2020-03-21,Jedburgh,Rydal,4,0
+1437,2019-20,30,2020-03-21,Kirkby,Lanark,0,5
+1438,2019-20,30,2020-03-21,Penrith,Orwell,7,0
+1439,2019-20,30,2020-03-21,Ashby,Islip,2,0
+1440,2019-20,30,2020-03-21,Barnet Vale,Eskdale,1,10
+1441,2019-20,31,2020-03-28,Stoke Edith,Quarry Bank,3,0
+1442,2019-20,31,2020-03-28,Netley,Thirsk,8,1
+1443,2019-20,31,2020-03-28,Dalby,Farley,0,10
+1444,2019-20,31,2020-03-28,Glenholm,Corrin,0,10
+1445,2019-20,31,2020-03-28,Hartwell,Jedburgh,9,0
+1446,2019-20,31,2020-03-28,Morden,Kirkby,1,0
+1447,2019-20,31,2020-03-28,Rydal,Penrith,1,1
+1448,2019-20,31,2020-03-28,Lanark,Ashby,4,0
+1449,2019-20,31,2020-03-28,Orwell,Barnet Vale,0,4
+1450,2019-20,31,2020-03-28,Islip,Eskdale,1,2
+1451,2019-20,32,2020-04-04,Thirsk,Stoke Edith,0,7
+1452,2019-20,32,2020-04-04,Farley,Quarry Bank,10,0
+1453,2019-20,32,2020-04-04,Corrin,Netley,4,0
+1454,2019-20,32,2020-04-04,Jedburgh,Dalby,1,2
+1455,2019-20,32,2020-04-04,Kirkby,Glenholm,10,0
+1456,2019-20,32,2020-04-04,Penrith,Hartwell,0,7
+1457,2019-20,32,2020-04-04,Ashby,Morden,4,0
+1458,2019-20,32,2020-04-04,Barnet Vale,Rydal,0,4
+1459,2019-20,32,2020-04-04,Eskdale,Lanark,2,1
+1460,2019-20,32,2020-04-04,Islip,Orwell,10,0
+1461,2019-20,33,2020-04-11,Stoke Edith,Farley,0,10
+1462,2019-20,33,2020-04-11,Thirsk,Corrin,0,10
+1463,2019-20,33,2020-04-11,Quarry Bank,Jedburgh,3,0
+1464,2019-20,33,2020-04-11,Netley,Kirkby,1,0
+1465,2019-20,33,2020-04-11,Dalby,Penrith,3,1
+1466,2019-20,33,2020-04-11,Glenholm,Ashby,0,10
+1467,2019-20,33,2020-04-11,Hartwell,Barnet Vale,10,0
+1468,2019-20,33,2020-04-11,Morden,Eskdale,0,4
+1469,2019-20,33,2020-04-11,Rydal,Islip,1,2
+1470,2019-20,33,2020-04-11,Lanark,Orwell,10,0
+1471,2019-20,34,2020-04-18,Corrin,Stoke Edith,1,1
+1472,2019-20,34,2020-04-18,Jedburgh,Farley,0,10
+1473,2019-20,34,2020-04-18,Kirkby,Thirsk,4,0
+1474,2019-20,34,2020-04-18,Penrith,Quarry Bank,0,0
+1475,2019-20,34,2020-04-18,Ashby,Netley,4,1
+1476,2019-20,34,2020-04-18,Barnet Vale,Dalby,0,5
+1477,2019-20,34,2020-04-18,Eskdale,Glenholm,10,0
+1478,2019-20,34,2020-04-18,Islip,Hartwell,0,5
+1479,2019-20,34,2020-04-18,Orwell,Morden,1,6
+1480,2019-20,34,2020-04-18,Lanark,Rydal,6,0
+1481,2019-20,35,2020-04-25,Stoke Edith,Jedburgh,6,1
+1482,2019-20,35,2020-04-25,Corrin,Kirkby,3,0
+1483,2019-20,35,2020-04-25,Farley,Penrith,10,0
+1484,2019-20,35,2020-04-25,Thirsk,Ashby,0,7
+1485,2019-20,35,2020-04-25,Quarry Bank,Barnet Vale,4,0
+1486,2019-20,35,2020-04-25,Netley,Eskdale,1,4
+1487,2019-20,35,2020-04-25,Dalby,Islip,1,2
+1488,2019-20,35,2020-04-25,Glenholm,Orwell,2,0
+1489,2019-20,35,2020-04-25,Hartwell,Lanark,4,1
+1490,2019-20,35,2020-04-25,Morden,Rydal,3,0
+1491,2019-20,36,2020-05-02,Kirkby,Stoke Edith,1,0
+1492,2019-20,36,2020-05-02,Penrith,Jedburgh,0,0
+1493,2019-20,36,2020-05-02,Ashby,Corrin,0,1
+1494,2019-20,36,2020-05-02,Barnet Vale,Farley,0,10
+1495,2019-20,36,2020-05-02,Eskdale,Thirsk,10,0
+1496,2019-20,36,2020-05-02,Islip,Quarry Bank,0,2
+1497,2019-20,36,2020-05-02,Orwell,Netley,0,4
+1498,2019-20,36,2020-05-02,Lanark,Dalby,2,1
+1499,2019-20,36,2020-05-02,Rydal,Glenholm,5,1
+1500,2019-20,36,2020-05-02,Morden,Hartwell,0,10
+1501,2019-20,37,2020-05-09,Stoke Edith,Penrith,0,1
+1502,2019-20,37,2020-05-09,Kirkby,Ashby,1,2
+1503,2019-20,37,2020-05-09,Jedburgh,Barnet Vale,4,1
+1504,2019-20,37,2020-05-09,Corrin,Eskdale,2,0
+1505,2019-20,37,2020-05-09,Farley,Islip,10,1
+1506,2019-20,37,2020-05-09,Thirsk,Orwell,1,2
+1507,2019-20,37,2020-05-09,Quarry Bank,Lanark,0,1
+1508,2019-20,37,2020-05-09,Netley,Rydal,2,1
+1509,2019-20,37,2020-05-09,Dalby,Morden,2,0
+1510,2019-20,37,2020-05-09,Glenholm,Hartwell,0,10
+1511,2019-20,38,2020-05-16,Ashby,Stoke Edith,0,4
+1512,2019-20,38,2020-05-16,Barnet Vale,Penrith,1,2
+1513,2019-20,38,2020-05-16,Eskdale,Kirkby,7,0
+1514,2019-20,38,2020-05-16,Islip,Jedburgh,1,0
+1515,2019-20,38,2020-05-16,Orwell,Corrin,0,10
+1516,2019-20,38,2020-05-16,Lanark,Farley,0,10
+1517,2019-20,38,2020-05-16,Rydal,Thirsk,3,1
+1518,2019-20,38,2020-05-16,Morden,Quarry Bank,0,2
+1519,2019-20,38,2020-05-16,Hartwell,Netley,10,0
+1520,2019-20,38,2020-05-16,Glenholm,Dalby,0,10
+1521,2020-21,1,2020-08-10,Kirkby,Hartwell,1,3
+1522,2020-21,1,2020-08-10,Barnet Vale,Morden,0,2
+1523,2020-21,1,2020-08-10,Eskdale,Islip,2,0
+1524,2020-21,1,2020-08-10,Rydal,Penrith,1,3
+1525,2020-21,1,2020-08-10,Jedburgh,Dalby,0,0
+1526,2020-21,1,2020-08-10,Lanark,Netley,2,0
+1527,2020-21,1,2020-08-10,Ashby,Glenholm,7,0
+1528,2020-21,1,2020-08-10,Corrin,Thirsk,7,0
+1529,2020-21,1,2020-08-10,Farley,Orwell,10,0
+1530,2020-21,1,2020-08-10,Stoke Edith,Quarry Bank,2,1
+1531,2020-21,2,2020-08-17,Morden,Kirkby,2,1
+1532,2020-21,2,2020-08-17,Islip,Hartwell,1,4
+1533,2020-21,2,2020-08-17,Penrith,Barnet Vale,3,0
+1534,2020-21,2,2020-08-17,Dalby,Eskdale,2,1
+1535,2020-21,2,2020-08-17,Netley,Rydal,2,1
+1536,2020-21,2,2020-08-17,Glenholm,Jedburgh,0,3
+1537,2020-21,2,2020-08-17,Thirsk,Lanark,0,3
+1538,2020-21,2,2020-08-17,Orwell,Ashby,0,5
+1539,2020-21,2,2020-08-17,Quarry Bank,Corrin,0,0
+1540,2020-21,2,2020-08-17,Stoke Edith,Farley,0,9
+1541,2020-21,3,2020-08-24,Kirkby,Islip,0,1
+1542,2020-21,3,2020-08-24,Morden,Penrith,1,2
+1543,2020-21,3,2020-08-24,Hartwell,Dalby,4,0
+1544,2020-21,3,2020-08-24,Barnet Vale,Netley,0,1
+1545,2020-21,3,2020-08-24,Eskdale,Glenholm,10,0
+1546,2020-21,3,2020-08-24,Rydal,Thirsk,0,1
+1547,2020-21,3,2020-08-24,Jedburgh,Orwell,3,1
+1548,2020-21,3,2020-08-24,Lanark,Quarry Bank,1,1
+1549,2020-21,3,2020-08-24,Ashby,Stoke Edith,2,2
+1550,2020-21,3,2020-08-24,Corrin,Farley,0,9
+1551,2020-21,4,2020-08-31,Penrith,Kirkby,5,0
+1552,2020-21,4,2020-08-31,Dalby,Islip,1,0
+1553,2020-21,4,2020-08-31,Netley,Morden,0,0
+1554,2020-21,4,2020-08-31,Glenholm,Hartwell,0,10
+1555,2020-21,4,2020-08-31,Thirsk,Barnet Vale,0,1
+1556,2020-21,4,2020-08-31,Orwell,Eskdale,0,5
+1557,2020-21,4,2020-08-31,Quarry Bank,Rydal,5,0
+1558,2020-21,4,2020-08-31,Stoke Edith,Jedburgh,3,1
+1559,2020-21,4,2020-08-31,Farley,Lanark,9,0
+1560,2020-21,4,2020-08-31,Corrin,Ashby,1,0
+1561,2020-21,5,2020-09-07,Kirkby,Dalby,1,2
+1562,2020-21,5,2020-09-07,Penrith,Netley,1,0
+1563,2020-21,5,2020-09-07,Islip,Glenholm,7,0
+1564,2020-21,5,2020-09-07,Morden,Thirsk,3,0
+1565,2020-21,5,2020-09-07,Hartwell,Orwell,10,2
+1566,2020-21,5,2020-09-07,Barnet Vale,Quarry Bank,1,2
+1567,2020-21,5,2020-09-07,Eskdale,Stoke Edith,1,0
+1568,2020-21,5,2020-09-07,Rydal,Farley,0,10
+1569,2020-21,5,2020-09-07,Jedburgh,Corrin,1,1
+1570,2020-21,5,2020-09-07,Lanark,Ashby,0,1
+1571,2020-21,6,2020-09-14,Netley,Kirkby,3,2
+1572,2020-21,6,2020-09-14,Glenholm,Dalby,0,5
+1573,2020-21,6,2020-09-14,Thirsk,Penrith,0,5
+1574,2020-21,6,2020-09-14,Orwell,Islip,0,2
+1575,2020-21,6,2020-09-14,Quarry Bank,Morden,3,0
+1576,2020-21,6,2020-09-14,Stoke Edith,Hartwell,0,1
+1577,2020-21,6,2020-09-14,Farley,Barnet Vale,10,0
+1578,2020-21,6,2020-09-14,Corrin,Eskdale,1,1
+1579,2020-21,6,2020-09-14,Ashby,Rydal,5,0
+1580,2020-21,6,2020-09-14,Lanark,Jedburgh,3,0
+1581,2020-21,7,2020-09-21,Kirkby,Glenholm,3,1
+1582,2020-21,7,2020-09-21,Netley,Thirsk,3,1
+1583,2020-21,7,2020-09-21,Dalby,Orwell,1,0
+1584,2020-21,7,2020-09-21,Penrith,Quarry Bank,1,1
+1585,2020-21,7,2020-09-21,Islip,Stoke Edith,0,1
+1586,2020-21,7,2020-09-21,Morden,Farley,0,10
+1587,2020-21,7,2020-09-21,Hartwell,Corrin,5,0
+1588,2020-21,7,2020-09-21,Barnet Vale,Ashby,0,3
+1589,2020-21,7,2020-09-21,Eskdale,Lanark,2,1
+1590,2020-21,7,2020-09-21,Rydal,Jedburgh,0,1
+1591,2020-21,8,2020-09-28,Thirsk,Kirkby,1,2
+1592,2020-21,8,2020-09-28,Orwell,Glenholm,0,3
+1593,2020-21,8,2020-09-28,Quarry Bank,Netley,4,2
+1594,2020-21,8,2020-09-28,Stoke Edith,Dalby,0,0
+1595,2020-21,8,2020-09-28,Farley,Penrith,7,0
+1596,2020-21,8,2020-09-28,Corrin,Islip,2,0
+1597,2020-21,8,2020-09-28,Ashby,Morden,2,2
+1598,2020-21,8,2020-09-28,Lanark,Hartwell,0,2
+1599,2020-21,8,2020-09-28,Jedburgh,Barnet Vale,3,1
+1600,2020-21,8,2020-09-28,Rydal,Eskdale,1,2
+1601,2020-21,9,2020-10-05,Kirkby,Orwell,4,0
+1602,2020-21,9,2020-10-05,Thirsk,Quarry Bank,0,5
+1603,2020-21,9,2020-10-05,Glenholm,Stoke Edith,0,4
+1604,2020-21,9,2020-10-05,Netley,Farley,0,10
+1605,2020-21,9,2020-10-05,Dalby,Corrin,0,1
+1606,2020-21,9,2020-10-05,Penrith,Ashby,2,0
+1607,2020-21,9,2020-10-05,Islip,Lanark,0,1
+1608,2020-21,9,2020-10-05,Morden,Jedburgh,2,0
+1609,2020-21,9,2020-10-05,Hartwell,Rydal,8,0
+1610,2020-21,9,2020-10-05,Barnet Vale,Eskdale,0,5
+1611,2020-21,10,2020-10-12,Quarry Bank,Kirkby,2,2
+1612,2020-21,10,2020-10-12,Stoke Edith,Orwell,5,0
+1613,2020-21,10,2020-10-12,Farley,Thirsk,10,0
+1614,2020-21,10,2020-10-12,Corrin,Glenholm,5,0
+1615,2020-21,10,2020-10-12,Ashby,Netley,0,1
+1616,2020-21,10,2020-10-12,Lanark,Dalby,1,1
+1617,2020-21,10,2020-10-12,Jedburgh,Penrith,0,4
+1618,2020-21,10,2020-10-12,Rydal,Islip,2,1
+1619,2020-21,10,2020-10-12,Eskdale,Morden,3,2
+1620,2020-21,10,2020-10-12,Barnet Vale,Hartwell,0,10
+1621,2020-21,11,2020-10-19,Kirkby,Stoke Edith,2,1
+1622,2020-21,11,2020-10-19,Quarry Bank,Farley,0,6
+1623,2020-21,11,2020-10-19,Orwell,Corrin,0,1
+1624,2020-21,11,2020-10-19,Thirsk,Ashby,1,1
+1625,2020-21,11,2020-10-19,Glenholm,Lanark,1,7
+1626,2020-21,11,2020-10-19,Netley,Jedburgh,3,2
+1627,2020-21,11,2020-10-19,Dalby,Rydal,2,0
+1628,2020-21,11,2020-10-19,Penrith,Eskdale,0,0
+1629,2020-21,11,2020-10-19,Islip,Barnet Vale,6,1
+1630,2020-21,11,2020-10-19,Morden,Hartwell,0,3
+1631,2020-21,12,2020-10-26,Farley,Kirkby,7,0
+1632,2020-21,12,2020-10-26,Corrin,Stoke Edith,1,2
+1633,2020-21,12,2020-10-26,Ashby,Quarry Bank,0,5
+1634,2020-21,12,2020-10-26,Lanark,Orwell,5,0
+1635,2020-21,12,2020-10-26,Jedburgh,Thirsk,3,2
+1636,2020-21,12,2020-10-26,Rydal,Glenholm,1,1
+1637,2020-21,12,2020-10-26,Eskdale,Netley,4,0
+1638,2020-21,12,2020-10-26,Barnet Vale,Dalby,0,3
+1639,2020-21,12,2020-10-26,Hartwell,Penrith,0,0
+1640,2020-21,12,2020-10-26,Morden,Islip,2,3
+1641,2020-21,13,2020-11-02,Kirkby,Corrin,0,0
+1642,2020-21,13,2020-11-02,Farley,Ashby,10,0
+1643,2020-21,13,2020-11-02,Stoke Edith,Lanark,3,0
+1644,2020-21,13,2020-11-02,Quarry Bank,Jedburgh,5,0
+1645,2020-21,13,2020-11-02,Orwell,Rydal,3,2
+1646,2020-21,13,2020-11-02,Thirsk,Eskdale,1,6
+1647,2020-21,13,2020-11-02,Glenholm,Barnet Vale,4,0
+1648,2020-21,13,2020-11-02,Netley,Hartwell,0,3
+1649,2020-21,13,2020-11-02,Dalby,Morden,2,1
+1650,2020-21,13,2020-11-02,Penrith,Islip,1,0
+1651,2020-21,14,2020-11-09,Ashby,Kirkby,0,1
+1652,2020-21,14,2020-11-09,Lanark,Corrin,1,2
+1653,2020-21,14,2020-11-09,Jedburgh,Farley,0,10
+1654,2020-21,14,2020-11-09,Rydal,Stoke Edith,0,3
+1655,2020-21,14,2020-11-09,Eskdale,Quarry Bank,3,1
+1656,2020-21,14,2020-11-09,Barnet Vale,Orwell,0,1
+1657,2020-21,14,2020-11-09,Hartwell,Thirsk,10,0
+1658,2020-21,14,2020-11-09,Morden,Glenholm,2,1
+1659,2020-21,14,2020-11-09,Islip,Netley,2,0
+1660,2020-21,14,2020-11-09,Penrith,Dalby,3,1
+1661,2020-21,15,2020-11-16,Kirkby,Lanark,0,3
+1662,2020-21,15,2020-11-16,Ashby,Jedburgh,2,0
+1663,2020-21,15,2020-11-16,Corrin,Rydal,3,2
+1664,2020-21,15,2020-11-16,Farley,Eskdale,3,0
+1665,2020-21,15,2020-11-16,Stoke Edith,Barnet Vale,9,0
+1666,2020-21,15,2020-11-16,Quarry Bank,Hartwell,0,1
+1667,2020-21,15,2020-11-16,Orwell,Morden,0,1
+1668,2020-21,15,2020-11-16,Thirsk,Islip,0,2
+1669,2020-21,15,2020-11-16,Glenholm,Penrith,1,3
+1670,2020-21,15,2020-11-16,Netley,Dalby,0,0
+1671,2020-21,16,2020-11-23,Jedburgh,Kirkby,0,5
+1672,2020-21,16,2020-11-23,Rydal,Lanark,1,3
+1673,2020-21,16,2020-11-23,Eskdale,Ashby,5,1
+1674,2020-21,16,2020-11-23,Barnet Vale,Corrin,1,3
+1675,2020-21,16,2020-11-23,Hartwell,Farley,0,1
+1676,2020-21,16,2020-11-23,Morden,Stoke Edith,0,4
+1677,2020-21,16,2020-11-23,Islip,Quarry Bank,2,0
+1678,2020-21,16,2020-11-23,Penrith,Orwell,4,0
+1679,2020-21,16,2020-11-23,Dalby,Thirsk,4,2
+1680,2020-21,16,2020-11-23,Netley,Glenholm,2,0
+1681,2020-21,17,2020-11-30,Kirkby,Rydal,1,0
+1682,2020-21,17,2020-11-30,Jedburgh,Eskdale,0,4
+1683,2020-21,17,2020-11-30,Lanark,Barnet Vale,10,0
+1684,2020-21,17,2020-11-30,Ashby,Hartwell,0,8
+1685,2020-21,17,2020-11-30,Corrin,Morden,1,1
+1686,2020-21,17,2020-11-30,Farley,Islip,7,0
+1687,2020-21,17,2020-11-30,Stoke Edith,Penrith,1,1
+1688,2020-21,17,2020-11-30,Quarry Bank,Dalby,0,2
+1689,2020-21,17,2020-11-30,Orwell,Netley,1,1
+1690,2020-21,17,2020-11-30,Thirsk,Glenholm,1,2
+1691,2020-21,18,2020-12-07,Eskdale,Kirkby,1,0
+1692,2020-21,18,2020-12-07,Barnet Vale,Rydal,0,1
+1693,2020-21,18,2020-12-07,Hartwell,Jedburgh,10,0
+1694,2020-21,18,2020-12-07,Morden,Lanark,0,3
+1695,2020-21,18,2020-12-07,Islip,Ashby,1,0
+1696,2020-21,18,2020-12-07,Penrith,Corrin,2,2
+1697,2020-21,18,2020-12-07,Dalby,Farley,0,7
+1698,2020-21,18,2020-12-07,Netley,Stoke Edith,0,2
+1699,2020-21,18,2020-12-07,Glenholm,Quarry Bank,2,5
+1700,2020-21,18,2020-12-07,Thirsk,Orwell,1,5
+1701,2020-21,19,2020-12-14,Kirkby,Barnet Vale,8,0
+1702,2020-21,19,2020-12-14,Eskdale,Hartwell,1,1
+1703,2020-21,19,2020-12-14,Rydal,Morden,1,1
+1704,2020-21,19,2020-12-14,Jedburgh,Islip,0,6
+1705,2020-21,19,2020-12-14,Lanark,Penrith,3,0
+1706,2020-21,19,2020-12-14,Ashby,Dalby,1,3
+1707,2020-21,19,2020-12-14,Corrin,Netley,2,0
+1708,2020-21,19,2020-12-14,Farley,Glenholm,10,0
+1709,2020-21,19,2020-12-14,Stoke Edith,Thirsk,5,0
+1710,2020-21,19,2020-12-14,Quarry Bank,Orwell,3,1
+1711,2020-21,20,2021-01-11,Hartwell,Kirkby,0,0
+1712,2020-21,20,2021-01-11,Morden,Barnet Vale,6,0
+1713,2020-21,20,2021-01-11,Islip,Eskdale,0,0
+1714,2020-21,20,2021-01-11,Penrith,Rydal,2,1
+1715,2020-21,20,2021-01-11,Dalby,Jedburgh,6,0
+1716,2020-21,20,2021-01-11,Netley,Lanark,0,1
+1717,2020-21,20,2021-01-11,Glenholm,Ashby,2,1
+1718,2020-21,20,2021-01-11,Thirsk,Corrin,1,4
+1719,2020-21,20,2021-01-11,Orwell,Farley,0,6
+1720,2020-21,20,2021-01-11,Quarry Bank,Stoke Edith,1,3
+1721,2020-21,21,2021-01-18,Kirkby,Morden,2,0
+1722,2020-21,21,2021-01-18,Hartwell,Islip,1,1
+1723,2020-21,21,2021-01-18,Barnet Vale,Penrith,0,10
+1724,2020-21,21,2021-01-18,Eskdale,Dalby,2,2
+1725,2020-21,21,2021-01-18,Rydal,Netley,1,2
+1726,2020-21,21,2021-01-18,Jedburgh,Glenholm,1,2
+1727,2020-21,21,2021-01-18,Lanark,Thirsk,6,0
+1728,2020-21,21,2021-01-18,Ashby,Orwell,0,4
+1729,2020-21,21,2021-01-18,Corrin,Quarry Bank,1,2
+1730,2020-21,21,2021-01-18,Farley,Stoke Edith,2,0
+1731,2020-21,22,2021-01-25,Islip,Kirkby,0,3
+1732,2020-21,22,2021-01-25,Penrith,Morden,2,1
+1733,2020-21,22,2021-01-25,Dalby,Hartwell,0,1
+1734,2020-21,22,2021-01-25,Netley,Barnet Vale,8,1
+1735,2020-21,22,2021-01-25,Glenholm,Eskdale,0,6
+1736,2020-21,22,2021-01-25,Thirsk,Rydal,1,0
+1737,2020-21,22,2021-01-25,Orwell,Jedburgh,3,0
+1738,2020-21,22,2021-01-25,Quarry Bank,Lanark,2,1
+1739,2020-21,22,2021-01-25,Stoke Edith,Ashby,7,1
+1740,2020-21,22,2021-01-25,Farley,Corrin,3,1
+1741,2020-21,23,2021-02-01,Kirkby,Penrith,1,0
+1742,2020-21,23,2021-02-01,Islip,Dalby,2,0
+1743,2020-21,23,2021-02-01,Morden,Netley,1,4
+1744,2020-21,23,2021-02-01,Hartwell,Glenholm,5,0
+1745,2020-21,23,2021-02-01,Barnet Vale,Thirsk,0,5
+1746,2020-21,23,2021-02-01,Eskdale,Orwell,4,0
+1747,2020-21,23,2021-02-01,Rydal,Quarry Bank,0,2
+1748,2020-21,23,2021-02-01,Jedburgh,Stoke Edith,0,10
+1749,2020-21,23,2021-02-01,Lanark,Farley,0,0
+1750,2020-21,23,2021-02-01,Ashby,Corrin,2,4
+1751,2020-21,24,2021-02-08,Dalby,Kirkby,0,2
+1752,2020-21,24,2021-02-08,Netley,Penrith,0,1
+1753,2020-21,24,2021-02-08,Glenholm,Islip,0,6
+1754,2020-21,24,2021-02-08,Thirsk,Morden,3,1
+1755,2020-21,24,2021-02-08,Orwell,Hartwell,0,5
+1756,2020-21,24,2021-02-08,Quarry Bank,Barnet Vale,4,0
+1757,2020-21,24,2021-02-08,Stoke Edith,Eskdale,1,3
+1758,2020-21,24,2021-02-08,Farley,Rydal,9,1
+1759,2020-21,24,2021-02-08,Corrin,Jedburgh,7,0
+1760,2020-21,24,2021-02-08,Ashby,Lanark,0,5
+1761,2020-21,25,2021-02-15,Kirkby,Netley,0,1
+1762,2020-21,25,2021-02-15,Dalby,Glenholm,8,0
+1763,2020-21,25,2021-02-15,Penrith,Thirsk,4,0
+1764,2020-21,25,2021-02-15,Islip,Orwell,3,0
+1765,2020-21,25,2021-02-15,Morden,Quarry Bank,1,2
+1766,2020-21,25,2021-02-15,Hartwell,Stoke Edith,0,0
+1767,2020-21,25,2021-02-15,Barnet Vale,Farley,0,10
+1768,2020-21,25,2021-02-15,Eskdale,Corrin,3,0
+1769,2020-21,25,2021-02-15,Rydal,Ashby,1,0
+1770,2020-21,25,2021-02-15,Jedburgh,Lanark,0,6
+1771,2020-21,26,2021-02-22,Glenholm,Kirkby,0,6
+1772,2020-21,26,2021-02-22,Thirsk,Netley,0,2
+1773,2020-21,26,2021-02-22,Orwell,Dalby,0,4
+1774,2020-21,26,2021-02-22,Quarry Bank,Penrith,0,2
+1775,2020-21,26,2021-02-22,Stoke Edith,Islip,4,1
+1776,2020-21,26,2021-02-22,Farley,Morden,3,0
+1777,2020-21,26,2021-02-22,Corrin,Hartwell,3,2
+1778,2020-21,26,2021-02-22,Ashby,Barnet Vale,0,1
+1779,2020-21,26,2021-02-22,Lanark,Eskdale,0,3
+1780,2020-21,26,2021-02-22,Jedburgh,Rydal,1,1
+1781,2020-21,27,2021-03-01,Kirkby,Thirsk,7,0
+1782,2020-21,27,2021-03-01,Glenholm,Orwell,0,3
+1783,2020-21,27,2021-03-01,Netley,Quarry Bank,0,0
+1784,2020-21,27,2021-03-01,Dalby,Stoke Edith,1,1
+1785,2020-21,27,2021-03-01,Penrith,Farley,1,2
+1786,2020-21,27,2021-03-01,Islip,Corrin,0,1
+1787,2020-21,27,2021-03-01,Morden,Ashby,5,0
+1788,2020-21,27,2021-03-01,Hartwell,Lanark,1,1
+1789,2020-21,27,2021-03-01,Barnet Vale,Jedburgh,1,1
+1790,2020-21,27,2021-03-01,Eskdale,Rydal,3,0
+1791,2020-21,28,2021-03-08,Orwell,Kirkby,0,0
+1792,2020-21,28,2021-03-08,Quarry Bank,Thirsk,1,0
+1793,2020-21,28,2021-03-08,Stoke Edith,Glenholm,7,0
+1794,2020-21,28,2021-03-08,Farley,Netley,4,1
+1795,2020-21,28,2021-03-08,Corrin,Dalby,1,3
+1796,2020-21,28,2021-03-08,Ashby,Penrith,0,6
+1797,2020-21,28,2021-03-08,Lanark,Islip,1,2
+1798,2020-21,28,2021-03-08,Jedburgh,Morden,0,6
+1799,2020-21,28,2021-03-08,Rydal,Hartwell,1,1
+1800,2020-21,28,2021-03-08,Eskdale,Barnet Vale,10,0
+1801,2020-21,29,2021-03-15,Kirkby,Quarry Bank,4,0
+1802,2020-21,29,2021-03-15,Orwell,Stoke Edith,0,2
+1803,2020-21,29,2021-03-15,Thirsk,Farley,0,6
+1804,2020-21,29,2021-03-15,Glenholm,Corrin,0,4
+1805,2020-21,29,2021-03-15,Netley,Ashby,4,1
+1806,2020-21,29,2021-03-15,Dalby,Lanark,3,0
+1807,2020-21,29,2021-03-15,Penrith,Jedburgh,10,0
+1808,2020-21,29,2021-03-15,Islip,Rydal,3,0
+1809,2020-21,29,2021-03-15,Morden,Eskdale,1,1
+1810,2020-21,29,2021-03-15,Hartwell,Barnet Vale,2,0
+1811,2020-21,30,2021-03-22,Stoke Edith,Kirkby,1,1
+1812,2020-21,30,2021-03-22,Farley,Quarry Bank,3,0
+1813,2020-21,30,2021-03-22,Corrin,Orwell,0,3
+1814,2020-21,30,2021-03-22,Ashby,Thirsk,1,1
+1815,2020-21,30,2021-03-22,Lanark,Glenholm,10,0
+1816,2020-21,30,2021-03-22,Jedburgh,Netley,0,5
+1817,2020-21,30,2021-03-22,Rydal,Dalby,0,7
+1818,2020-21,30,2021-03-22,Eskdale,Penrith,1,0
+1819,2020-21,30,2021-03-22,Barnet Vale,Islip,0,6
+1820,2020-21,30,2021-03-22,Hartwell,Morden,0,2
+1821,2020-21,31,2021-03-29,Kirkby,Farley,4,1
+1822,2020-21,31,2021-03-29,Stoke Edith,Corrin,1,0
+1823,2020-21,31,2021-03-29,Quarry Bank,Ashby,3,0
+1824,2020-21,31,2021-03-29,Orwell,Lanark,1,1
+1825,2020-21,31,2021-03-29,Thirsk,Jedburgh,2,0
+1826,2020-21,31,2021-03-29,Glenholm,Rydal,0,1
+1827,2020-21,31,2021-03-29,Netley,Eskdale,0,2
+1828,2020-21,31,2021-03-29,Dalby,Barnet Vale,10,0
+1829,2020-21,31,2021-03-29,Penrith,Hartwell,2,1
+1830,2020-21,31,2021-03-29,Islip,Morden,2,0
+1831,2020-21,32,2021-04-05,Corrin,Kirkby,1,4
+1832,2020-21,32,2021-04-05,Ashby,Farley,1,10
+1833,2020-21,32,2021-04-05,Lanark,Stoke Edith,5,1
+1834,2020-21,32,2021-04-05,Jedburgh,Quarry Bank,1,5
+1835,2020-21,32,2021-04-05,Rydal,Orwell,1,2
+1836,2020-21,32,2021-04-05,Eskdale,Thirsk,5,0
+1837,2020-21,32,2021-04-05,Barnet Vale,Glenholm,0,0
+1838,2020-21,32,2021-04-05,Hartwell,Netley,2,0
+1839,2020-21,32,2021-04-05,Morden,Dalby,1,2
+1840,2020-21,32,2021-04-05,Islip,Penrith,2,2
+1841,2020-21,33,2021-04-12,Kirkby,Ashby,10,1
+1842,2020-21,33,2021-04-12,Corrin,Lanark,1,1
+1843,2020-21,33,2021-04-12,Farley,Jedburgh,10,0
+1844,2020-21,33,2021-04-12,Stoke Edith,Rydal,5,0
+1845,2020-21,33,2021-04-12,Quarry Bank,Eskdale,0,2
+1846,2020-21,33,2021-04-12,Orwell,Barnet Vale,3,0
+1847,2020-21,33,2021-04-12,Thirsk,Hartwell,1,3
+1848,2020-21,33,2021-04-12,Glenholm,Morden,0,6
+1849,2020-21,33,2021-04-12,Netley,Islip,1,3
+1850,2020-21,33,2021-04-12,Dalby,Penrith,2,2
+1851,2020-21,34,2021-04-19,Lanark,Kirkby,1,1
+1852,2020-21,34,2021-04-19,Jedburgh,Ashby,2,1
+1853,2020-21,34,2021-04-19,Rydal,Corrin,0,1
+1854,2020-21,34,2021-04-19,Eskdale,Farley,0,2
+1855,2020-21,34,2021-04-19,Barnet Vale,Stoke Edith,0,3
+1856,2020-21,34,2021-04-19,Hartwell,Quarry Bank,1,1
+1857,2020-21,34,2021-04-19,Morden,Orwell,2,0
+1858,2020-21,34,2021-04-19,Islip,Thirsk,4,0
+1859,2020-21,34,2021-04-19,Penrith,Glenholm,10,0
+1860,2020-21,34,2021-04-19,Dalby,Netley,3,0
+1861,2020-21,35,2021-04-26,Kirkby,Jedburgh,10,0
+1862,2020-21,35,2021-04-26,Lanark,Rydal,8,0
+1863,2020-21,35,2021-04-26,Ashby,Eskdale,0,8
+1864,2020-21,35,2021-04-26,Corrin,Barnet Vale,2,0
+1865,2020-21,35,2021-04-26,Farley,Hartwell,2,0
+1866,2020-21,35,2021-04-26,Stoke Edith,Morden,1,2
+1867,2020-21,35,2021-04-26,Quarry Bank,Islip,1,1
+1868,2020-21,35,2021-04-26,Orwell,Penrith,0,3
+1869,2020-21,35,2021-04-26,Thirsk,Dalby,1,5
+1870,2020-21,35,2021-04-26,Glenholm,Netley,0,7
+1871,2020-21,36,2021-05-03,Rydal,Kirkby,0,10
+1872,2020-21,36,2021-05-03,Eskdale,Jedburgh,7,1
+1873,2020-21,36,2021-05-03,Barnet Vale,Lanark,0,4
+1874,2020-21,36,2021-05-03,Hartwell,Ashby,8,0
+1875,2020-21,36,2021-05-03,Morden,Corrin,5,0
+1876,2020-21,36,2021-05-03,Islip,Farley,0,0
+1877,2020-21,36,2021-05-03,Penrith,Stoke Edith,4,0
+1878,2020-21,36,2021-05-03,Dalby,Quarry Bank,2,1
+1879,2020-21,36,2021-05-03,Netley,Orwell,0,0
+1880,2020-21,36,2021-05-03,Glenholm,Thirsk,0,6
+1881,2020-21,37,2021-05-10,Kirkby,Eskdale,4,2
+1882,2020-21,37,2021-05-10,Rydal,Barnet Vale,1,1
+1883,2020-21,37,2021-05-10,Jedburgh,Hartwell,1,3
+1884,2020-21,37,2021-05-10,Lanark,Morden,0,0
+1885,2020-21,37,2021-05-10,Ashby,Islip,0,10
+1886,2020-21,37,2021-05-10,Corrin,Penrith,2,1
+1887,2020-21,37,2021-05-10,Farley,Dalby,2,0
+1888,2020-21,37,2021-05-10,Stoke Edith,Netley,1,2
+1889,2020-21,37,2021-05-10,Quarry Bank,Glenholm,9,0
+1890,2020-21,37,2021-05-10,Orwell,Thirsk,0,2
+1891,2020-21,38,2021-05-17,Barnet Vale,Kirkby,0,10
+1892,2020-21,38,2021-05-17,Hartwell,Eskdale,1,4
+1893,2020-21,38,2021-05-17,Morden,Rydal,10,0
+1894,2020-21,38,2021-05-17,Islip,Jedburgh,7,0
+1895,2020-21,38,2021-05-17,Penrith,Lanark,2,1
+1896,2020-21,38,2021-05-17,Dalby,Ashby,10,0
+1897,2020-21,38,2021-05-17,Netley,Corrin,1,3
+1898,2020-21,38,2021-05-17,Glenholm,Farley,0,10
+1899,2020-21,38,2021-05-17,Thirsk,Stoke Edith,1,0
+1900,2020-21,38,2021-05-17,Orwell,Quarry Bank,1,0
+1901,2021-22,1,2021-08-10,Penrith,Morden,1,1
+1902,2021-22,1,2021-08-10,Orwell,Lanark,0,4
+1903,2021-22,1,2021-08-10,Corrin,Thirsk,1,1
+1904,2021-22,1,2021-08-10,Jedburgh,Islip,1,4
+1905,2021-22,1,2021-08-10,Netley,Hartwell,1,2
+1906,2021-22,1,2021-08-10,Dalby,Eskdale,0,1
+1907,2021-22,1,2021-08-10,Barnet Vale,Kirkby,0,2
+1908,2021-22,1,2021-08-10,Farley,Rydal,6,0
+1909,2021-22,1,2021-08-10,Quarry Bank,Ashby,4,0
+1910,2021-22,1,2021-08-10,Glenholm,Stoke Edith,1,6
+1911,2021-22,2,2021-08-17,Lanark,Penrith,0,1
+1912,2021-22,2,2021-08-17,Thirsk,Morden,0,1
+1913,2021-22,2,2021-08-17,Islip,Orwell,0,1
+1914,2021-22,2,2021-08-17,Hartwell,Corrin,4,1
+1915,2021-22,2,2021-08-17,Eskdale,Jedburgh,4,0
+1916,2021-22,2,2021-08-17,Kirkby,Netley,6,0
+1917,2021-22,2,2021-08-17,Rydal,Dalby,0,7
+1918,2021-22,2,2021-08-17,Ashby,Barnet Vale,1,0
+1919,2021-22,2,2021-08-17,Stoke Edith,Farley,0,3
+1920,2021-22,2,2021-08-17,Glenholm,Quarry Bank,1,5
+1921,2021-22,3,2021-08-24,Penrith,Thirsk,1,0
+1922,2021-22,3,2021-08-24,Lanark,Islip,3,0
+1923,2021-22,3,2021-08-24,Morden,Hartwell,4,0
+1924,2021-22,3,2021-08-24,Orwell,Eskdale,1,1
+1925,2021-22,3,2021-08-24,Corrin,Kirkby,0,3
+1926,2021-22,3,2021-08-24,Jedburgh,Rydal,2,0
+1927,2021-22,3,2021-08-24,Netley,Ashby,0,1
+1928,2021-22,3,2021-08-24,Dalby,Stoke Edith,3,0
+1929,2021-22,3,2021-08-24,Barnet Vale,Glenholm,4,1
+1930,2021-22,3,2021-08-24,Farley,Quarry Bank,1,0
+1931,2021-22,4,2021-08-31,Islip,Penrith,2,3
+1932,2021-22,4,2021-08-31,Hartwell,Thirsk,1,1
+1933,2021-22,4,2021-08-31,Eskdale,Lanark,2,0
+1934,2021-22,4,2021-08-31,Kirkby,Morden,0,0
+1935,2021-22,4,2021-08-31,Rydal,Orwell,1,1
+1936,2021-22,4,2021-08-31,Ashby,Corrin,0,1
+1937,2021-22,4,2021-08-31,Stoke Edith,Jedburgh,1,0
+1938,2021-22,4,2021-08-31,Glenholm,Netley,2,3
+1939,2021-22,4,2021-08-31,Quarry Bank,Dalby,0,2
+1940,2021-22,4,2021-08-31,Farley,Barnet Vale,4,0
+1941,2021-22,5,2021-09-07,Penrith,Hartwell,1,1
+1942,2021-22,5,2021-09-07,Islip,Eskdale,1,1
+1943,2021-22,5,2021-09-07,Thirsk,Kirkby,0,2
+1944,2021-22,5,2021-09-07,Lanark,Rydal,6,0
+1945,2021-22,5,2021-09-07,Morden,Ashby,10,0
+1946,2021-22,5,2021-09-07,Orwell,Stoke Edith,0,0
+1947,2021-22,5,2021-09-07,Corrin,Glenholm,2,0
+1948,2021-22,5,2021-09-07,Jedburgh,Quarry Bank,0,1
+1949,2021-22,5,2021-09-07,Netley,Farley,1,4
+1950,2021-22,5,2021-09-07,Dalby,Barnet Vale,5,1
+1951,2021-22,6,2021-09-14,Eskdale,Penrith,2,0
+1952,2021-22,6,2021-09-14,Kirkby,Hartwell,4,0
+1953,2021-22,6,2021-09-14,Rydal,Islip,0,4
+1954,2021-22,6,2021-09-14,Ashby,Thirsk,0,4
+1955,2021-22,6,2021-09-14,Stoke Edith,Lanark,1,2
+1956,2021-22,6,2021-09-14,Glenholm,Morden,0,10
+1957,2021-22,6,2021-09-14,Quarry Bank,Orwell,1,0
+1958,2021-22,6,2021-09-14,Farley,Corrin,4,0
+1959,2021-22,6,2021-09-14,Barnet Vale,Jedburgh,4,1
+1960,2021-22,6,2021-09-14,Dalby,Netley,6,0
+1961,2021-22,7,2021-09-21,Penrith,Kirkby,3,1
+1962,2021-22,7,2021-09-21,Eskdale,Rydal,4,0
+1963,2021-22,7,2021-09-21,Hartwell,Ashby,3,1
+1964,2021-22,7,2021-09-21,Islip,Stoke Edith,1,1
+1965,2021-22,7,2021-09-21,Thirsk,Glenholm,2,0
+1966,2021-22,7,2021-09-21,Lanark,Quarry Bank,3,2
+1967,2021-22,7,2021-09-21,Morden,Farley,2,1
+1968,2021-22,7,2021-09-21,Orwell,Barnet Vale,1,2
+1969,2021-22,7,2021-09-21,Corrin,Dalby,0,5
+1970,2021-22,7,2021-09-21,Jedburgh,Netley,2,1
+1971,2021-22,8,2021-09-28,Rydal,Penrith,0,4
+1972,2021-22,8,2021-09-28,Ashby,Kirkby,0,10
+1973,2021-22,8,2021-09-28,Stoke Edith,Eskdale,1,3
+1974,2021-22,8,2021-09-28,Glenholm,Hartwell,0,4
+1975,2021-22,8,2021-09-28,Quarry Bank,Islip,2,1
+1976,2021-22,8,2021-09-28,Farley,Thirsk,2,0
+1977,2021-22,8,2021-09-28,Barnet Vale,Lanark,0,2
+1978,2021-22,8,2021-09-28,Dalby,Morden,0,4
+1979,2021-22,8,2021-09-28,Netley,Orwell,2,1
+1980,2021-22,8,2021-09-28,Jedburgh,Corrin,1,1
+1981,2021-22,9,2021-10-05,Penrith,Ashby,6,0
+1982,2021-22,9,2021-10-05,Rydal,Stoke Edith,2,2
+1983,2021-22,9,2021-10-05,Kirkby,Glenholm,9,1
+1984,2021-22,9,2021-10-05,Eskdale,Quarry Bank,1,1
+1985,2021-22,9,2021-10-05,Hartwell,Farley,0,1
+1986,2021-22,9,2021-10-05,Islip,Barnet Vale,3,1
+1987,2021-22,9,2021-10-05,Thirsk,Dalby,0,7
+1988,2021-22,9,2021-10-05,Lanark,Netley,3,0
+1989,2021-22,9,2021-10-05,Morden,Jedburgh,7,0
+1990,2021-22,9,2021-10-05,Orwell,Corrin,0,0
+1991,2021-22,10,2021-10-12,Stoke Edith,Penrith,0,3
+1992,2021-22,10,2021-10-12,Glenholm,Ashby,1,0
+1993,2021-22,10,2021-10-12,Quarry Bank,Rydal,1,1
+1994,2021-22,10,2021-10-12,Farley,Kirkby,0,1
+1995,2021-22,10,2021-10-12,Barnet Vale,Eskdale,0,3
+1996,2021-22,10,2021-10-12,Dalby,Hartwell,4,0
+1997,2021-22,10,2021-10-12,Netley,Islip,0,1
+1998,2021-22,10,2021-10-12,Jedburgh,Thirsk,2,1
+1999,2021-22,10,2021-10-12,Corrin,Lanark,0,4
+2000,2021-22,10,2021-10-12,Orwell,Morden,1,8
+2001,2021-22,11,2021-10-19,Penrith,Glenholm,5,0
+2002,2021-22,11,2021-10-19,Stoke Edith,Quarry Bank,2,0
+2003,2021-22,11,2021-10-19,Ashby,Farley,1,6
+2004,2021-22,11,2021-10-19,Rydal,Barnet Vale,0,3
+2005,2021-22,11,2021-10-19,Kirkby,Dalby,0,2
+2006,2021-22,11,2021-10-19,Eskdale,Netley,4,0
+2007,2021-22,11,2021-10-19,Hartwell,Jedburgh,3,1
+2008,2021-22,11,2021-10-19,Islip,Corrin,2,1
+2009,2021-22,11,2021-10-19,Thirsk,Orwell,0,2
+2010,2021-22,11,2021-10-19,Lanark,Morden,0,3
+2011,2021-22,12,2021-10-26,Quarry Bank,Penrith,1,3
+2012,2021-22,12,2021-10-26,Farley,Glenholm,8,1
+2013,2021-22,12,2021-10-26,Barnet Vale,Stoke Edith,2,1
+2014,2021-22,12,2021-10-26,Dalby,Ashby,10,0
+2015,2021-22,12,2021-10-26,Netley,Rydal,3,1
+2016,2021-22,12,2021-10-26,Jedburgh,Kirkby,1,1
+2017,2021-22,12,2021-10-26,Corrin,Eskdale,0,6
+2018,2021-22,12,2021-10-26,Orwell,Hartwell,1,6
+2019,2021-22,12,2021-10-26,Morden,Islip,3,0
+2020,2021-22,12,2021-10-26,Lanark,Thirsk,3,2
+2021,2021-22,13,2021-11-02,Penrith,Farley,0,0
+2022,2021-22,13,2021-11-02,Quarry Bank,Barnet Vale,0,2
+2023,2021-22,13,2021-11-02,Glenholm,Dalby,0,10
+2024,2021-22,13,2021-11-02,Stoke Edith,Netley,0,1
+2025,2021-22,13,2021-11-02,Ashby,Jedburgh,0,2
+2026,2021-22,13,2021-11-02,Rydal,Corrin,1,1
+2027,2021-22,13,2021-11-02,Kirkby,Orwell,5,2
+2028,2021-22,13,2021-11-02,Eskdale,Morden,2,1
+2029,2021-22,13,2021-11-02,Hartwell,Lanark,1,1
+2030,2021-22,13,2021-11-02,Islip,Thirsk,4,0
+2031,2021-22,14,2021-11-09,Barnet Vale,Penrith,1,3
+2032,2021-22,14,2021-11-09,Dalby,Farley,8,0
+2033,2021-22,14,2021-11-09,Netley,Quarry Bank,1,1
+2034,2021-22,14,2021-11-09,Jedburgh,Glenholm,4,0
+2035,2021-22,14,2021-11-09,Corrin,Stoke Edith,0,0
+2036,2021-22,14,2021-11-09,Orwell,Ashby,2,0
+2037,2021-22,14,2021-11-09,Morden,Rydal,10,0
+2038,2021-22,14,2021-11-09,Lanark,Kirkby,1,1
+2039,2021-22,14,2021-11-09,Thirsk,Eskdale,1,5
+2040,2021-22,14,2021-11-09,Islip,Hartwell,1,2
+2041,2021-22,15,2021-11-16,Penrith,Dalby,0,6
+2042,2021-22,15,2021-11-16,Barnet Vale,Netley,1,1
+2043,2021-22,15,2021-11-16,Farley,Jedburgh,1,1
+2044,2021-22,15,2021-11-16,Quarry Bank,Corrin,3,3
+2045,2021-22,15,2021-11-16,Glenholm,Orwell,1,0
+2046,2021-22,15,2021-11-16,Stoke Edith,Morden,2,9
+2047,2021-22,15,2021-11-16,Ashby,Lanark,0,3
+2048,2021-22,15,2021-11-16,Rydal,Thirsk,1,0
+2049,2021-22,15,2021-11-16,Kirkby,Islip,1,1
+2050,2021-22,15,2021-11-16,Eskdale,Hartwell,3,1
+2051,2021-22,16,2021-11-23,Netley,Penrith,0,1
+2052,2021-22,16,2021-11-23,Jedburgh,Dalby,0,4
+2053,2021-22,16,2021-11-23,Corrin,Barnet Vale,2,0
+2054,2021-22,16,2021-11-23,Orwell,Farley,0,3
+2055,2021-22,16,2021-11-23,Morden,Quarry Bank,10,1
+2056,2021-22,16,2021-11-23,Lanark,Glenholm,4,0
+2057,2021-22,16,2021-11-23,Thirsk,Stoke Edith,0,1
+2058,2021-22,16,2021-11-23,Islip,Ashby,5,2
+2059,2021-22,16,2021-11-23,Hartwell,Rydal,6,0
+2060,2021-22,16,2021-11-23,Eskdale,Kirkby,3,2
+2061,2021-22,17,2021-11-30,Penrith,Jedburgh,1,0
+2062,2021-22,17,2021-11-30,Netley,Corrin,2,0
+2063,2021-22,17,2021-11-30,Dalby,Orwell,10,0
+2064,2021-22,17,2021-11-30,Barnet Vale,Morden,0,9
+2065,2021-22,17,2021-11-30,Farley,Lanark,0,1
+2066,2021-22,17,2021-11-30,Quarry Bank,Thirsk,1,1
+2067,2021-22,17,2021-11-30,Glenholm,Islip,0,2
+2068,2021-22,17,2021-11-30,Stoke Edith,Hartwell,1,4
+2069,2021-22,17,2021-11-30,Ashby,Eskdale,0,10
+2070,2021-22,17,2021-11-30,Rydal,Kirkby,0,4
+2071,2021-22,18,2021-12-07,Corrin,Penrith,2,0
+2072,2021-22,18,2021-12-07,Orwell,Jedburgh,1,0
+2073,2021-22,18,2021-12-07,Morden,Netley,2,0
+2074,2021-22,18,2021-12-07,Lanark,Dalby,0,5
+2075,2021-22,18,2021-12-07,Thirsk,Barnet Vale,1,1
+2076,2021-22,18,2021-12-07,Islip,Farley,0,0
+2077,2021-22,18,2021-12-07,Hartwell,Quarry Bank,4,1
+2078,2021-22,18,2021-12-07,Eskdale,Glenholm,10,0
+2079,2021-22,18,2021-12-07,Kirkby,Stoke Edith,4,1
+2080,2021-22,18,2021-12-07,Rydal,Ashby,0,1
+2081,2021-22,19,2021-12-14,Penrith,Orwell,2,2
+2082,2021-22,19,2021-12-14,Corrin,Morden,0,6
+2083,2021-22,19,2021-12-14,Jedburgh,Lanark,0,1
+2084,2021-22,19,2021-12-14,Netley,Thirsk,1,0
+2085,2021-22,19,2021-12-14,Dalby,Islip,10,0
+2086,2021-22,19,2021-12-14,Barnet Vale,Hartwell,0,4
+2087,2021-22,19,2021-12-14,Farley,Eskdale,1,5
+2088,2021-22,19,2021-12-14,Quarry Bank,Kirkby,0,3
+2089,2021-22,19,2021-12-14,Glenholm,Rydal,1,0
+2090,2021-22,19,2021-12-14,Stoke Edith,Ashby,2,0
+2091,2021-22,20,2022-01-11,Morden,Penrith,9,0
+2092,2021-22,20,2022-01-11,Lanark,Orwell,4,0
+2093,2021-22,20,2022-01-11,Thirsk,Corrin,2,2
+2094,2021-22,20,2022-01-11,Islip,Jedburgh,0,0
+2095,2021-22,20,2022-01-11,Hartwell,Netley,2,0
+2096,2021-22,20,2022-01-11,Eskdale,Dalby,1,2
+2097,2021-22,20,2022-01-11,Kirkby,Barnet Vale,3,0
+2098,2021-22,20,2022-01-11,Rydal,Farley,0,4
+2099,2021-22,20,2022-01-11,Ashby,Quarry Bank,0,2
+2100,2021-22,20,2022-01-11,Stoke Edith,Glenholm,5,0
+2101,2021-22,21,2022-01-18,Penrith,Lanark,1,3
+2102,2021-22,21,2022-01-18,Morden,Thirsk,10,0
+2103,2021-22,21,2022-01-18,Orwell,Islip,1,2
+2104,2021-22,21,2022-01-18,Corrin,Hartwell,2,6
+2105,2021-22,21,2022-01-18,Jedburgh,Eskdale,0,4
+2106,2021-22,21,2022-01-18,Netley,Kirkby,0,0
+2107,2021-22,21,2022-01-18,Dalby,Rydal,10,0
+2108,2021-22,21,2022-01-18,Barnet Vale,Ashby,3,2
+2109,2021-22,21,2022-01-18,Farley,Stoke Edith,1,0
+2110,2021-22,21,2022-01-18,Quarry Bank,Glenholm,1,0
+2111,2021-22,22,2022-01-25,Thirsk,Penrith,3,1
+2112,2021-22,22,2022-01-25,Islip,Lanark,2,3
+2113,2021-22,22,2022-01-25,Hartwell,Morden,0,4
+2114,2021-22,22,2022-01-25,Eskdale,Orwell,9,0
+2115,2021-22,22,2022-01-25,Kirkby,Corrin,7,1
+2116,2021-22,22,2022-01-25,Rydal,Jedburgh,1,3
+2117,2021-22,22,2022-01-25,Ashby,Netley,0,2
+2118,2021-22,22,2022-01-25,Stoke Edith,Dalby,0,7
+2119,2021-22,22,2022-01-25,Glenholm,Barnet Vale,0,0
+2120,2021-22,22,2022-01-25,Quarry Bank,Farley,1,0
+2121,2021-22,23,2022-02-01,Penrith,Islip,0,1
+2122,2021-22,23,2022-02-01,Thirsk,Hartwell,0,4
+2123,2021-22,23,2022-02-01,Lanark,Eskdale,1,3
+2124,2021-22,23,2022-02-01,Morden,Kirkby,2,2
+2125,2021-22,23,2022-02-01,Orwell,Rydal,4,1
+2126,2021-22,23,2022-02-01,Corrin,Ashby,2,2
+2127,2021-22,23,2022-02-01,Jedburgh,Stoke Edith,1,2
+2128,2021-22,23,2022-02-01,Netley,Glenholm,6,0
+2129,2021-22,23,2022-02-01,Dalby,Quarry Bank,10,0
+2130,2021-22,23,2022-02-01,Barnet Vale,Farley,0,1
+2131,2021-22,24,2022-02-08,Hartwell,Penrith,2,0
+2132,2021-22,24,2022-02-08,Eskdale,Islip,7,0
+2133,2021-22,24,2022-02-08,Kirkby,Thirsk,4,0
+2134,2021-22,24,2022-02-08,Rydal,Lanark,0,3
+2135,2021-22,24,2022-02-08,Ashby,Morden,0,10
+2136,2021-22,24,2022-02-08,Stoke Edith,Orwell,4,3
+2137,2021-22,24,2022-02-08,Glenholm,Corrin,0,2
+2138,2021-22,24,2022-02-08,Quarry Bank,Jedburgh,0,0
+2139,2021-22,24,2022-02-08,Farley,Netley,3,3
+2140,2021-22,24,2022-02-08,Barnet Vale,Dalby,0,10
+2141,2021-22,25,2022-02-15,Penrith,Eskdale,0,10
+2142,2021-22,25,2022-02-15,Hartwell,Kirkby,0,1
+2143,2021-22,25,2022-02-15,Islip,Rydal,4,0
+2144,2021-22,25,2022-02-15,Thirsk,Ashby,2,1
+2145,2021-22,25,2022-02-15,Lanark,Stoke Edith,1,1
+2146,2021-22,25,2022-02-15,Morden,Glenholm,10,1
+2147,2021-22,25,2022-02-15,Orwell,Quarry Bank,1,0
+2148,2021-22,25,2022-02-15,Corrin,Farley,0,1
+2149,2021-22,25,2022-02-15,Jedburgh,Barnet Vale,4,0
+2150,2021-22,25,2022-02-15,Netley,Dalby,0,5
+2151,2021-22,26,2022-02-22,Kirkby,Penrith,5,0
+2152,2021-22,26,2022-02-22,Rydal,Eskdale,0,10
+2153,2021-22,26,2022-02-22,Ashby,Hartwell,1,5
+2154,2021-22,26,2022-02-22,Stoke Edith,Islip,2,0
+2155,2021-22,26,2022-02-22,Glenholm,Thirsk,1,3
+2156,2021-22,26,2022-02-22,Quarry Bank,Lanark,0,2
+2157,2021-22,26,2022-02-22,Farley,Morden,0,8
+2158,2021-22,26,2022-02-22,Barnet Vale,Orwell,0,0
+2159,2021-22,26,2022-02-22,Dalby,Corrin,10,0
+2160,2021-22,26,2022-02-22,Netley,Jedburgh,1,0
+2161,2021-22,27,2022-03-01,Penrith,Rydal,2,0
+2162,2021-22,27,2022-03-01,Kirkby,Ashby,5,1
+2163,2021-22,27,2022-03-01,Eskdale,Stoke Edith,8,0
+2164,2021-22,27,2022-03-01,Hartwell,Glenholm,7,0
+2165,2021-22,27,2022-03-01,Islip,Quarry Bank,3,1
+2166,2021-22,27,2022-03-01,Thirsk,Farley,1,2
+2167,2021-22,27,2022-03-01,Lanark,Barnet Vale,2,2
+2168,2021-22,27,2022-03-01,Morden,Dalby,0,1
+2169,2021-22,27,2022-03-01,Orwell,Netley,0,3
+2170,2021-22,27,2022-03-01,Corrin,Jedburgh,0,3
+2171,2021-22,28,2022-03-08,Ashby,Penrith,2,2
+2172,2021-22,28,2022-03-08,Stoke Edith,Rydal,6,0
+2173,2021-22,28,2022-03-08,Glenholm,Kirkby,0,8
+2174,2021-22,28,2022-03-08,Quarry Bank,Eskdale,0,10
+2175,2021-22,28,2022-03-08,Farley,Hartwell,1,1
+2176,2021-22,28,2022-03-08,Barnet Vale,Islip,0,2
+2177,2021-22,28,2022-03-08,Dalby,Thirsk,10,0
+2178,2021-22,28,2022-03-08,Netley,Lanark,2,0
+2179,2021-22,28,2022-03-08,Jedburgh,Morden,0,7
+2180,2021-22,28,2022-03-08,Corrin,Orwell,2,1
+2181,2021-22,29,2022-03-15,Penrith,Stoke Edith,0,4
+2182,2021-22,29,2022-03-15,Ashby,Glenholm,2,1
+2183,2021-22,29,2022-03-15,Rydal,Quarry Bank,0,1
+2184,2021-22,29,2022-03-15,Kirkby,Farley,0,1
+2185,2021-22,29,2022-03-15,Eskdale,Barnet Vale,10,0
+2186,2021-22,29,2022-03-15,Hartwell,Dalby,0,4
+2187,2021-22,29,2022-03-15,Islip,Netley,3,2
+2188,2021-22,29,2022-03-15,Thirsk,Jedburgh,1,3
+2189,2021-22,29,2022-03-15,Lanark,Corrin,2,2
+2190,2021-22,29,2022-03-15,Morden,Orwell,10,0
+2191,2021-22,30,2022-03-22,Glenholm,Penrith,0,4
+2192,2021-22,30,2022-03-22,Quarry Bank,Stoke Edith,0,3
+2193,2021-22,30,2022-03-22,Farley,Ashby,3,0
+2194,2021-22,30,2022-03-22,Barnet Vale,Rydal,1,0
+2195,2021-22,30,2022-03-22,Dalby,Kirkby,6,0
+2196,2021-22,30,2022-03-22,Netley,Eskdale,0,9
+2197,2021-22,30,2022-03-22,Jedburgh,Hartwell,0,3
+2198,2021-22,30,2022-03-22,Corrin,Islip,1,3
+2199,2021-22,30,2022-03-22,Orwell,Thirsk,2,0
+2200,2021-22,30,2022-03-22,Morden,Lanark,10,0
+2201,2021-22,31,2022-03-29,Penrith,Quarry Bank,1,0
+2202,2021-22,31,2022-03-29,Glenholm,Farley,0,7
+2203,2021-22,31,2022-03-29,Stoke Edith,Barnet Vale,6,0
+2204,2021-22,31,2022-03-29,Ashby,Dalby,0,10
+2205,2021-22,31,2022-03-29,Rydal,Netley,0,9
+2206,2021-22,31,2022-03-29,Kirkby,Jedburgh,0,1
+2207,2021-22,31,2022-03-29,Eskdale,Corrin,10,0
+2208,2021-22,31,2022-03-29,Hartwell,Orwell,6,0
+2209,2021-22,31,2022-03-29,Islip,Morden,0,6
+2210,2021-22,31,2022-03-29,Thirsk,Lanark,1,1
+2211,2021-22,32,2022-04-05,Farley,Penrith,3,0
+2212,2021-22,32,2022-04-05,Barnet Vale,Quarry Bank,4,1
+2213,2021-22,32,2022-04-05,Dalby,Glenholm,10,0
+2214,2021-22,32,2022-04-05,Netley,Stoke Edith,3,0
+2215,2021-22,32,2022-04-05,Jedburgh,Ashby,3,0
+2216,2021-22,32,2022-04-05,Corrin,Rydal,3,1
+2217,2021-22,32,2022-04-05,Orwell,Kirkby,0,5
+2218,2021-22,32,2022-04-05,Morden,Eskdale,2,4
+2219,2021-22,32,2022-04-05,Lanark,Hartwell,0,5
+2220,2021-22,32,2022-04-05,Thirsk,Islip,0,4
+2221,2021-22,33,2022-04-12,Penrith,Barnet Vale,4,1
+2222,2021-22,33,2022-04-12,Farley,Dalby,3,4
+2223,2021-22,33,2022-04-12,Quarry Bank,Netley,1,4
+2224,2021-22,33,2022-04-12,Glenholm,Jedburgh,1,8
+2225,2021-22,33,2022-04-12,Stoke Edith,Corrin,3,0
+2226,2021-22,33,2022-04-12,Ashby,Orwell,1,0
+2227,2021-22,33,2022-04-12,Rydal,Morden,0,10
+2228,2021-22,33,2022-04-12,Kirkby,Lanark,7,0
+2229,2021-22,33,2022-04-12,Eskdale,Thirsk,10,0
+2230,2021-22,33,2022-04-12,Hartwell,Islip,1,1
+2231,2021-22,34,2022-04-19,Dalby,Penrith,10,1
+2232,2021-22,34,2022-04-19,Netley,Barnet Vale,3,0
+2233,2021-22,34,2022-04-19,Jedburgh,Farley,0,1
+2234,2021-22,34,2022-04-19,Corrin,Quarry Bank,0,1
+2235,2021-22,34,2022-04-19,Orwell,Glenholm,2,0
+2236,2021-22,34,2022-04-19,Morden,Stoke Edith,9,0
+2237,2021-22,34,2022-04-19,Lanark,Ashby,0,4
+2238,2021-22,34,2022-04-19,Thirsk,Rydal,4,2
+2239,2021-22,34,2022-04-19,Islip,Kirkby,1,3
+2240,2021-22,34,2022-04-19,Hartwell,Eskdale,1,7
+2241,2021-22,35,2022-04-26,Penrith,Netley,1,3
+2242,2021-22,35,2022-04-26,Dalby,Jedburgh,9,0
+2243,2021-22,35,2022-04-26,Barnet Vale,Corrin,1,1
+2244,2021-22,35,2022-04-26,Farley,Orwell,7,0
+2245,2021-22,35,2022-04-26,Quarry Bank,Morden,0,10
+2246,2021-22,35,2022-04-26,Glenholm,Lanark,1,2
+2247,2021-22,35,2022-04-26,Stoke Edith,Thirsk,6,1
+2248,2021-22,35,2022-04-26,Ashby,Islip,1,2
+2249,2021-22,35,2022-04-26,Rydal,Hartwell,0,10
+2250,2021-22,35,2022-04-26,Kirkby,Eskdale,0,2
+2251,2021-22,36,2022-05-03,Jedburgh,Penrith,5,0
+2252,2021-22,36,2022-05-03,Corrin,Netley,0,2
+2253,2021-22,36,2022-05-03,Orwell,Dalby,0,10
+2254,2021-22,36,2022-05-03,Morden,Barnet Vale,10,0
+2255,2021-22,36,2022-05-03,Lanark,Farley,0,6
+2256,2021-22,36,2022-05-03,Thirsk,Quarry Bank,1,2
+2257,2021-22,36,2022-05-03,Islip,Glenholm,4,0
+2258,2021-22,36,2022-05-03,Hartwell,Stoke Edith,1,0
+2259,2021-22,36,2022-05-03,Eskdale,Ashby,10,0
+2260,2021-22,36,2022-05-03,Kirkby,Rydal,10,0
+2261,2021-22,37,2022-05-10,Penrith,Corrin,2,0
+2262,2021-22,37,2022-05-10,Jedburgh,Orwell,9,0
+2263,2021-22,37,2022-05-10,Netley,Morden,1,10
+2264,2021-22,37,2022-05-10,Dalby,Lanark,10,0
+2265,2021-22,37,2022-05-10,Barnet Vale,Thirsk,2,2
+2266,2021-22,37,2022-05-10,Farley,Islip,5,2
+2267,2021-22,37,2022-05-10,Quarry Bank,Hartwell,0,2
+2268,2021-22,37,2022-05-10,Glenholm,Eskdale,0,10
+2269,2021-22,37,2022-05-10,Stoke Edith,Kirkby,1,2
+2270,2021-22,37,2022-05-10,Ashby,Rydal,10,0
+2271,2021-22,38,2022-05-17,Orwell,Penrith,0,2
+2272,2021-22,38,2022-05-17,Morden,Corrin,10,0
+2273,2021-22,38,2022-05-17,Lanark,Jedburgh,0,5
+2274,2021-22,38,2022-05-17,Thirsk,Netley,0,3
+2275,2021-22,38,2022-05-17,Islip,Dalby,0,10
+2276,2021-22,38,2022-05-17,Hartwell,Barnet Vale,5,0
+2277,2021-22,38,2022-05-17,Eskdale,Farley,10,0
+2278,2021-22,38,2022-05-17,Kirkby,Quarry Bank,9,0
+2279,2021-22,38,2022-05-17,Rydal,Glenholm,0,2
+2280,2021-22,38,2022-05-17,Ashby,Stoke Edith,1,1
+2281,2022-23,1,2022-08-10,Quarry Bank,Netley,1,2
+2282,2022-23,1,2022-08-10,Ashby,Farley,1,0
+2283,2022-23,1,2022-08-10,Corrin,Lanark,0,2
+2284,2022-23,1,2022-08-10,Thirsk,Islip,0,3
+2285,2022-23,1,2022-08-10,Stoke Edith,Hartwell,1,2
+2286,2022-23,1,2022-08-10,Orwell,Eskdale,0,10
+2287,2022-23,1,2022-08-10,Dalby,Barnet Vale,10,0
+2288,2022-23,1,2022-08-10,Penrith,Morden,0,9
+2289,2022-23,1,2022-08-10,Kirkby,Glenholm,8,0
+2290,2022-23,1,2022-08-10,Jedburgh,Rydal,4,1
+2291,2022-23,2,2022-08-17,Farley,Quarry Bank,4,1
+2292,2022-23,2,2022-08-17,Lanark,Netley,0,2
+2293,2022-23,2,2022-08-17,Islip,Ashby,0,0
+2294,2022-23,2,2022-08-17,Hartwell,Corrin,3,0
+2295,2022-23,2,2022-08-17,Eskdale,Thirsk,10,1
+2296,2022-23,2,2022-08-17,Barnet Vale,Stoke Edith,0,1
+2297,2022-23,2,2022-08-17,Morden,Orwell,10,0
+2298,2022-23,2,2022-08-17,Glenholm,Dalby,1,10
+2299,2022-23,2,2022-08-17,Rydal,Penrith,0,0
+2300,2022-23,2,2022-08-17,Jedburgh,Kirkby,1,4
+2301,2022-23,3,2022-08-24,Quarry Bank,Lanark,1,0
+2302,2022-23,3,2022-08-24,Farley,Islip,2,0
+2303,2022-23,3,2022-08-24,Netley,Hartwell,2,1
+2304,2022-23,3,2022-08-24,Ashby,Eskdale,1,5
+2305,2022-23,3,2022-08-24,Corrin,Barnet Vale,1,2
+2306,2022-23,3,2022-08-24,Thirsk,Morden,0,9
+2307,2022-23,3,2022-08-24,Stoke Edith,Glenholm,4,0
+2308,2022-23,3,2022-08-24,Orwell,Rydal,2,1
+2309,2022-23,3,2022-08-24,Dalby,Jedburgh,3,0
+2310,2022-23,3,2022-08-24,Penrith,Kirkby,0,5
+2311,2022-23,4,2022-08-31,Islip,Quarry Bank,1,0
+2312,2022-23,4,2022-08-31,Hartwell,Lanark,3,0
+2313,2022-23,4,2022-08-31,Eskdale,Farley,4,0
+2314,2022-23,4,2022-08-31,Barnet Vale,Netley,1,1
+2315,2022-23,4,2022-08-31,Morden,Ashby,4,0
+2316,2022-23,4,2022-08-31,Glenholm,Corrin,0,0
+2317,2022-23,4,2022-08-31,Rydal,Thirsk,0,0
+2318,2022-23,4,2022-08-31,Jedburgh,Stoke Edith,3,0
+2319,2022-23,4,2022-08-31,Kirkby,Orwell,4,1
+2320,2022-23,4,2022-08-31,Penrith,Dalby,0,10
+2321,2022-23,5,2022-09-07,Quarry Bank,Hartwell,2,1
+2322,2022-23,5,2022-09-07,Islip,Eskdale,0,6
+2323,2022-23,5,2022-09-07,Lanark,Barnet Vale,0,4
+2324,2022-23,5,2022-09-07,Farley,Morden,1,2
+2325,2022-23,5,2022-09-07,Netley,Glenholm,5,1
+2326,2022-23,5,2022-09-07,Ashby,Rydal,3,0
+2327,2022-23,5,2022-09-07,Corrin,Jedburgh,1,3
+2328,2022-23,5,2022-09-07,Thirsk,Kirkby,0,3
+2329,2022-23,5,2022-09-07,Stoke Edith,Penrith,1,2
+2330,2022-23,5,2022-09-07,Orwell,Dalby,0,10
+2331,2022-23,6,2022-09-14,Eskdale,Quarry Bank,10,0
+2332,2022-23,6,2022-09-14,Barnet Vale,Hartwell,0,6
+2333,2022-23,6,2022-09-14,Morden,Islip,3,1
+2334,2022-23,6,2022-09-14,Glenholm,Lanark,1,1
+2335,2022-23,6,2022-09-14,Rydal,Farley,2,4
+2336,2022-23,6,2022-09-14,Jedburgh,Netley,0,1
+2337,2022-23,6,2022-09-14,Kirkby,Ashby,1,1
+2338,2022-23,6,2022-09-14,Penrith,Corrin,4,0
+2339,2022-23,6,2022-09-14,Dalby,Thirsk,10,0
+2340,2022-23,6,2022-09-14,Orwell,Stoke Edith,2,3
+2341,2022-23,7,2022-09-21,Quarry Bank,Barnet Vale,3,1
+2342,2022-23,7,2022-09-21,Eskdale,Morden,1,0
+2343,2022-23,7,2022-09-21,Hartwell,Glenholm,7,1
+2344,2022-23,7,2022-09-21,Islip,Rydal,3,0
+2345,2022-23,7,2022-09-21,Lanark,Jedburgh,0,2
+2346,2022-23,7,2022-09-21,Farley,Kirkby,1,1
+2347,2022-23,7,2022-09-21,Netley,Penrith,4,0
+2348,2022-23,7,2022-09-21,Ashby,Dalby,0,5
+2349,2022-23,7,2022-09-21,Corrin,Orwell,1,1
+2350,2022-23,7,2022-09-21,Thirsk,Stoke Edith,2,3
+2351,2022-23,8,2022-09-28,Morden,Quarry Bank,10,0
+2352,2022-23,8,2022-09-28,Glenholm,Barnet Vale,0,1
+2353,2022-23,8,2022-09-28,Rydal,Eskdale,0,10
+2354,2022-23,8,2022-09-28,Jedburgh,Hartwell,1,1
+2355,2022-23,8,2022-09-28,Kirkby,Islip,1,0
+2356,2022-23,8,2022-09-28,Penrith,Lanark,1,2
+2357,2022-23,8,2022-09-28,Dalby,Farley,1,0
+2358,2022-23,8,2022-09-28,Orwell,Netley,1,3
+2359,2022-23,8,2022-09-28,Stoke Edith,Ashby,0,1
+2360,2022-23,8,2022-09-28,Thirsk,Corrin,2,0
+2361,2022-23,9,2022-10-05,Quarry Bank,Glenholm,1,0
+2362,2022-23,9,2022-10-05,Morden,Rydal,10,0
+2363,2022-23,9,2022-10-05,Barnet Vale,Jedburgh,2,3
+2364,2022-23,9,2022-10-05,Eskdale,Kirkby,3,0
+2365,2022-23,9,2022-10-05,Hartwell,Penrith,7,0
+2366,2022-23,9,2022-10-05,Islip,Dalby,1,7
+2367,2022-23,9,2022-10-05,Lanark,Orwell,1,1
+2368,2022-23,9,2022-10-05,Farley,Stoke Edith,2,1
+2369,2022-23,9,2022-10-05,Netley,Thirsk,3,1
+2370,2022-23,9,2022-10-05,Ashby,Corrin,3,0
+2371,2022-23,10,2022-10-12,Rydal,Quarry Bank,2,0
+2372,2022-23,10,2022-10-12,Jedburgh,Glenholm,6,0
+2373,2022-23,10,2022-10-12,Kirkby,Morden,0,0
+2374,2022-23,10,2022-10-12,Penrith,Barnet Vale,1,2
+2375,2022-23,10,2022-10-12,Dalby,Eskdale,2,0
+2376,2022-23,10,2022-10-12,Orwell,Hartwell,0,3
+2377,2022-23,10,2022-10-12,Stoke Edith,Islip,1,0
+2378,2022-23,10,2022-10-12,Thirsk,Lanark,2,1
+2379,2022-23,10,2022-10-12,Corrin,Farley,0,6
+2380,2022-23,10,2022-10-12,Ashby,Netley,1,1
+2381,2022-23,11,2022-10-19,Quarry Bank,Jedburgh,2,2
+2382,2022-23,11,2022-10-19,Rydal,Kirkby,1,4
+2383,2022-23,11,2022-10-19,Glenholm,Penrith,1,1
+2384,2022-23,11,2022-10-19,Morden,Dalby,0,3
+2385,2022-23,11,2022-10-19,Barnet Vale,Orwell,1,0
+2386,2022-23,11,2022-10-19,Eskdale,Stoke Edith,3,1
+2387,2022-23,11,2022-10-19,Hartwell,Thirsk,4,2
+2388,2022-23,11,2022-10-19,Islip,Corrin,4,0
+2389,2022-23,11,2022-10-19,Lanark,Ashby,0,2
+2390,2022-23,11,2022-10-19,Farley,Netley,2,0
+2391,2022-23,12,2022-10-26,Kirkby,Quarry Bank,6,0
+2392,2022-23,12,2022-10-26,Penrith,Jedburgh,0,5
+2393,2022-23,12,2022-10-26,Dalby,Rydal,10,0
+2394,2022-23,12,2022-10-26,Orwell,Glenholm,3,2
+2395,2022-23,12,2022-10-26,Stoke Edith,Morden,0,4
+2396,2022-23,12,2022-10-26,Thirsk,Barnet Vale,2,1
+2397,2022-23,12,2022-10-26,Corrin,Eskdale,0,10
+2398,2022-23,12,2022-10-26,Ashby,Hartwell,1,2
+2399,2022-23,12,2022-10-26,Netley,Islip,2,0
+2400,2022-23,12,2022-10-26,Farley,Lanark,10,0
+2401,2022-23,13,2022-11-02,Quarry Bank,Penrith,4,0
+2402,2022-23,13,2022-11-02,Kirkby,Dalby,0,2
+2403,2022-23,13,2022-11-02,Jedburgh,Orwell,3,1
+2404,2022-23,13,2022-11-02,Rydal,Stoke Edith,2,2
+2405,2022-23,13,2022-11-02,Glenholm,Thirsk,0,2
+2406,2022-23,13,2022-11-02,Morden,Corrin,10,0
+2407,2022-23,13,2022-11-02,Barnet Vale,Ashby,0,2
+2408,2022-23,13,2022-11-02,Eskdale,Netley,3,1
+2409,2022-23,13,2022-11-02,Hartwell,Farley,0,3
+2410,2022-23,13,2022-11-02,Islip,Lanark,6,1
+2411,2022-23,14,2022-11-09,Dalby,Quarry Bank,9,0
+2412,2022-23,14,2022-11-09,Orwell,Penrith,2,0
+2413,2022-23,14,2022-11-09,Stoke Edith,Kirkby,0,5
+2414,2022-23,14,2022-11-09,Thirsk,Jedburgh,0,1
+2415,2022-23,14,2022-11-09,Corrin,Rydal,2,3
+2416,2022-23,14,2022-11-09,Ashby,Glenholm,5,0
+2417,2022-23,14,2022-11-09,Netley,Morden,0,4
+2418,2022-23,14,2022-11-09,Farley,Barnet Vale,6,2
+2419,2022-23,14,2022-11-09,Lanark,Eskdale,0,10
+2420,2022-23,14,2022-11-09,Islip,Hartwell,0,0
+2421,2022-23,15,2022-11-16,Quarry Bank,Orwell,1,1
+2422,2022-23,15,2022-11-16,Dalby,Stoke Edith,4,0
+2423,2022-23,15,2022-11-16,Penrith,Thirsk,1,0
+2424,2022-23,15,2022-11-16,Kirkby,Corrin,10,0
+2425,2022-23,15,2022-11-16,Jedburgh,Ashby,4,1
+2426,2022-23,15,2022-11-16,Rydal,Netley,1,5
+2427,2022-23,15,2022-11-16,Glenholm,Farley,0,10
+2428,2022-23,15,2022-11-16,Morden,Lanark,10,0
+2429,2022-23,15,2022-11-16,Barnet Vale,Islip,0,0
+2430,2022-23,15,2022-11-16,Eskdale,Hartwell,4,1
+2431,2022-23,16,2022-11-23,Stoke Edith,Quarry Bank,2,0
+2432,2022-23,16,2022-11-23,Thirsk,Orwell,0,0
+2433,2022-23,16,2022-11-23,Corrin,Dalby,0,10
+2434,2022-23,16,2022-11-23,Ashby,Penrith,4,0
+2435,2022-23,16,2022-11-23,Netley,Kirkby,0,2
+2436,2022-23,16,2022-11-23,Farley,Jedburgh,1,0
+2437,2022-23,16,2022-11-23,Lanark,Rydal,0,2
+2438,2022-23,16,2022-11-23,Islip,Glenholm,6,0
+2439,2022-23,16,2022-11-23,Hartwell,Morden,0,5
+2440,2022-23,16,2022-11-23,Eskdale,Barnet Vale,7,1
+2441,2022-23,17,2022-11-30,Quarry Bank,Thirsk,1,3
+2442,2022-23,17,2022-11-30,Stoke Edith,Corrin,3,1
+2443,2022-23,17,2022-11-30,Orwell,Ashby,0,1
+2444,2022-23,17,2022-11-30,Dalby,Netley,6,0
+2445,2022-23,17,2022-11-30,Penrith,Farley,1,10
+2446,2022-23,17,2022-11-30,Kirkby,Lanark,10,0
+2447,2022-23,17,2022-11-30,Jedburgh,Islip,2,0
+2448,2022-23,17,2022-11-30,Rydal,Hartwell,1,2
+2449,2022-23,17,2022-11-30,Glenholm,Eskdale,0,10
+2450,2022-23,17,2022-11-30,Morden,Barnet Vale,10,1
+2451,2022-23,18,2022-12-07,Corrin,Quarry Bank,0,1
+2452,2022-23,18,2022-12-07,Ashby,Thirsk,1,0
+2453,2022-23,18,2022-12-07,Netley,Stoke Edith,2,1
+2454,2022-23,18,2022-12-07,Farley,Orwell,4,1
+2455,2022-23,18,2022-12-07,Lanark,Dalby,0,10
+2456,2022-23,18,2022-12-07,Islip,Penrith,3,0
+2457,2022-23,18,2022-12-07,Hartwell,Kirkby,0,6
+2458,2022-23,18,2022-12-07,Eskdale,Jedburgh,2,0
+2459,2022-23,18,2022-12-07,Barnet Vale,Rydal,1,4
+2460,2022-23,18,2022-12-07,Morden,Glenholm,10,0
+2461,2022-23,19,2022-12-14,Quarry Bank,Ashby,0,2
+2462,2022-23,19,2022-12-14,Corrin,Netley,0,4
+2463,2022-23,19,2022-12-14,Thirsk,Farley,1,2
+2464,2022-23,19,2022-12-14,Stoke Edith,Lanark,3,0
+2465,2022-23,19,2022-12-14,Orwell,Islip,1,0
+2466,2022-23,19,2022-12-14,Dalby,Hartwell,5,0
+2467,2022-23,19,2022-12-14,Penrith,Eskdale,0,10
+2468,2022-23,19,2022-12-14,Kirkby,Barnet Vale,10,0
+2469,2022-23,19,2022-12-14,Jedburgh,Morden,0,2
+2470,2022-23,19,2022-12-14,Rydal,Glenholm,6,0
+2471,2022-23,20,2023-01-11,Netley,Quarry Bank,6,0
+2472,2022-23,20,2023-01-11,Farley,Ashby,6,0
+2473,2022-23,20,2023-01-11,Lanark,Corrin,3,2
+2474,2022-23,20,2023-01-11,Islip,Thirsk,1,0
+2475,2022-23,20,2023-01-11,Hartwell,Stoke Edith,0,2
+2476,2022-23,20,2023-01-11,Eskdale,Orwell,2,0
+2477,2022-23,20,2023-01-11,Barnet Vale,Dalby,0,9
+2478,2022-23,20,2023-01-11,Morden,Penrith,10,0
+2479,2022-23,20,2023-01-11,Glenholm,Kirkby,0,10
+2480,2022-23,20,2023-01-11,Rydal,Jedburgh,1,3
+2481,2022-23,21,2023-01-18,Quarry Bank,Farley,0,5
+2482,2022-23,21,2023-01-18,Netley,Lanark,10,0
+2483,2022-23,21,2023-01-18,Ashby,Islip,0,0
+2484,2022-23,21,2023-01-18,Corrin,Hartwell,1,5
+2485,2022-23,21,2023-01-18,Thirsk,Eskdale,0,3
+2486,2022-23,21,2023-01-18,Stoke Edith,Barnet Vale,3,0
+2487,2022-23,21,2023-01-18,Orwell,Morden,1,4
+2488,2022-23,21,2023-01-18,Dalby,Glenholm,10,0
+2489,2022-23,21,2023-01-18,Penrith,Rydal,0,6
+2490,2022-23,21,2023-01-18,Kirkby,Jedburgh,4,2
+2491,2022-23,22,2023-01-25,Lanark,Quarry Bank,1,1
+2492,2022-23,22,2023-01-25,Islip,Farley,0,4
+2493,2022-23,22,2023-01-25,Hartwell,Netley,0,0
+2494,2022-23,22,2023-01-25,Eskdale,Ashby,2,1
+2495,2022-23,22,2023-01-25,Barnet Vale,Corrin,1,0
+2496,2022-23,22,2023-01-25,Morden,Thirsk,6,0
+2497,2022-23,22,2023-01-25,Glenholm,Stoke Edith,1,4
+2498,2022-23,22,2023-01-25,Rydal,Orwell,0,0
+2499,2022-23,22,2023-01-25,Jedburgh,Dalby,1,0
+2500,2022-23,22,2023-01-25,Kirkby,Penrith,10,0
+2501,2022-23,23,2023-02-01,Quarry Bank,Islip,0,1
+2502,2022-23,23,2023-02-01,Lanark,Hartwell,0,4
+2503,2022-23,23,2023-02-01,Farley,Eskdale,1,0
+2504,2022-23,23,2023-02-01,Netley,Barnet Vale,6,1
+2505,2022-23,23,2023-02-01,Ashby,Morden,0,10
+2506,2022-23,23,2023-02-01,Corrin,Glenholm,0,1
+2507,2022-23,23,2023-02-01,Thirsk,Rydal,1,0
+2508,2022-23,23,2023-02-01,Stoke Edith,Jedburgh,2,0
+2509,2022-23,23,2023-02-01,Orwell,Kirkby,0,8
+2510,2022-23,23,2023-02-01,Dalby,Penrith,10,0
+2511,2022-23,24,2023-02-08,Hartwell,Quarry Bank,3,0
+2512,2022-23,24,2023-02-08,Eskdale,Islip,1,2
+2513,2022-23,24,2023-02-08,Barnet Vale,Lanark,4,0
+2514,2022-23,24,2023-02-08,Morden,Farley,0,0
+2515,2022-23,24,2023-02-08,Glenholm,Netley,0,8
+2516,2022-23,24,2023-02-08,Rydal,Ashby,2,0
+2517,2022-23,24,2023-02-08,Jedburgh,Corrin,10,0
+2518,2022-23,24,2023-02-08,Kirkby,Thirsk,4,1
+2519,2022-23,24,2023-02-08,Penrith,Stoke Edith,0,9
+2520,2022-23,24,2023-02-08,Dalby,Orwell,8,0
+2521,2022-23,25,2023-02-15,Quarry Bank,Eskdale,0,2
+2522,2022-23,25,2023-02-15,Hartwell,Barnet Vale,2,0
+2523,2022-23,25,2023-02-15,Islip,Morden,0,7
+2524,2022-23,25,2023-02-15,Lanark,Glenholm,2,2
+2525,2022-23,25,2023-02-15,Farley,Rydal,3,0
+2526,2022-23,25,2023-02-15,Netley,Jedburgh,0,2
+2527,2022-23,25,2023-02-15,Ashby,Kirkby,0,10
+2528,2022-23,25,2023-02-15,Corrin,Penrith,1,2
+2529,2022-23,25,2023-02-15,Thirsk,Dalby,0,5
+2530,2022-23,25,2023-02-15,Stoke Edith,Orwell,4,1
+2531,2022-23,26,2023-02-22,Barnet Vale,Quarry Bank,2,0
+2532,2022-23,26,2023-02-22,Morden,Eskdale,6,0
+2533,2022-23,26,2023-02-22,Glenholm,Hartwell,1,3
+2534,2022-23,26,2023-02-22,Rydal,Islip,3,0
+2535,2022-23,26,2023-02-22,Jedburgh,Lanark,10,0
+2536,2022-23,26,2023-02-22,Kirkby,Farley,3,1
+2537,2022-23,26,2023-02-22,Penrith,Netley,0,10
+2538,2022-23,26,2023-02-22,Dalby,Ashby,10,0
+2539,2022-23,26,2023-02-22,Orwell,Corrin,7,1
+2540,2022-23,26,2023-02-22,Stoke Edith,Thirsk,1,0
+2541,2022-23,27,2023-03-01,Quarry Bank,Morden,0,10
+2542,2022-23,27,2023-03-01,Barnet Vale,Glenholm,1,1
+2543,2022-23,27,2023-03-01,Eskdale,Rydal,1,1
+2544,2022-23,27,2023-03-01,Hartwell,Jedburgh,1,3
+2545,2022-23,27,2023-03-01,Islip,Kirkby,1,5
+2546,2022-23,27,2023-03-01,Lanark,Penrith,1,0
+2547,2022-23,27,2023-03-01,Farley,Dalby,0,1
+2548,2022-23,27,2023-03-01,Netley,Orwell,2,1
+2549,2022-23,27,2023-03-01,Ashby,Stoke Edith,0,5
+2550,2022-23,27,2023-03-01,Corrin,Thirsk,0,8
+2551,2022-23,28,2023-03-08,Glenholm,Quarry Bank,1,2
+2552,2022-23,28,2023-03-08,Rydal,Morden,2,6
+2553,2022-23,28,2023-03-08,Jedburgh,Barnet Vale,10,0
+2554,2022-23,28,2023-03-08,Kirkby,Eskdale,7,0
+2555,2022-23,28,2023-03-08,Penrith,Hartwell,0,6
+2556,2022-23,28,2023-03-08,Dalby,Islip,10,1
+2557,2022-23,28,2023-03-08,Orwell,Lanark,3,0
+2558,2022-23,28,2023-03-08,Stoke Edith,Farley,2,1
+2559,2022-23,28,2023-03-08,Thirsk,Netley,1,2
+2560,2022-23,28,2023-03-08,Corrin,Ashby,0,1
+2561,2022-23,29,2023-03-15,Quarry Bank,Rydal,1,4
+2562,2022-23,29,2023-03-15,Glenholm,Jedburgh,0,10
+2563,2022-23,29,2023-03-15,Morden,Kirkby,0,4
+2564,2022-23,29,2023-03-15,Barnet Vale,Penrith,5,1
+2565,2022-23,29,2023-03-15,Eskdale,Dalby,0,8
+2566,2022-23,29,2023-03-15,Hartwell,Orwell,0,2
+2567,2022-23,29,2023-03-15,Islip,Stoke Edith,0,3
+2568,2022-23,29,2023-03-15,Lanark,Thirsk,1,5
+2569,2022-23,29,2023-03-15,Farley,Corrin,10,0
+2570,2022-23,29,2023-03-15,Netley,Ashby,7,0
+2571,2022-23,30,2023-03-22,Jedburgh,Quarry Bank,10,0
+2572,2022-23,30,2023-03-22,Kirkby,Rydal,4,0
+2573,2022-23,30,2023-03-22,Penrith,Glenholm,1,2
+2574,2022-23,30,2023-03-22,Dalby,Morden,2,2
+2575,2022-23,30,2023-03-22,Orwell,Barnet Vale,1,1
+2576,2022-23,30,2023-03-22,Stoke Edith,Eskdale,1,1
+2577,2022-23,30,2023-03-22,Thirsk,Hartwell,5,1
+2578,2022-23,30,2023-03-22,Corrin,Islip,0,3
+2579,2022-23,30,2023-03-22,Ashby,Lanark,0,0
+2580,2022-23,30,2023-03-22,Netley,Farley,1,2
+2581,2022-23,31,2023-03-29,Quarry Bank,Kirkby,0,10
+2582,2022-23,31,2023-03-29,Jedburgh,Penrith,10,0
+2583,2022-23,31,2023-03-29,Rydal,Dalby,1,4
+2584,2022-23,31,2023-03-29,Glenholm,Orwell,2,1
+2585,2022-23,31,2023-03-29,Morden,Stoke Edith,1,2
+2586,2022-23,31,2023-03-29,Barnet Vale,Thirsk,0,5
+2587,2022-23,31,2023-03-29,Eskdale,Corrin,4,0
+2588,2022-23,31,2023-03-29,Hartwell,Ashby,2,0
+2589,2022-23,31,2023-03-29,Islip,Netley,0,6
+2590,2022-23,31,2023-03-29,Lanark,Farley,0,2
+2591,2022-23,32,2023-04-05,Penrith,Quarry Bank,1,1
+2592,2022-23,32,2023-04-05,Dalby,Kirkby,1,0
+2593,2022-23,32,2023-04-05,Orwell,Jedburgh,0,7
+2594,2022-23,32,2023-04-05,Stoke Edith,Rydal,0,0
+2595,2022-23,32,2023-04-05,Thirsk,Glenholm,6,0
+2596,2022-23,32,2023-04-05,Corrin,Morden,0,10
+2597,2022-23,32,2023-04-05,Ashby,Barnet Vale,4,2
+2598,2022-23,32,2023-04-05,Netley,Eskdale,6,0
+2599,2022-23,32,2023-04-05,Farley,Hartwell,3,0
+2600,2022-23,32,2023-04-05,Lanark,Islip,1,1
+2601,2022-23,33,2023-04-12,Quarry Bank,Dalby,0,10
+2602,2022-23,33,2023-04-12,Penrith,Orwell,0,2
+2603,2022-23,33,2023-04-12,Kirkby,Stoke Edith,5,0
+2604,2022-23,33,2023-04-12,Jedburgh,Thirsk,5,0
+2605,2022-23,33,2023-04-12,Rydal,Corrin,10,0
+2606,2022-23,33,2023-04-12,Glenholm,Ashby,1,2
+2607,2022-23,33,2023-04-12,Morden,Netley,1,0
+2608,2022-23,33,2023-04-12,Barnet Vale,Farley,0,7
+2609,2022-23,33,2023-04-12,Eskdale,Lanark,4,1
+2610,2022-23,33,2023-04-12,Hartwell,Islip,1,0
+2611,2022-23,34,2023-04-19,Orwell,Quarry Bank,3,0
+2612,2022-23,34,2023-04-19,Stoke Edith,Dalby,1,5
+2613,2022-23,34,2023-04-19,Thirsk,Penrith,5,0
+2614,2022-23,34,2023-04-19,Corrin,Kirkby,0,10
+2615,2022-23,34,2023-04-19,Ashby,Jedburgh,0,9
+2616,2022-23,34,2023-04-19,Netley,Rydal,2,0
+2617,2022-23,34,2023-04-19,Farley,Glenholm,8,0
+2618,2022-23,34,2023-04-19,Lanark,Morden,0,10
+2619,2022-23,34,2023-04-19,Islip,Barnet Vale,2,2
+2620,2022-23,34,2023-04-19,Hartwell,Eskdale,4,1
+2621,2022-23,35,2023-04-26,Quarry Bank,Stoke Edith,0,4
+2622,2022-23,35,2023-04-26,Orwell,Thirsk,0,2
+2623,2022-23,35,2023-04-26,Dalby,Corrin,10,0
+2624,2022-23,35,2023-04-26,Penrith,Ashby,1,0
+2625,2022-23,35,2023-04-26,Kirkby,Netley,1,1
+2626,2022-23,35,2023-04-26,Jedburgh,Farley,1,0
+2627,2022-23,35,2023-04-26,Rydal,Lanark,6,0
+2628,2022-23,35,2023-04-26,Glenholm,Islip,2,0
+2629,2022-23,35,2023-04-26,Morden,Hartwell,6,0
+2630,2022-23,35,2023-04-26,Barnet Vale,Eskdale,1,3
+2631,2022-23,36,2023-05-03,Thirsk,Quarry Bank,9,0
+2632,2022-23,36,2023-05-03,Corrin,Stoke Edith,0,9
+2633,2022-23,36,2023-05-03,Ashby,Orwell,2,2
+2634,2022-23,36,2023-05-03,Netley,Dalby,1,2
+2635,2022-23,36,2023-05-03,Farley,Penrith,10,0
+2636,2022-23,36,2023-05-03,Lanark,Kirkby,0,8
+2637,2022-23,36,2023-05-03,Islip,Jedburgh,0,10
+2638,2022-23,36,2023-05-03,Hartwell,Rydal,0,0
+2639,2022-23,36,2023-05-03,Eskdale,Glenholm,5,1
+2640,2022-23,36,2023-05-03,Barnet Vale,Morden,0,10
+2641,2022-23,37,2023-05-10,Quarry Bank,Corrin,1,0
+2642,2022-23,37,2023-05-10,Thirsk,Ashby,6,0
+2643,2022-23,37,2023-05-10,Stoke Edith,Netley,3,2
+2644,2022-23,37,2023-05-10,Orwell,Farley,0,5
+2645,2022-23,37,2023-05-10,Dalby,Lanark,10,1
+2646,2022-23,37,2023-05-10,Penrith,Islip,0,0
+2647,2022-23,37,2023-05-10,Kirkby,Hartwell,5,0
+2648,2022-23,37,2023-05-10,Jedburgh,Eskdale,6,0
+2649,2022-23,37,2023-05-10,Rydal,Barnet Vale,4,0
+2650,2022-23,37,2023-05-10,Glenholm,Morden,0,10
+2651,2022-23,38,2023-05-17,Ashby,Quarry Bank,4,0
+2652,2022-23,38,2023-05-17,Netley,Corrin,10,0
+2653,2022-23,38,2023-05-17,Farley,Thirsk,1,0
+2654,2022-23,38,2023-05-17,Lanark,Stoke Edith,1,5
+2655,2022-23,38,2023-05-17,Islip,Orwell,0,5
+2656,2022-23,38,2023-05-17,Hartwell,Dalby,0,6
+2657,2022-23,38,2023-05-17,Eskdale,Penrith,3,0
+2658,2022-23,38,2023-05-17,Barnet Vale,Kirkby,1,10
+2659,2022-23,38,2023-05-17,Morden,Jedburgh,1,1
+2660,2022-23,38,2023-05-17,Glenholm,Rydal,1,0
+2661,2023-24,1,2023-08-10,Hartwell,Islip,3,0
+2662,2023-24,1,2023-08-10,Glenholm,Stoke Edith,1,2
+2663,2023-24,1,2023-08-10,Ashby,Thirsk,0,3
+2664,2023-24,1,2023-08-10,Rydal,Quarry Bank,3,0
+2665,2023-24,1,2023-08-10,Jedburgh,Corrin,10,0
+2666,2023-24,1,2023-08-10,Kirkby,Lanark,7,0
+2667,2023-24,1,2023-08-10,Eskdale,Dalby,0,3
+2668,2023-24,1,2023-08-10,Netley,Orwell,5,0
+2669,2023-24,1,2023-08-10,Farley,Barnet Vale,5,0
+2670,2023-24,1,2023-08-10,Penrith,Morden,0,5
+2671,2023-24,2,2023-08-17,Stoke Edith,Hartwell,4,0
+2672,2023-24,2,2023-08-17,Thirsk,Islip,4,0
+2673,2023-24,2,2023-08-17,Quarry Bank,Glenholm,2,0
+2674,2023-24,2,2023-08-17,Corrin,Ashby,0,0
+2675,2023-24,2,2023-08-17,Lanark,Rydal,1,1
+2676,2023-24,2,2023-08-17,Dalby,Jedburgh,3,0
+2677,2023-24,2,2023-08-17,Orwell,Kirkby,0,6
+2678,2023-24,2,2023-08-17,Barnet Vale,Eskdale,1,2
+2679,2023-24,2,2023-08-17,Morden,Netley,2,1
+2680,2023-24,2,2023-08-17,Penrith,Farley,0,4
+2681,2023-24,3,2023-08-24,Hartwell,Thirsk,1,1
+2682,2023-24,3,2023-08-24,Stoke Edith,Quarry Bank,4,0
+2683,2023-24,3,2023-08-24,Islip,Corrin,6,1
+2684,2023-24,3,2023-08-24,Glenholm,Lanark,1,1
+2685,2023-24,3,2023-08-24,Ashby,Dalby,0,6
+2686,2023-24,3,2023-08-24,Rydal,Orwell,1,3
+2687,2023-24,3,2023-08-24,Jedburgh,Barnet Vale,9,1
+2688,2023-24,3,2023-08-24,Kirkby,Morden,3,1
+2689,2023-24,3,2023-08-24,Eskdale,Penrith,2,0
+2690,2023-24,3,2023-08-24,Netley,Farley,0,0
+2691,2023-24,4,2023-08-31,Quarry Bank,Hartwell,2,2
+2692,2023-24,4,2023-08-31,Corrin,Thirsk,0,9
+2693,2023-24,4,2023-08-31,Lanark,Stoke Edith,1,2
+2694,2023-24,4,2023-08-31,Dalby,Islip,10,0
+2695,2023-24,4,2023-08-31,Orwell,Glenholm,3,0
+2696,2023-24,4,2023-08-31,Barnet Vale,Ashby,1,1
+2697,2023-24,4,2023-08-31,Morden,Rydal,3,0
+2698,2023-24,4,2023-08-31,Penrith,Jedburgh,1,6
+2699,2023-24,4,2023-08-31,Farley,Kirkby,3,1
+2700,2023-24,4,2023-08-31,Netley,Eskdale,1,0
+2701,2023-24,5,2023-09-07,Hartwell,Corrin,5,0
+2702,2023-24,5,2023-09-07,Quarry Bank,Lanark,2,1
+2703,2023-24,5,2023-09-07,Thirsk,Dalby,1,0
+2704,2023-24,5,2023-09-07,Stoke Edith,Orwell,1,0
+2705,2023-24,5,2023-09-07,Islip,Barnet Vale,0,1
+2706,2023-24,5,2023-09-07,Glenholm,Morden,0,5
+2707,2023-24,5,2023-09-07,Ashby,Penrith,1,1
+2708,2023-24,5,2023-09-07,Rydal,Farley,0,2
+2709,2023-24,5,2023-09-07,Jedburgh,Netley,4,1
+2710,2023-24,5,2023-09-07,Kirkby,Eskdale,3,2
+2711,2023-24,6,2023-09-14,Lanark,Hartwell,0,1
+2712,2023-24,6,2023-09-14,Dalby,Corrin,10,0
+2713,2023-24,6,2023-09-14,Orwell,Quarry Bank,1,0
+2714,2023-24,6,2023-09-14,Barnet Vale,Thirsk,0,3
+2715,2023-24,6,2023-09-14,Morden,Stoke Edith,4,0
+2716,2023-24,6,2023-09-14,Penrith,Islip,1,1
+2717,2023-24,6,2023-09-14,Farley,Glenholm,6,0
+2718,2023-24,6,2023-09-14,Netley,Ashby,5,0
+2719,2023-24,6,2023-09-14,Eskdale,Rydal,0,1
+2720,2023-24,6,2023-09-14,Kirkby,Jedburgh,1,3
+2721,2023-24,7,2023-09-21,Hartwell,Dalby,0,3
+2722,2023-24,7,2023-09-21,Lanark,Orwell,1,3
+2723,2023-24,7,2023-09-21,Corrin,Barnet Vale,0,0
+2724,2023-24,7,2023-09-21,Quarry Bank,Morden,0,4
+2725,2023-24,7,2023-09-21,Thirsk,Penrith,7,0
+2726,2023-24,7,2023-09-21,Stoke Edith,Farley,0,1
+2727,2023-24,7,2023-09-21,Islip,Netley,0,6
+2728,2023-24,7,2023-09-21,Glenholm,Eskdale,0,3
+2729,2023-24,7,2023-09-21,Ashby,Kirkby,0,4
+2730,2023-24,7,2023-09-21,Rydal,Jedburgh,0,5
+2731,2023-24,8,2023-09-28,Orwell,Hartwell,1,0
+2732,2023-24,8,2023-09-28,Barnet Vale,Dalby,0,7
+2733,2023-24,8,2023-09-28,Morden,Lanark,10,0
+2734,2023-24,8,2023-09-28,Penrith,Corrin,2,1
+2735,2023-24,8,2023-09-28,Farley,Quarry Bank,5,0
+2736,2023-24,8,2023-09-28,Netley,Thirsk,0,0
+2737,2023-24,8,2023-09-28,Eskdale,Stoke Edith,1,2
+2738,2023-24,8,2023-09-28,Kirkby,Islip,7,1
+2739,2023-24,8,2023-09-28,Jedburgh,Glenholm,10,0
+2740,2023-24,8,2023-09-28,Rydal,Ashby,3,0
+2741,2023-24,9,2023-10-05,Hartwell,Barnet Vale,4,0
+2742,2023-24,9,2023-10-05,Orwell,Morden,1,2
+2743,2023-24,9,2023-10-05,Dalby,Penrith,9,0
+2744,2023-24,9,2023-10-05,Lanark,Farley,1,8
+2745,2023-24,9,2023-10-05,Corrin,Netley,1,6
+2746,2023-24,9,2023-10-05,Quarry Bank,Eskdale,1,1
+2747,2023-24,9,2023-10-05,Thirsk,Kirkby,2,0
+2748,2023-24,9,2023-10-05,Stoke Edith,Jedburgh,0,5
+2749,2023-24,9,2023-10-05,Islip,Rydal,0,0
+2750,2023-24,9,2023-10-05,Glenholm,Ashby,2,1
+2751,2023-24,10,2023-10-12,Morden,Hartwell,1,0
+2752,2023-24,10,2023-10-12,Penrith,Barnet Vale,3,2
+2753,2023-24,10,2023-10-12,Farley,Orwell,2,0
+2754,2023-24,10,2023-10-12,Netley,Dalby,2,2
+2755,2023-24,10,2023-10-12,Eskdale,Lanark,5,0
+2756,2023-24,10,2023-10-12,Kirkby,Corrin,10,0
+2757,2023-24,10,2023-10-12,Jedburgh,Quarry Bank,7,0
+2758,2023-24,10,2023-10-12,Rydal,Thirsk,1,2
+2759,2023-24,10,2023-10-12,Ashby,Stoke Edith,0,3
+2760,2023-24,10,2023-10-12,Glenholm,Islip,2,0
+2761,2023-24,11,2023-10-19,Hartwell,Penrith,4,2
+2762,2023-24,11,2023-10-19,Morden,Farley,0,3
+2763,2023-24,11,2023-10-19,Barnet Vale,Netley,2,2
+2764,2023-24,11,2023-10-19,Orwell,Eskdale,3,0
+2765,2023-24,11,2023-10-19,Dalby,Kirkby,2,1
+2766,2023-24,11,2023-10-19,Lanark,Jedburgh,0,10
+2767,2023-24,11,2023-10-19,Corrin,Rydal,0,1
+2768,2023-24,11,2023-10-19,Quarry Bank,Ashby,4,0
+2769,2023-24,11,2023-10-19,Thirsk,Glenholm,1,0
+2770,2023-24,11,2023-10-19,Stoke Edith,Islip,4,1
+2771,2023-24,12,2023-10-26,Farley,Hartwell,2,0
+2772,2023-24,12,2023-10-26,Netley,Penrith,6,0
+2773,2023-24,12,2023-10-26,Eskdale,Morden,1,3
+2774,2023-24,12,2023-10-26,Kirkby,Barnet Vale,10,0
+2775,2023-24,12,2023-10-26,Jedburgh,Orwell,3,1
+2776,2023-24,12,2023-10-26,Rydal,Dalby,0,3
+2777,2023-24,12,2023-10-26,Ashby,Lanark,2,1
+2778,2023-24,12,2023-10-26,Glenholm,Corrin,1,2
+2779,2023-24,12,2023-10-26,Islip,Quarry Bank,1,3
+2780,2023-24,12,2023-10-26,Stoke Edith,Thirsk,1,2
+2781,2023-24,13,2023-11-02,Hartwell,Netley,3,1
+2782,2023-24,13,2023-11-02,Farley,Eskdale,2,0
+2783,2023-24,13,2023-11-02,Penrith,Kirkby,0,5
+2784,2023-24,13,2023-11-02,Morden,Jedburgh,0,3
+2785,2023-24,13,2023-11-02,Barnet Vale,Rydal,2,1
+2786,2023-24,13,2023-11-02,Orwell,Ashby,10,0
+2787,2023-24,13,2023-11-02,Dalby,Glenholm,10,0
+2788,2023-24,13,2023-11-02,Lanark,Islip,2,3
+2789,2023-24,13,2023-11-02,Corrin,Stoke Edith,1,1
+2790,2023-24,13,2023-11-02,Quarry Bank,Thirsk,0,1
+2791,2023-24,14,2023-11-09,Eskdale,Hartwell,0,0
+2792,2023-24,14,2023-11-09,Kirkby,Netley,4,1
+2793,2023-24,14,2023-11-09,Jedburgh,Farley,1,1
+2794,2023-24,14,2023-11-09,Rydal,Penrith,3,1
+2795,2023-24,14,2023-11-09,Ashby,Morden,0,7
+2796,2023-24,14,2023-11-09,Glenholm,Barnet Vale,3,1
+2797,2023-24,14,2023-11-09,Islip,Orwell,0,4
+2798,2023-24,14,2023-11-09,Stoke Edith,Dalby,0,2
+2799,2023-24,14,2023-11-09,Thirsk,Lanark,10,0
+2800,2023-24,14,2023-11-09,Quarry Bank,Corrin,3,0
+2801,2023-24,15,2023-11-16,Hartwell,Kirkby,0,3
+2802,2023-24,15,2023-11-16,Eskdale,Jedburgh,0,3
+2803,2023-24,15,2023-11-16,Netley,Rydal,1,1
+2804,2023-24,15,2023-11-16,Farley,Ashby,10,0
+2805,2023-24,15,2023-11-16,Penrith,Glenholm,0,3
+2806,2023-24,15,2023-11-16,Morden,Islip,3,0
+2807,2023-24,15,2023-11-16,Barnet Vale,Stoke Edith,1,5
+2808,2023-24,15,2023-11-16,Orwell,Thirsk,2,0
+2809,2023-24,15,2023-11-16,Dalby,Quarry Bank,5,1
+2810,2023-24,15,2023-11-16,Lanark,Corrin,2,4
+2811,2023-24,16,2023-11-23,Jedburgh,Hartwell,6,1
+2812,2023-24,16,2023-11-23,Rydal,Kirkby,0,1
+2813,2023-24,16,2023-11-23,Ashby,Eskdale,0,4
+2814,2023-24,16,2023-11-23,Glenholm,Netley,1,0
+2815,2023-24,16,2023-11-23,Islip,Farley,0,3
+2816,2023-24,16,2023-11-23,Stoke Edith,Penrith,4,0
+2817,2023-24,16,2023-11-23,Thirsk,Morden,0,1
+2818,2023-24,16,2023-11-23,Quarry Bank,Barnet Vale,2,1
+2819,2023-24,16,2023-11-23,Corrin,Orwell,0,10
+2820,2023-24,16,2023-11-23,Lanark,Dalby,0,10
+2821,2023-24,17,2023-11-30,Hartwell,Rydal,2,1
+2822,2023-24,17,2023-11-30,Jedburgh,Ashby,10,0
+2823,2023-24,17,2023-11-30,Kirkby,Glenholm,6,0
+2824,2023-24,17,2023-11-30,Eskdale,Islip,6,0
+2825,2023-24,17,2023-11-30,Netley,Stoke Edith,3,2
+2826,2023-24,17,2023-11-30,Farley,Thirsk,2,1
+2827,2023-24,17,2023-11-30,Penrith,Quarry Bank,0,3
+2828,2023-24,17,2023-11-30,Morden,Corrin,6,0
+2829,2023-24,17,2023-11-30,Barnet Vale,Lanark,3,1
+2830,2023-24,17,2023-11-30,Orwell,Dalby,0,0
+2831,2023-24,18,2023-12-07,Ashby,Hartwell,0,4
+2832,2023-24,18,2023-12-07,Glenholm,Rydal,0,1
+2833,2023-24,18,2023-12-07,Islip,Jedburgh,1,6
+2834,2023-24,18,2023-12-07,Stoke Edith,Kirkby,0,6
+2835,2023-24,18,2023-12-07,Thirsk,Eskdale,0,0
+2836,2023-24,18,2023-12-07,Quarry Bank,Netley,2,2
+2837,2023-24,18,2023-12-07,Corrin,Farley,0,7
+2838,2023-24,18,2023-12-07,Lanark,Penrith,1,2
+2839,2023-24,18,2023-12-07,Dalby,Morden,4,0
+2840,2023-24,18,2023-12-07,Orwell,Barnet Vale,10,0
+2841,2023-24,19,2023-12-14,Hartwell,Glenholm,4,1
+2842,2023-24,19,2023-12-14,Ashby,Islip,0,2
+2843,2023-24,19,2023-12-14,Rydal,Stoke Edith,1,1
+2844,2023-24,19,2023-12-14,Jedburgh,Thirsk,2,0
+2845,2023-24,19,2023-12-14,Kirkby,Quarry Bank,5,0
+2846,2023-24,19,2023-12-14,Eskdale,Corrin,4,0
+2847,2023-24,19,2023-12-14,Netley,Lanark,5,0
+2848,2023-24,19,2023-12-14,Farley,Dalby,0,2
+2849,2023-24,19,2023-12-14,Penrith,Orwell,0,7
+2850,2023-24,19,2023-12-14,Morden,Barnet Vale,5,0
+2851,2023-24,20,2024-01-11,Islip,Hartwell,2,2
+2852,2023-24,20,2024-01-11,Stoke Edith,Glenholm,0,2
+2853,2023-24,20,2024-01-11,Thirsk,Ashby,7,1
+2854,2023-24,20,2024-01-11,Quarry Bank,Rydal,0,1
+2855,2023-24,20,2024-01-11,Corrin,Jedburgh,0,10
+2856,2023-24,20,2024-01-11,Lanark,Kirkby,0,10
+2857,2023-24,20,2024-01-11,Dalby,Eskdale,4,1
+2858,2023-24,20,2024-01-11,Orwell,Netley,10,0
+2859,2023-24,20,2024-01-11,Barnet Vale,Farley,0,5
+2860,2023-24,20,2024-01-11,Morden,Penrith,4,0
+2861,2023-24,21,2024-01-18,Hartwell,Stoke Edith,2,1
+2862,2023-24,21,2024-01-18,Islip,Thirsk,0,6
+2863,2023-24,21,2024-01-18,Glenholm,Quarry Bank,2,0
+2864,2023-24,21,2024-01-18,Ashby,Corrin,0,2
+2865,2023-24,21,2024-01-18,Rydal,Lanark,10,0
+2866,2023-24,21,2024-01-18,Jedburgh,Dalby,2,1
+2867,2023-24,21,2024-01-18,Kirkby,Orwell,1,0
+2868,2023-24,21,2024-01-18,Eskdale,Barnet Vale,6,0
+2869,2023-24,21,2024-01-18,Netley,Morden,2,1
+2870,2023-24,21,2024-01-18,Farley,Penrith,6,0
+2871,2023-24,22,2024-01-25,Thirsk,Hartwell,2,1
+2872,2023-24,22,2024-01-25,Quarry Bank,Stoke Edith,0,1
+2873,2023-24,22,2024-01-25,Corrin,Islip,2,2
+2874,2023-24,22,2024-01-25,Lanark,Glenholm,0,10
+2875,2023-24,22,2024-01-25,Dalby,Ashby,10,0
+2876,2023-24,22,2024-01-25,Orwell,Rydal,4,0
+2877,2023-24,22,2024-01-25,Barnet Vale,Jedburgh,0,7
+2878,2023-24,22,2024-01-25,Morden,Kirkby,0,5
+2879,2023-24,22,2024-01-25,Penrith,Eskdale,0,6
+2880,2023-24,22,2024-01-25,Farley,Netley,6,0
+2881,2023-24,23,2024-02-01,Hartwell,Quarry Bank,3,0
+2882,2023-24,23,2024-02-01,Thirsk,Corrin,5,1
+2883,2023-24,23,2024-02-01,Stoke Edith,Lanark,10,0
+2884,2023-24,23,2024-02-01,Islip,Dalby,0,10
+2885,2023-24,23,2024-02-01,Glenholm,Orwell,0,4
+2886,2023-24,23,2024-02-01,Ashby,Barnet Vale,0,5
+2887,2023-24,23,2024-02-01,Rydal,Morden,0,0
+2888,2023-24,23,2024-02-01,Jedburgh,Penrith,10,0
+2889,2023-24,23,2024-02-01,Kirkby,Farley,4,0
+2890,2023-24,23,2024-02-01,Eskdale,Netley,4,0
+2891,2023-24,24,2024-02-08,Corrin,Hartwell,1,5
+2892,2023-24,24,2024-02-08,Lanark,Quarry Bank,0,6
+2893,2023-24,24,2024-02-08,Dalby,Thirsk,3,1
+2894,2023-24,24,2024-02-08,Orwell,Stoke Edith,6,0
+2895,2023-24,24,2024-02-08,Barnet Vale,Islip,2,0
+2896,2023-24,24,2024-02-08,Morden,Glenholm,2,1
+2897,2023-24,24,2024-02-08,Penrith,Ashby,2,0
+2898,2023-24,24,2024-02-08,Farley,Rydal,1,1
+2899,2023-24,24,2024-02-08,Netley,Jedburgh,0,10
+2900,2023-24,24,2024-02-08,Eskdale,Kirkby,0,5
+2901,2023-24,25,2024-02-15,Hartwell,Lanark,10,0
+2902,2023-24,25,2024-02-15,Corrin,Dalby,0,10
+2903,2023-24,25,2024-02-15,Quarry Bank,Orwell,0,9
+2904,2023-24,25,2024-02-15,Thirsk,Barnet Vale,4,1
+2905,2023-24,25,2024-02-15,Stoke Edith,Morden,0,1
+2906,2023-24,25,2024-02-15,Islip,Penrith,2,1
+2907,2023-24,25,2024-02-15,Glenholm,Farley,0,1
+2908,2023-24,25,2024-02-15,Ashby,Netley,0,2
+2909,2023-24,25,2024-02-15,Rydal,Eskdale,2,1
+2910,2023-24,25,2024-02-15,Jedburgh,Kirkby,0,1
+2911,2023-24,26,2024-02-22,Dalby,Hartwell,6,0
+2912,2023-24,26,2024-02-22,Orwell,Lanark,10,0
+2913,2023-24,26,2024-02-22,Barnet Vale,Corrin,1,2
+2914,2023-24,26,2024-02-22,Morden,Quarry Bank,1,1
+2915,2023-24,26,2024-02-22,Penrith,Thirsk,0,6
+2916,2023-24,26,2024-02-22,Farley,Stoke Edith,2,1
+2917,2023-24,26,2024-02-22,Netley,Islip,0,3
+2918,2023-24,26,2024-02-22,Eskdale,Glenholm,2,0
+2919,2023-24,26,2024-02-22,Kirkby,Ashby,10,0
+2920,2023-24,26,2024-02-22,Jedburgh,Rydal,5,2
+2921,2023-24,27,2024-02-29,Hartwell,Orwell,0,5
+2922,2023-24,27,2024-02-29,Dalby,Barnet Vale,10,0
+2923,2023-24,27,2024-02-29,Lanark,Morden,1,10
+2924,2023-24,27,2024-02-29,Corrin,Penrith,5,1
+2925,2023-24,27,2024-02-29,Quarry Bank,Farley,0,2
+2926,2023-24,27,2024-02-29,Thirsk,Netley,9,0
+2927,2023-24,27,2024-02-29,Stoke Edith,Eskdale,0,2
+2928,2023-24,27,2024-02-29,Islip,Kirkby,0,10
+2929,2023-24,27,2024-02-29,Glenholm,Jedburgh,0,3
+2930,2023-24,27,2024-02-29,Ashby,Rydal,0,7
+2931,2023-24,28,2024-03-07,Barnet Vale,Hartwell,1,3
+2932,2023-24,28,2024-03-07,Morden,Orwell,0,8
+2933,2023-24,28,2024-03-07,Penrith,Dalby,0,10
+2934,2023-24,28,2024-03-07,Farley,Lanark,10,0
+2935,2023-24,28,2024-03-07,Netley,Corrin,0,3
+2936,2023-24,28,2024-03-07,Eskdale,Quarry Bank,6,0
+2937,2023-24,28,2024-03-07,Kirkby,Thirsk,2,1
+2938,2023-24,28,2024-03-07,Jedburgh,Stoke Edith,3,0
+2939,2023-24,28,2024-03-07,Rydal,Islip,4,0
+2940,2023-24,28,2024-03-07,Ashby,Glenholm,1,9
+2941,2023-24,29,2024-03-14,Hartwell,Morden,1,1
+2942,2023-24,29,2024-03-14,Barnet Vale,Penrith,4,0
+2943,2023-24,29,2024-03-14,Orwell,Farley,6,1
+2944,2023-24,29,2024-03-14,Dalby,Netley,10,0
+2945,2023-24,29,2024-03-14,Lanark,Eskdale,0,10
+2946,2023-24,29,2024-03-14,Corrin,Kirkby,0,8
+2947,2023-24,29,2024-03-14,Quarry Bank,Jedburgh,1,7
+2948,2023-24,29,2024-03-14,Thirsk,Rydal,4,0
+2949,2023-24,29,2024-03-14,Stoke Edith,Ashby,9,1
+2950,2023-24,29,2024-03-14,Islip,Glenholm,1,2
+2951,2023-24,30,2024-03-21,Penrith,Hartwell,0,3
+2952,2023-24,30,2024-03-21,Farley,Morden,2,0
+2953,2023-24,30,2024-03-21,Netley,Barnet Vale,1,3
+2954,2023-24,30,2024-03-21,Eskdale,Orwell,0,1
+2955,2023-24,30,2024-03-21,Kirkby,Dalby,1,0
+2956,2023-24,30,2024-03-21,Jedburgh,Lanark,10,0
+2957,2023-24,30,2024-03-21,Rydal,Corrin,2,3
+2958,2023-24,30,2024-03-21,Ashby,Quarry Bank,2,3
+2959,2023-24,30,2024-03-21,Glenholm,Thirsk,0,2
+2960,2023-24,30,2024-03-21,Islip,Stoke Edith,0,2
+2961,2023-24,31,2024-03-28,Hartwell,Farley,2,1
+2962,2023-24,31,2024-03-28,Penrith,Netley,0,3
+2963,2023-24,31,2024-03-28,Morden,Eskdale,1,2
+2964,2023-24,31,2024-03-28,Barnet Vale,Kirkby,0,7
+2965,2023-24,31,2024-03-28,Orwell,Jedburgh,5,0
+2966,2023-24,31,2024-03-28,Dalby,Rydal,10,0
+2967,2023-24,31,2024-03-28,Lanark,Ashby,0,1
+2968,2023-24,31,2024-03-28,Corrin,Glenholm,0,3
+2969,2023-24,31,2024-03-28,Quarry Bank,Islip,0,2
+2970,2023-24,31,2024-03-28,Thirsk,Stoke Edith,4,1
+2971,2023-24,32,2024-04-04,Netley,Hartwell,0,4
+2972,2023-24,32,2024-04-04,Eskdale,Farley,0,0
+2973,2023-24,32,2024-04-04,Kirkby,Penrith,10,0
+2974,2023-24,32,2024-04-04,Jedburgh,Morden,4,0
+2975,2023-24,32,2024-04-04,Rydal,Barnet Vale,1,0
+2976,2023-24,32,2024-04-04,Ashby,Orwell,1,10
+2977,2023-24,32,2024-04-04,Glenholm,Dalby,1,5
+2978,2023-24,32,2024-04-04,Islip,Lanark,3,0
+2979,2023-24,32,2024-04-04,Stoke Edith,Corrin,3,0
+2980,2023-24,32,2024-04-04,Thirsk,Quarry Bank,6,0
+2981,2023-24,33,2024-04-11,Hartwell,Eskdale,1,2
+2982,2023-24,33,2024-04-11,Netley,Kirkby,0,10
+2983,2023-24,33,2024-04-11,Farley,Jedburgh,2,1
+2984,2023-24,33,2024-04-11,Penrith,Rydal,2,5
+2985,2023-24,33,2024-04-11,Morden,Ashby,9,1
+2986,2023-24,33,2024-04-11,Barnet Vale,Glenholm,0,1
+2987,2023-24,33,2024-04-11,Orwell,Islip,10,0
+2988,2023-24,33,2024-04-11,Dalby,Stoke Edith,6,0
+2989,2023-24,33,2024-04-11,Lanark,Thirsk,0,10
+2990,2023-24,33,2024-04-11,Corrin,Quarry Bank,4,0
+2991,2023-24,34,2024-04-18,Kirkby,Hartwell,6,0
+2992,2023-24,34,2024-04-18,Jedburgh,Eskdale,0,1
+2993,2023-24,34,2024-04-18,Rydal,Netley,0,0
+2994,2023-24,34,2024-04-18,Ashby,Farley,0,10
+2995,2023-24,34,2024-04-18,Glenholm,Penrith,10,0
+2996,2023-24,34,2024-04-18,Islip,Morden,2,2
+2997,2023-24,34,2024-04-18,Stoke Edith,Barnet Vale,0,2
+2998,2023-24,34,2024-04-18,Thirsk,Orwell,0,5
+2999,2023-24,34,2024-04-18,Quarry Bank,Dalby,0,10
+3000,2023-24,34,2024-04-18,Corrin,Lanark,7,0
+3001,2023-24,35,2024-04-25,Hartwell,Jedburgh,0,4
+3002,2023-24,35,2024-04-25,Kirkby,Rydal,10,0
+3003,2023-24,35,2024-04-25,Eskdale,Ashby,10,0
+3004,2023-24,35,2024-04-25,Netley,Glenholm,0,5
+3005,2023-24,35,2024-04-25,Farley,Islip,5,0
+3006,2023-24,35,2024-04-25,Penrith,Stoke Edith,0,7
+3007,2023-24,35,2024-04-25,Morden,Thirsk,0,3
+3008,2023-24,35,2024-04-25,Barnet Vale,Quarry Bank,3,0
+3009,2023-24,35,2024-04-25,Orwell,Corrin,10,0
+3010,2023-24,35,2024-04-25,Dalby,Lanark,10,0
+3011,2023-24,36,2024-05-02,Rydal,Hartwell,0,2
+3012,2023-24,36,2024-05-02,Ashby,Jedburgh,0,10
+3013,2023-24,36,2024-05-02,Glenholm,Kirkby,1,4
+3014,2023-24,36,2024-05-02,Islip,Eskdale,0,7
+3015,2023-24,36,2024-05-02,Stoke Edith,Netley,5,2
+3016,2023-24,36,2024-05-02,Thirsk,Farley,3,1
+3017,2023-24,36,2024-05-02,Quarry Bank,Penrith,2,0
+3018,2023-24,36,2024-05-02,Corrin,Morden,1,2
+3019,2023-24,36,2024-05-02,Lanark,Barnet Vale,0,10
+3020,2023-24,36,2024-05-02,Dalby,Orwell,0,1
+3021,2023-24,37,2024-05-09,Hartwell,Ashby,10,0
+3022,2023-24,37,2024-05-09,Rydal,Glenholm,0,5
+3023,2023-24,37,2024-05-09,Jedburgh,Islip,7,0
+3024,2023-24,37,2024-05-09,Kirkby,Stoke Edith,6,0
+3025,2023-24,37,2024-05-09,Eskdale,Thirsk,1,0
+3026,2023-24,37,2024-05-09,Netley,Quarry Bank,3,0
+3027,2023-24,37,2024-05-09,Farley,Corrin,2,0
+3028,2023-24,37,2024-05-09,Penrith,Lanark,2,1
+3029,2023-24,37,2024-05-09,Morden,Dalby,1,3
+3030,2023-24,37,2024-05-09,Barnet Vale,Orwell,0,7
+3031,2023-24,38,2024-05-16,Glenholm,Hartwell,5,0
+3032,2023-24,38,2024-05-16,Islip,Ashby,4,0
+3033,2023-24,38,2024-05-16,Stoke Edith,Rydal,3,3
+3034,2023-24,38,2024-05-16,Thirsk,Jedburgh,1,0
+3035,2023-24,38,2024-05-16,Quarry Bank,Kirkby,0,10
+3036,2023-24,38,2024-05-16,Corrin,Eskdale,0,6
+3037,2023-24,38,2024-05-16,Lanark,Netley,0,6
+3038,2023-24,38,2024-05-16,Dalby,Farley,6,0
+3039,2023-24,38,2024-05-16,Orwell,Penrith,10,0
+3040,2023-24,38,2024-05-16,Barnet Vale,Morden,0,0
+3041,2024-25,1,2024-08-10,Jedburgh,Islip,5,0
+3042,2024-25,1,2024-08-10,Eskdale,Rydal,5,0
+3043,2024-25,1,2024-08-10,Hartwell,Barnet Vale,0,3
+3044,2024-25,1,2024-08-10,Corrin,Stoke Edith,0,1
+3045,2024-25,1,2024-08-10,Kirkby,Netley,10,0
+3046,2024-25,1,2024-08-10,Farley,Orwell,1,5
+3047,2024-25,1,2024-08-10,Morden,Quarry Bank,1,1
+3048,2024-25,1,2024-08-10,Penrith,Ashby,2,4
+3049,2024-25,1,2024-08-10,Lanark,Glenholm,0,10
+3050,2024-25,1,2024-08-10,Thirsk,Dalby,1,3
+3051,2024-25,2,2024-08-17,Rydal,Jedburgh,1,3
+3052,2024-25,2,2024-08-17,Barnet Vale,Islip,1,0
+3053,2024-25,2,2024-08-17,Stoke Edith,Eskdale,0,0
+3054,2024-25,2,2024-08-17,Netley,Hartwell,0,3
+3055,2024-25,2,2024-08-17,Orwell,Corrin,10,0
+3056,2024-25,2,2024-08-17,Quarry Bank,Kirkby,0,10
+3057,2024-25,2,2024-08-17,Ashby,Farley,0,5
+3058,2024-25,2,2024-08-17,Glenholm,Morden,2,0
+3059,2024-25,2,2024-08-17,Dalby,Penrith,10,0
+3060,2024-25,2,2024-08-17,Thirsk,Lanark,10,0
+3061,2024-25,3,2024-08-24,Jedburgh,Barnet Vale,1,0
+3062,2024-25,3,2024-08-24,Rydal,Stoke Edith,0,2
+3063,2024-25,3,2024-08-24,Islip,Netley,3,0
+3064,2024-25,3,2024-08-24,Eskdale,Orwell,0,4
+3065,2024-25,3,2024-08-24,Hartwell,Quarry Bank,2,0
+3066,2024-25,3,2024-08-24,Corrin,Ashby,4,0
+3067,2024-25,3,2024-08-24,Kirkby,Glenholm,1,1
+3068,2024-25,3,2024-08-24,Farley,Dalby,0,4
+3069,2024-25,3,2024-08-24,Morden,Thirsk,0,2
+3070,2024-25,3,2024-08-24,Penrith,Lanark,0,1
+3071,2024-25,4,2024-08-31,Stoke Edith,Jedburgh,1,1
+3072,2024-25,4,2024-08-31,Netley,Barnet Vale,0,7
+3073,2024-25,4,2024-08-31,Orwell,Rydal,10,0
+3074,2024-25,4,2024-08-31,Quarry Bank,Islip,0,0
+3075,2024-25,4,2024-08-31,Ashby,Eskdale,0,7
+3076,2024-25,4,2024-08-31,Glenholm,Hartwell,3,0
+3077,2024-25,4,2024-08-31,Dalby,Corrin,7,0
+3078,2024-25,4,2024-08-31,Thirsk,Kirkby,0,3
+3079,2024-25,4,2024-08-31,Lanark,Farley,1,4
+3080,2024-25,4,2024-08-31,Penrith,Morden,0,7
+3081,2024-25,5,2024-09-07,Jedburgh,Netley,3,1
+3082,2024-25,5,2024-09-07,Stoke Edith,Orwell,0,3
+3083,2024-25,5,2024-09-07,Barnet Vale,Quarry Bank,4,0
+3084,2024-25,5,2024-09-07,Rydal,Ashby,3,0
+3085,2024-25,5,2024-09-07,Islip,Glenholm,0,3
+3086,2024-25,5,2024-09-07,Eskdale,Dalby,1,2
+3087,2024-25,5,2024-09-07,Hartwell,Thirsk,0,3
+3088,2024-25,5,2024-09-07,Corrin,Lanark,4,1
+3089,2024-25,5,2024-09-07,Kirkby,Penrith,10,0
+3090,2024-25,5,2024-09-07,Farley,Morden,1,1
+3091,2024-25,6,2024-09-14,Orwell,Jedburgh,6,0
+3092,2024-25,6,2024-09-14,Quarry Bank,Netley,3,1
+3093,2024-25,6,2024-09-14,Ashby,Stoke Edith,0,5
+3094,2024-25,6,2024-09-14,Glenholm,Barnet Vale,1,0
+3095,2024-25,6,2024-09-14,Dalby,Rydal,10,0
+3096,2024-25,6,2024-09-14,Thirsk,Islip,3,0
+3097,2024-25,6,2024-09-14,Lanark,Eskdale,1,9
+3098,2024-25,6,2024-09-14,Penrith,Hartwell,0,6
+3099,2024-25,6,2024-09-14,Morden,Corrin,1,1
+3100,2024-25,6,2024-09-14,Farley,Kirkby,0,4
+3101,2024-25,7,2024-09-21,Jedburgh,Quarry Bank,2,1
+3102,2024-25,7,2024-09-21,Orwell,Ashby,10,0
+3103,2024-25,7,2024-09-21,Netley,Glenholm,0,3
+3104,2024-25,7,2024-09-21,Stoke Edith,Dalby,1,1
+3105,2024-25,7,2024-09-21,Barnet Vale,Thirsk,1,2
+3106,2024-25,7,2024-09-21,Rydal,Lanark,1,1
+3107,2024-25,7,2024-09-21,Islip,Penrith,4,0
+3108,2024-25,7,2024-09-21,Eskdale,Morden,3,0
+3109,2024-25,7,2024-09-21,Hartwell,Farley,1,0
+3110,2024-25,7,2024-09-21,Corrin,Kirkby,1,5
+3111,2024-25,8,2024-09-28,Ashby,Jedburgh,0,6
+3112,2024-25,8,2024-09-28,Glenholm,Quarry Bank,6,0
+3113,2024-25,8,2024-09-28,Dalby,Orwell,2,2
+3114,2024-25,8,2024-09-28,Thirsk,Netley,7,0
+3115,2024-25,8,2024-09-28,Lanark,Stoke Edith,0,9
+3116,2024-25,8,2024-09-28,Penrith,Barnet Vale,0,7
+3117,2024-25,8,2024-09-28,Morden,Rydal,3,0
+3118,2024-25,8,2024-09-28,Farley,Islip,2,2
+3119,2024-25,8,2024-09-28,Kirkby,Eskdale,3,0
+3120,2024-25,8,2024-09-28,Corrin,Hartwell,2,1
+3121,2024-25,9,2024-10-05,Jedburgh,Glenholm,1,1
+3122,2024-25,9,2024-10-05,Ashby,Dalby,0,10
+3123,2024-25,9,2024-10-05,Quarry Bank,Thirsk,0,8
+3124,2024-25,9,2024-10-05,Orwell,Lanark,10,0
+3125,2024-25,9,2024-10-05,Netley,Penrith,4,0
+3126,2024-25,9,2024-10-05,Stoke Edith,Morden,3,0
+3127,2024-25,9,2024-10-05,Barnet Vale,Farley,5,0
+3128,2024-25,9,2024-10-05,Rydal,Kirkby,0,9
+3129,2024-25,9,2024-10-05,Islip,Corrin,1,2
+3130,2024-25,9,2024-10-05,Eskdale,Hartwell,3,0
+3131,2024-25,10,2024-10-12,Dalby,Jedburgh,4,0
+3132,2024-25,10,2024-10-12,Thirsk,Glenholm,1,0
+3133,2024-25,10,2024-10-12,Lanark,Ashby,2,2
+3134,2024-25,10,2024-10-12,Penrith,Quarry Bank,1,2
+3135,2024-25,10,2024-10-12,Morden,Orwell,0,6
+3136,2024-25,10,2024-10-12,Farley,Netley,1,1
+3137,2024-25,10,2024-10-12,Kirkby,Stoke Edith,6,1
+3138,2024-25,10,2024-10-12,Corrin,Barnet Vale,0,1
+3139,2024-25,10,2024-10-12,Hartwell,Rydal,4,0
+3140,2024-25,10,2024-10-12,Eskdale,Islip,4,0
+3141,2024-25,11,2024-10-19,Jedburgh,Thirsk,1,3
+3142,2024-25,11,2024-10-19,Dalby,Lanark,10,0
+3143,2024-25,11,2024-10-19,Glenholm,Penrith,10,0
+3144,2024-25,11,2024-10-19,Ashby,Morden,0,6
+3145,2024-25,11,2024-10-19,Quarry Bank,Farley,2,2
+3146,2024-25,11,2024-10-19,Orwell,Kirkby,1,2
+3147,2024-25,11,2024-10-19,Netley,Corrin,0,0
+3148,2024-25,11,2024-10-19,Stoke Edith,Hartwell,2,0
+3149,2024-25,11,2024-10-19,Barnet Vale,Eskdale,0,1
+3150,2024-25,11,2024-10-19,Rydal,Islip,2,2
+3151,2024-25,12,2024-10-26,Lanark,Jedburgh,0,3
+3152,2024-25,12,2024-10-26,Penrith,Thirsk,0,10
+3153,2024-25,12,2024-10-26,Morden,Dalby,1,3
+3154,2024-25,12,2024-10-26,Farley,Glenholm,0,3
+3155,2024-25,12,2024-10-26,Kirkby,Ashby,10,0
+3156,2024-25,12,2024-10-26,Corrin,Quarry Bank,1,2
+3157,2024-25,12,2024-10-26,Hartwell,Orwell,0,3
+3158,2024-25,12,2024-10-26,Eskdale,Netley,3,0
+3159,2024-25,12,2024-10-26,Islip,Stoke Edith,0,1
+3160,2024-25,12,2024-10-26,Rydal,Barnet Vale,1,1
+3161,2024-25,13,2024-11-02,Jedburgh,Penrith,6,0
+3162,2024-25,13,2024-11-02,Lanark,Morden,0,3
+3163,2024-25,13,2024-11-02,Thirsk,Farley,10,0
+3164,2024-25,13,2024-11-02,Dalby,Kirkby,0,1
+3165,2024-25,13,2024-11-02,Glenholm,Corrin,3,1
+3166,2024-25,13,2024-11-02,Ashby,Hartwell,0,10
+3167,2024-25,13,2024-11-02,Quarry Bank,Eskdale,0,4
+3168,2024-25,13,2024-11-02,Orwell,Islip,6,0
+3169,2024-25,13,2024-11-02,Netley,Rydal,3,2
+3170,2024-25,13,2024-11-02,Stoke Edith,Barnet Vale,3,0
+3171,2024-25,14,2024-11-09,Morden,Jedburgh,1,0
+3172,2024-25,14,2024-11-09,Farley,Penrith,4,1
+3173,2024-25,14,2024-11-09,Kirkby,Lanark,10,1
+3174,2024-25,14,2024-11-09,Corrin,Thirsk,0,5
+3175,2024-25,14,2024-11-09,Hartwell,Dalby,1,2
+3176,2024-25,14,2024-11-09,Eskdale,Glenholm,0,2
+3177,2024-25,14,2024-11-09,Islip,Ashby,7,0
+3178,2024-25,14,2024-11-09,Rydal,Quarry Bank,0,1
+3179,2024-25,14,2024-11-09,Barnet Vale,Orwell,0,6
+3180,2024-25,14,2024-11-09,Stoke Edith,Netley,4,1
+3181,2024-25,15,2024-11-16,Jedburgh,Farley,6,0
+3182,2024-25,15,2024-11-16,Morden,Kirkby,1,2
+3183,2024-25,15,2024-11-16,Penrith,Corrin,0,0
+3184,2024-25,15,2024-11-16,Lanark,Hartwell,1,8
+3185,2024-25,15,2024-11-16,Thirsk,Eskdale,3,0
+3186,2024-25,15,2024-11-16,Dalby,Islip,4,0
+3187,2024-25,15,2024-11-16,Glenholm,Rydal,8,0
+3188,2024-25,15,2024-11-16,Ashby,Barnet Vale,1,3
+3189,2024-25,15,2024-11-16,Quarry Bank,Stoke Edith,0,4
+3190,2024-25,15,2024-11-16,Orwell,Netley,10,1
+3191,2024-25,16,2024-11-23,Kirkby,Jedburgh,2,0
+3192,2024-25,16,2024-11-23,Corrin,Farley,2,1
+3193,2024-25,16,2024-11-23,Hartwell,Morden,3,1
+3194,2024-25,16,2024-11-23,Eskdale,Penrith,4,0
+3195,2024-25,16,2024-11-23,Islip,Lanark,7,0
+3196,2024-25,16,2024-11-23,Rydal,Thirsk,1,5
+3197,2024-25,16,2024-11-23,Barnet Vale,Dalby,0,6
+3198,2024-25,16,2024-11-23,Stoke Edith,Glenholm,1,2
+3199,2024-25,16,2024-11-23,Netley,Ashby,1,0
+3200,2024-25,16,2024-11-23,Orwell,Quarry Bank,10,0
+3201,2024-25,17,2024-11-30,Jedburgh,Corrin,3,0
+3202,2024-25,17,2024-11-30,Kirkby,Hartwell,4,1
+3203,2024-25,17,2024-11-30,Farley,Eskdale,0,5
+3204,2024-25,17,2024-11-30,Morden,Islip,1,0
+3205,2024-25,17,2024-11-30,Penrith,Rydal,0,2
+3206,2024-25,17,2024-11-30,Lanark,Barnet Vale,1,2
+3207,2024-25,17,2024-11-30,Thirsk,Stoke Edith,3,0
+3208,2024-25,17,2024-11-30,Dalby,Netley,5,0
+3209,2024-25,17,2024-11-30,Glenholm,Orwell,0,1
+3210,2024-25,17,2024-11-30,Ashby,Quarry Bank,0,1
+3211,2024-25,18,2024-12-07,Hartwell,Jedburgh,1,0
+3212,2024-25,18,2024-12-07,Eskdale,Corrin,3,0
+3213,2024-25,18,2024-12-07,Islip,Kirkby,0,3
+3214,2024-25,18,2024-12-07,Rydal,Farley,2,1
+3215,2024-25,18,2024-12-07,Barnet Vale,Morden,0,0
+3216,2024-25,18,2024-12-07,Stoke Edith,Penrith,10,0
+3217,2024-25,18,2024-12-07,Netley,Lanark,7,1
+3218,2024-25,18,2024-12-07,Orwell,Thirsk,1,0
+3219,2024-25,18,2024-12-07,Quarry Bank,Dalby,0,10
+3220,2024-25,18,2024-12-07,Ashby,Glenholm,0,10
+3221,2024-25,19,2024-12-14,Jedburgh,Eskdale,2,1
+3222,2024-25,19,2024-12-14,Hartwell,Islip,2,0
+3223,2024-25,19,2024-12-14,Corrin,Rydal,0,1
+3224,2024-25,19,2024-12-14,Kirkby,Barnet Vale,6,0
+3225,2024-25,19,2024-12-14,Farley,Stoke Edith,0,5
+3226,2024-25,19,2024-12-14,Morden,Netley,3,2
+3227,2024-25,19,2024-12-14,Penrith,Orwell,0,10
+3228,2024-25,19,2024-12-14,Lanark,Quarry Bank,1,2
+3229,2024-25,19,2024-12-14,Thirsk,Ashby,10,0
+3230,2024-25,19,2024-12-14,Dalby,Glenholm,2,0
+3231,2024-25,20,2025-01-11,Islip,Jedburgh,0,4
+3232,2024-25,20,2025-01-11,Rydal,Eskdale,1,1
+3233,2024-25,20,2025-01-11,Barnet Vale,Hartwell,0,1
+3234,2024-25,20,2025-01-11,Stoke Edith,Corrin,2,0
+3235,2024-25,20,2025-01-11,Netley,Kirkby,1,5
+3236,2024-25,20,2025-01-11,Orwell,Farley,10,0
+3237,2024-25,20,2025-01-11,Quarry Bank,Morden,0,3
+3238,2024-25,20,2025-01-11,Ashby,Penrith,0,2
+3239,2024-25,20,2025-01-11,Glenholm,Lanark,10,0
+3240,2024-25,20,2025-01-11,Dalby,Thirsk,1,1
+3241,2024-25,21,2025-01-18,Jedburgh,Rydal,3,1
+3242,2024-25,21,2025-01-18,Islip,Barnet Vale,0,0
+3243,2024-25,21,2025-01-18,Eskdale,Stoke Edith,0,3
+3244,2024-25,21,2025-01-18,Hartwell,Netley,3,0
+3245,2024-25,21,2025-01-18,Corrin,Orwell,0,4
+3246,2024-25,21,2025-01-18,Kirkby,Quarry Bank,10,0
+3247,2024-25,21,2025-01-18,Farley,Ashby,3,1
+3248,2024-25,21,2025-01-18,Morden,Glenholm,0,2
+3249,2024-25,21,2025-01-18,Penrith,Dalby,0,10
+3250,2024-25,21,2025-01-18,Lanark,Thirsk,0,10
+3251,2024-25,22,2025-01-25,Barnet Vale,Jedburgh,0,2
+3252,2024-25,22,2025-01-25,Stoke Edith,Rydal,3,0
+3253,2024-25,22,2025-01-25,Netley,Islip,2,1
+3254,2024-25,22,2025-01-25,Orwell,Eskdale,9,0
+3255,2024-25,22,2025-01-25,Quarry Bank,Hartwell,0,8
+3256,2024-25,22,2025-01-25,Ashby,Corrin,1,3
+3257,2024-25,22,2025-01-25,Glenholm,Kirkby,3,1
+3258,2024-25,22,2025-01-25,Dalby,Farley,10,0
+3259,2024-25,22,2025-01-25,Thirsk,Morden,9,1
+3260,2024-25,22,2025-01-25,Lanark,Penrith,0,0
+3261,2024-25,23,2025-02-01,Jedburgh,Stoke Edith,0,3
+3262,2024-25,23,2025-02-01,Barnet Vale,Netley,2,1
+3263,2024-25,23,2025-02-01,Rydal,Orwell,0,2
+3264,2024-25,23,2025-02-01,Islip,Quarry Bank,6,0
+3265,2024-25,23,2025-02-01,Eskdale,Ashby,5,0
+3266,2024-25,23,2025-02-01,Hartwell,Glenholm,2,1
+3267,2024-25,23,2025-02-01,Corrin,Dalby,0,6
+3268,2024-25,23,2025-02-01,Kirkby,Thirsk,1,0
+3269,2024-25,23,2025-02-01,Farley,Lanark,2,0
+3270,2024-25,23,2025-02-01,Morden,Penrith,3,0
+3271,2024-25,24,2025-02-08,Netley,Jedburgh,0,2
+3272,2024-25,24,2025-02-08,Orwell,Stoke Edith,1,1
+3273,2024-25,24,2025-02-08,Quarry Bank,Barnet Vale,0,5
+3274,2024-25,24,2025-02-08,Ashby,Rydal,1,4
+3275,2024-25,24,2025-02-08,Glenholm,Islip,3,1
+3276,2024-25,24,2025-02-08,Dalby,Eskdale,10,0
+3277,2024-25,24,2025-02-08,Thirsk,Hartwell,2,1
+3278,2024-25,24,2025-02-08,Lanark,Corrin,0,5
+3279,2024-25,24,2025-02-08,Penrith,Kirkby,0,10
+3280,2024-25,24,2025-02-08,Morden,Farley,3,2
+3281,2024-25,25,2025-02-15,Jedburgh,Orwell,0,4
+3282,2024-25,25,2025-02-15,Netley,Quarry Bank,7,0
+3283,2024-25,25,2025-02-15,Stoke Edith,Ashby,10,0
+3284,2024-25,25,2025-02-15,Barnet Vale,Glenholm,0,2
+3285,2024-25,25,2025-02-15,Rydal,Dalby,0,5
+3286,2024-25,25,2025-02-15,Islip,Thirsk,0,5
+3287,2024-25,25,2025-02-15,Eskdale,Lanark,6,0
+3288,2024-25,25,2025-02-15,Hartwell,Penrith,10,0
+3289,2024-25,25,2025-02-15,Corrin,Morden,2,0
+3290,2024-25,25,2025-02-15,Kirkby,Farley,10,0
+3291,2024-25,26,2025-02-22,Quarry Bank,Jedburgh,1,7
+3292,2024-25,26,2025-02-22,Ashby,Orwell,0,10
+3293,2024-25,26,2025-02-22,Glenholm,Netley,3,0
+3294,2024-25,26,2025-02-22,Dalby,Stoke Edith,3,2
+3295,2024-25,26,2025-02-22,Thirsk,Barnet Vale,4,0
+3296,2024-25,26,2025-02-22,Lanark,Rydal,0,7
+3297,2024-25,26,2025-02-22,Penrith,Islip,0,8
+3298,2024-25,26,2025-02-22,Morden,Eskdale,2,1
+3299,2024-25,26,2025-02-22,Farley,Hartwell,0,6
+3300,2024-25,26,2025-02-22,Kirkby,Corrin,6,0
+3301,2024-25,27,2025-03-01,Jedburgh,Ashby,9,0
+3302,2024-25,27,2025-03-01,Quarry Bank,Glenholm,0,10
+3303,2024-25,27,2025-03-01,Orwell,Dalby,1,0
+3304,2024-25,27,2025-03-01,Netley,Thirsk,0,5
+3305,2024-25,27,2025-03-01,Stoke Edith,Lanark,10,0
+3306,2024-25,27,2025-03-01,Barnet Vale,Penrith,10,0
+3307,2024-25,27,2025-03-01,Rydal,Morden,4,0
+3308,2024-25,27,2025-03-01,Islip,Farley,1,0
+3309,2024-25,27,2025-03-01,Eskdale,Kirkby,0,10
+3310,2024-25,27,2025-03-01,Hartwell,Corrin,3,1
+3311,2024-25,28,2025-03-08,Glenholm,Jedburgh,5,0
+3312,2024-25,28,2025-03-08,Dalby,Ashby,10,0
+3313,2024-25,28,2025-03-08,Thirsk,Quarry Bank,10,0
+3314,2024-25,28,2025-03-08,Lanark,Orwell,0,10
+3315,2024-25,28,2025-03-08,Penrith,Netley,0,8
+3316,2024-25,28,2025-03-08,Morden,Stoke Edith,0,9
+3317,2024-25,28,2025-03-08,Farley,Barnet Vale,0,2
+3318,2024-25,28,2025-03-08,Kirkby,Rydal,8,0
+3319,2024-25,28,2025-03-08,Corrin,Islip,2,0
+3320,2024-25,28,2025-03-08,Hartwell,Eskdale,10,0
+3321,2024-25,29,2025-03-15,Jedburgh,Dalby,0,6
+3322,2024-25,29,2025-03-15,Glenholm,Thirsk,0,0
+3323,2024-25,29,2025-03-15,Ashby,Lanark,2,1
+3324,2024-25,29,2025-03-15,Quarry Bank,Penrith,3,0
+3325,2024-25,29,2025-03-15,Orwell,Morden,10,0
+3326,2024-25,29,2025-03-15,Netley,Farley,2,0
+3327,2024-25,29,2025-03-15,Stoke Edith,Kirkby,0,2
+3328,2024-25,29,2025-03-15,Barnet Vale,Corrin,1,0
+3329,2024-25,29,2025-03-15,Rydal,Hartwell,0,1
+3330,2024-25,29,2025-03-15,Islip,Eskdale,6,0
+3331,2024-25,30,2025-03-22,Thirsk,Jedburgh,4,0
+3332,2024-25,30,2025-03-22,Lanark,Dalby,0,10
+3333,2024-25,30,2025-03-22,Penrith,Glenholm,0,10
+3334,2024-25,30,2025-03-22,Morden,Ashby,2,0
+3335,2024-25,30,2025-03-22,Farley,Quarry Bank,4,1
+3336,2024-25,30,2025-03-22,Kirkby,Orwell,4,0
+3337,2024-25,30,2025-03-22,Corrin,Netley,3,0
+3338,2024-25,30,2025-03-22,Hartwell,Stoke Edith,0,1
+3339,2024-25,30,2025-03-22,Eskdale,Barnet Vale,0,5
+3340,2024-25,30,2025-03-22,Islip,Rydal,0,1
+3341,2024-25,31,2025-03-29,Jedburgh,Lanark,7,0
+3342,2024-25,31,2025-03-29,Thirsk,Penrith,10,0
+3343,2024-25,31,2025-03-29,Dalby,Morden,10,1
+3344,2024-25,31,2025-03-29,Glenholm,Farley,8,0
+3345,2024-25,31,2025-03-29,Ashby,Kirkby,0,10
+3346,2024-25,31,2025-03-29,Quarry Bank,Corrin,1,4
+3347,2024-25,31,2025-03-29,Orwell,Hartwell,2,0
+3348,2024-25,31,2025-03-29,Netley,Eskdale,3,0
+3349,2024-25,31,2025-03-29,Stoke Edith,Islip,4,0
+3350,2024-25,31,2025-03-29,Barnet Vale,Rydal,0,1
+3351,2024-25,32,2025-04-05,Penrith,Jedburgh,0,10
+3352,2024-25,32,2025-04-05,Morden,Lanark,4,0
+3353,2024-25,32,2025-04-05,Farley,Thirsk,0,10
+3354,2024-25,32,2025-04-05,Kirkby,Dalby,1,1
+3355,2024-25,32,2025-04-05,Corrin,Glenholm,0,5
+3356,2024-25,32,2025-04-05,Hartwell,Ashby,10,0
+3357,2024-25,32,2025-04-05,Eskdale,Quarry Bank,1,0
+3358,2024-25,32,2025-04-05,Islip,Orwell,0,8
+3359,2024-25,32,2025-04-05,Rydal,Netley,4,1
+3360,2024-25,32,2025-04-05,Barnet Vale,Stoke Edith,1,2
+3361,2024-25,33,2025-04-12,Jedburgh,Morden,6,0
+3362,2024-25,33,2025-04-12,Penrith,Farley,1,5
+3363,2024-25,33,2025-04-12,Lanark,Kirkby,0,10
+3364,2024-25,33,2025-04-12,Thirsk,Corrin,10,0
+3365,2024-25,33,2025-04-12,Dalby,Hartwell,2,0
+3366,2024-25,33,2025-04-12,Glenholm,Eskdale,10,0
+3367,2024-25,33,2025-04-12,Ashby,Islip,0,2
+3368,2024-25,33,2025-04-12,Quarry Bank,Rydal,0,6
+3369,2024-25,33,2025-04-12,Orwell,Barnet Vale,4,0
+3370,2024-25,33,2025-04-12,Netley,Stoke Edith,0,7
+3371,2024-25,34,2025-04-19,Farley,Jedburgh,0,1
+3372,2024-25,34,2025-04-19,Kirkby,Morden,10,0
+3373,2024-25,34,2025-04-19,Corrin,Penrith,10,0
+3374,2024-25,34,2025-04-19,Hartwell,Lanark,10,0
+3375,2024-25,34,2025-04-19,Eskdale,Thirsk,0,10
+3376,2024-25,34,2025-04-19,Islip,Dalby,0,6
+3377,2024-25,34,2025-04-19,Rydal,Glenholm,0,2
+3378,2024-25,34,2025-04-19,Barnet Vale,Ashby,7,0
+3379,2024-25,34,2025-04-19,Stoke Edith,Quarry Bank,10,0
+3380,2024-25,34,2025-04-19,Netley,Orwell,0,10
+3381,2024-25,35,2025-04-26,Jedburgh,Kirkby,0,8
+3382,2024-25,35,2025-04-26,Farley,Corrin,1,1
+3383,2024-25,35,2025-04-26,Morden,Hartwell,0,7
+3384,2024-25,35,2025-04-26,Penrith,Eskdale,1,2
+3385,2024-25,35,2025-04-26,Lanark,Islip,0,3
+3386,2024-25,35,2025-04-26,Thirsk,Rydal,7,0
+3387,2024-25,35,2025-04-26,Dalby,Barnet Vale,5,0
+3388,2024-25,35,2025-04-26,Glenholm,Stoke Edith,2,2
+3389,2024-25,35,2025-04-26,Ashby,Netley,1,0
+3390,2024-25,35,2025-04-26,Quarry Bank,Orwell,0,10
+3391,2024-25,36,2025-05-03,Corrin,Jedburgh,0,1
+3392,2024-25,36,2025-05-03,Hartwell,Kirkby,1,5
+3393,2024-25,36,2025-05-03,Eskdale,Farley,0,2
+3394,2024-25,36,2025-05-03,Islip,Morden,2,1
+3395,2024-25,36,2025-05-03,Rydal,Penrith,10,0
+3396,2024-25,36,2025-05-03,Barnet Vale,Lanark,10,0
+3397,2024-25,36,2025-05-03,Stoke Edith,Thirsk,0,4
+3398,2024-25,36,2025-05-03,Netley,Dalby,0,10
+3399,2024-25,36,2025-05-03,Orwell,Glenholm,0,0
+3400,2024-25,36,2025-05-03,Quarry Bank,Ashby,1,2
+3401,2024-25,37,2025-05-10,Jedburgh,Hartwell,0,5
+3402,2024-25,37,2025-05-10,Corrin,Eskdale,9,1
+3403,2024-25,37,2025-05-10,Kirkby,Islip,10,0
+3404,2024-25,37,2025-05-10,Farley,Rydal,0,2
+3405,2024-25,37,2025-05-10,Morden,Barnet Vale,0,3
+3406,2024-25,37,2025-05-10,Penrith,Stoke Edith,0,10
+3407,2024-25,37,2025-05-10,Lanark,Netley,0,2
+3408,2024-25,37,2025-05-10,Thirsk,Orwell,5,0
+3409,2024-25,37,2025-05-10,Dalby,Quarry Bank,10,0
+3410,2024-25,37,2025-05-10,Glenholm,Ashby,10,0
+3411,2024-25,38,2025-05-17,Eskdale,Jedburgh,1,3
+3412,2024-25,38,2025-05-17,Islip,Hartwell,0,5
+3413,2024-25,38,2025-05-17,Rydal,Corrin,4,1
+3414,2024-25,38,2025-05-17,Barnet Vale,Kirkby,0,10
+3415,2024-25,38,2025-05-17,Stoke Edith,Farley,8,0
+3416,2024-25,38,2025-05-17,Netley,Morden,3,0
+3417,2024-25,38,2025-05-17,Orwell,Penrith,10,0
+3418,2024-25,38,2025-05-17,Quarry Bank,Lanark,2,0
+3419,2024-25,38,2025-05-17,Ashby,Thirsk,0,10
+3420,2024-25,38,2025-05-17,Glenholm,Dalby,2,1
+3421,2025-26,1,2025-08-10,Morden,Eskdale,0,1
+3422,2025-26,1,2025-08-10,Farley,Penrith,1,0
+3423,2025-26,1,2025-08-10,Ashby,Netley,1,0
+3424,2025-26,1,2025-08-10,Glenholm,Barnet Vale,5,1
+3425,2025-26,1,2025-08-10,Islip,Rydal,0,0
+3426,2025-26,1,2025-08-10,Lanark,Stoke Edith,0,5
+3427,2025-26,1,2025-08-10,Orwell,Quarry Bank,10,0
+3428,2025-26,1,2025-08-10,Jedburgh,Corrin,3,2
+3429,2025-26,1,2025-08-10,Thirsk,Hartwell,3,0
+3430,2025-26,1,2025-08-10,Kirkby,Dalby,3,0
+3431,2025-26,2,2025-08-17,Penrith,Morden,0,1
+3432,2025-26,2,2025-08-17,Netley,Eskdale,2,1
+3433,2025-26,2,2025-08-17,Barnet Vale,Farley,3,1
+3434,2025-26,2,2025-08-17,Rydal,Ashby,7,0
+3435,2025-26,2,2025-08-17,Stoke Edith,Glenholm,1,3
+3436,2025-26,2,2025-08-17,Quarry Bank,Islip,0,5
+3437,2025-26,2,2025-08-17,Corrin,Lanark,7,0
+3438,2025-26,2,2025-08-17,Hartwell,Orwell,2,2
+3439,2025-26,2,2025-08-17,Dalby,Jedburgh,2,0
+3440,2025-26,2,2025-08-17,Kirkby,Thirsk,1,0
+3441,2025-26,3,2025-08-24,Morden,Netley,0,1
+3442,2025-26,3,2025-08-24,Penrith,Barnet Vale,0,6
+3443,2025-26,3,2025-08-24,Eskdale,Rydal,0,5
+3444,2025-26,3,2025-08-24,Farley,Stoke Edith,1,3
+3445,2025-26,3,2025-08-24,Ashby,Quarry Bank,2,0
+3446,2025-26,3,2025-08-24,Glenholm,Corrin,4,1
+3447,2025-26,3,2025-08-24,Islip,Hartwell,0,2
+3448,2025-26,3,2025-08-24,Lanark,Dalby,0,7
+3449,2025-26,3,2025-08-24,Orwell,Kirkby,1,1
+3450,2025-26,3,2025-08-24,Jedburgh,Thirsk,0,3
+3451,2025-26,4,2025-08-31,Barnet Vale,Morden,2,0
+3452,2025-26,4,2025-08-31,Rydal,Netley,4,0
+3453,2025-26,4,2025-08-31,Stoke Edith,Penrith,10,0
+3454,2025-26,4,2025-08-31,Quarry Bank,Eskdale,0,4
+3455,2025-26,4,2025-08-31,Corrin,Farley,4,0
+3456,2025-26,4,2025-08-31,Hartwell,Ashby,7,0
+3457,2025-26,4,2025-08-31,Dalby,Glenholm,1,1
+3458,2025-26,4,2025-08-31,Kirkby,Islip,10,0
+3459,2025-26,4,2025-08-31,Thirsk,Lanark,10,0
+3460,2025-26,4,2025-08-31,Jedburgh,Orwell,1,1
+3461,2025-26,5,2025-09-07,Morden,Rydal,0,2
+3462,2025-26,5,2025-09-07,Barnet Vale,Stoke Edith,2,4
+3463,2025-26,5,2025-09-07,Netley,Quarry Bank,4,1
+3464,2025-26,5,2025-09-07,Penrith,Corrin,0,6
+3465,2025-26,5,2025-09-07,Eskdale,Hartwell,1,4
+3466,2025-26,5,2025-09-07,Farley,Dalby,0,2
+3467,2025-26,5,2025-09-07,Ashby,Kirkby,0,10
+3468,2025-26,5,2025-09-07,Glenholm,Thirsk,0,1
+3469,2025-26,5,2025-09-07,Islip,Jedburgh,0,1
+3470,2025-26,5,2025-09-07,Lanark,Orwell,0,7
+3471,2025-26,6,2025-09-14,Stoke Edith,Morden,2,0
+3472,2025-26,6,2025-09-14,Quarry Bank,Rydal,0,8
+3473,2025-26,6,2025-09-14,Corrin,Barnet Vale,2,1
+3474,2025-26,6,2025-09-14,Hartwell,Netley,9,0
+3475,2025-26,6,2025-09-14,Dalby,Penrith,10,0
+3476,2025-26,6,2025-09-14,Kirkby,Eskdale,10,0
+3477,2025-26,6,2025-09-14,Thirsk,Farley,10,0
+3478,2025-26,6,2025-09-14,Jedburgh,Ashby,3,0
+3479,2025-26,6,2025-09-14,Orwell,Glenholm,1,1
+3480,2025-26,6,2025-09-14,Lanark,Islip,0,2
+3481,2025-26,7,2025-09-21,Morden,Quarry Bank,5,0
+3482,2025-26,7,2025-09-21,Stoke Edith,Corrin,1,1
+3483,2025-26,7,2025-09-21,Rydal,Hartwell,1,0
+3484,2025-26,7,2025-09-21,Barnet Vale,Dalby,0,0
+3485,2025-26,7,2025-09-21,Netley,Kirkby,0,10
+3486,2025-26,7,2025-09-21,Penrith,Thirsk,0,10
+3487,2025-26,7,2025-09-21,Eskdale,Jedburgh,1,3
+3488,2025-26,7,2025-09-21,Farley,Orwell,0,3
+3489,2025-26,7,2025-09-21,Ashby,Lanark,0,1
+3490,2025-26,7,2025-09-21,Glenholm,Islip,7,0
+3491,2025-26,8,2025-09-28,Corrin,Morden,4,0
+3492,2025-26,8,2025-09-28,Hartwell,Quarry Bank,10,0
+3493,2025-26,8,2025-09-28,Dalby,Stoke Edith,3,0
+3494,2025-26,8,2025-09-28,Kirkby,Rydal,9,0
+3495,2025-26,8,2025-09-28,Thirsk,Barnet Vale,7,0
+3496,2025-26,8,2025-09-28,Jedburgh,Netley,7,0
+3497,2025-26,8,2025-09-28,Orwell,Penrith,10,0
+3498,2025-26,8,2025-09-28,Lanark,Eskdale,0,2
+3499,2025-26,8,2025-09-28,Islip,Farley,0,0
+3500,2025-26,8,2025-09-28,Glenholm,Ashby,10,0
+3501,2025-26,9,2025-10-05,Morden,Hartwell,0,2
+3502,2025-26,9,2025-10-05,Corrin,Dalby,0,2
+3503,2025-26,9,2025-10-05,Quarry Bank,Kirkby,0,10
+3504,2025-26,9,2025-10-05,Stoke Edith,Thirsk,0,2
+3505,2025-26,9,2025-10-05,Rydal,Jedburgh,1,0
+3506,2025-26,9,2025-10-05,Barnet Vale,Orwell,1,4
+3507,2025-26,9,2025-10-05,Netley,Lanark,2,2
+3508,2025-26,9,2025-10-05,Penrith,Islip,0,4
+3509,2025-26,9,2025-10-05,Eskdale,Glenholm,0,6
+3510,2025-26,9,2025-10-05,Farley,Ashby,5,1
+3511,2025-26,10,2025-10-12,Dalby,Morden,1,0
+3512,2025-26,10,2025-10-12,Kirkby,Hartwell,8,0
+3513,2025-26,10,2025-10-12,Thirsk,Corrin,2,0
+3514,2025-26,10,2025-10-12,Jedburgh,Quarry Bank,10,1
+3515,2025-26,10,2025-10-12,Orwell,Stoke Edith,2,1
+3516,2025-26,10,2025-10-12,Lanark,Rydal,0,3
+3517,2025-26,10,2025-10-12,Islip,Barnet Vale,3,0
+3518,2025-26,10,2025-10-12,Glenholm,Netley,10,0
+3519,2025-26,10,2025-10-12,Ashby,Penrith,1,0
+3520,2025-26,10,2025-10-12,Farley,Eskdale,2,1
+3521,2025-26,11,2025-10-19,Morden,Kirkby,0,9
+3522,2025-26,11,2025-10-19,Dalby,Thirsk,1,2
+3523,2025-26,11,2025-10-19,Hartwell,Jedburgh,1,0
+3524,2025-26,11,2025-10-19,Corrin,Orwell,2,0
+3525,2025-26,11,2025-10-19,Quarry Bank,Lanark,0,5
+3526,2025-26,11,2025-10-19,Stoke Edith,Islip,2,1
+3527,2025-26,11,2025-10-19,Rydal,Glenholm,0,2
+3528,2025-26,11,2025-10-19,Barnet Vale,Ashby,1,1
+3529,2025-26,11,2025-10-19,Netley,Farley,0,3
+3530,2025-26,11,2025-10-19,Penrith,Eskdale,0,2
+3531,2025-26,12,2025-10-26,Thirsk,Morden,8,0
+3532,2025-26,12,2025-10-26,Jedburgh,Kirkby,0,4
+3533,2025-26,12,2025-10-26,Orwell,Dalby,2,1
+3534,2025-26,12,2025-10-26,Lanark,Hartwell,2,2
+3535,2025-26,12,2025-10-26,Islip,Corrin,1,4
+3536,2025-26,12,2025-10-26,Glenholm,Quarry Bank,10,0
+3537,2025-26,12,2025-10-26,Ashby,Stoke Edith,0,7
+3538,2025-26,12,2025-10-26,Farley,Rydal,2,3
+3539,2025-26,12,2025-10-26,Eskdale,Barnet Vale,4,1
+3540,2025-26,12,2025-10-26,Penrith,Netley,1,1
+3541,2025-26,13,2025-11-02,Morden,Jedburgh,2,2
+3542,2025-26,13,2025-11-02,Thirsk,Orwell,4,1
+3543,2025-26,13,2025-11-02,Kirkby,Lanark,10,0
+3544,2025-26,13,2025-11-02,Dalby,Islip,9,0
+3545,2025-26,13,2025-11-02,Hartwell,Glenholm,0,3
+3546,2025-26,13,2025-11-02,Corrin,Ashby,9,0
+3547,2025-26,13,2025-11-02,Quarry Bank,Farley,1,3
+3548,2025-26,13,2025-11-02,Stoke Edith,Eskdale,4,0
+3549,2025-26,13,2025-11-02,Rydal,Penrith,7,0
+3550,2025-26,13,2025-11-02,Barnet Vale,Netley,3,0
+3551,2025-26,14,2025-11-09,Orwell,Morden,3,1
+3552,2025-26,14,2025-11-09,Lanark,Jedburgh,1,1
+3553,2025-26,14,2025-11-09,Islip,Thirsk,0,7
+3554,2025-26,14,2025-11-09,Glenholm,Kirkby,0,1
+3555,2025-26,14,2025-11-09,Ashby,Dalby,0,10
+3556,2025-26,14,2025-11-09,Farley,Hartwell,0,1
+3557,2025-26,14,2025-11-09,Eskdale,Corrin,0,3
+3558,2025-26,14,2025-11-09,Penrith,Quarry Bank,1,1
+3559,2025-26,14,2025-11-09,Netley,Stoke Edith,0,8
+3560,2025-26,14,2025-11-09,Barnet Vale,Rydal,1,1
+3561,2025-26,15,2025-11-16,Morden,Lanark,2,1
+3562,2025-26,15,2025-11-16,Orwell,Islip,8,0
+3563,2025-26,15,2025-11-16,Jedburgh,Glenholm,2,6
+3564,2025-26,15,2025-11-16,Thirsk,Ashby,10,0
+3565,2025-26,15,2025-11-16,Kirkby,Farley,10,0
+3566,2025-26,15,2025-11-16,Dalby,Eskdale,10,2
+3567,2025-26,15,2025-11-16,Hartwell,Penrith,5,1
+3568,2025-26,15,2025-11-16,Corrin,Netley,10,0
+3569,2025-26,15,2025-11-16,Quarry Bank,Barnet Vale,0,2
+3570,2025-26,15,2025-11-16,Stoke Edith,Rydal,0,1
+3571,2025-26,16,2025-11-23,Islip,Morden,2,3
+3572,2025-26,16,2025-11-23,Glenholm,Lanark,9,0
+3573,2025-26,16,2025-11-23,Ashby,Orwell,0,10
+3574,2025-26,16,2025-11-23,Farley,Jedburgh,1,2
+3575,2025-26,16,2025-11-23,Eskdale,Thirsk,0,8
+3576,2025-26,16,2025-11-23,Penrith,Kirkby,0,10
+3577,2025-26,16,2025-11-23,Netley,Dalby,0,10
+3578,2025-26,16,2025-11-23,Barnet Vale,Hartwell,1,3
+3579,2025-26,16,2025-11-23,Rydal,Corrin,2,1
+3580,2025-26,16,2025-11-23,Stoke Edith,Quarry Bank,10,0
+3581,2025-26,17,2025-11-30,Morden,Glenholm,1,4
+3582,2025-26,17,2025-11-30,Islip,Ashby,3,1
+3583,2025-26,17,2025-11-30,Lanark,Farley,4,1
+3584,2025-26,17,2025-11-30,Orwell,Eskdale,9,0
+3585,2025-26,17,2025-11-30,Jedburgh,Penrith,6,1
+3586,2025-26,17,2025-11-30,Thirsk,Netley,10,0
+3587,2025-26,17,2025-11-30,Kirkby,Barnet Vale,10,0
+3588,2025-26,17,2025-11-30,Dalby,Rydal,8,0
+3589,2025-26,17,2025-11-30,Hartwell,Stoke Edith,0,1
+3590,2025-26,17,2025-11-30,Corrin,Quarry Bank,10,1
+3591,2025-26,18,2025-12-07,Ashby,Morden,1,8
+3592,2025-26,18,2025-12-07,Farley,Glenholm,0,5
+3593,2025-26,18,2025-12-07,Eskdale,Islip,1,0
+3594,2025-26,18,2025-12-07,Penrith,Lanark,0,3
+3595,2025-26,18,2025-12-07,Netley,Orwell,0,10
+3596,2025-26,18,2025-12-07,Barnet Vale,Jedburgh,0,2
+3597,2025-26,18,2025-12-07,Rydal,Thirsk,1,7
+3598,2025-26,18,2025-12-07,Stoke Edith,Kirkby,0,5
+3599,2025-26,18,2025-12-07,Quarry Bank,Dalby,0,10
+3600,2025-26,18,2025-12-07,Corrin,Hartwell,3,0
+3601,2025-26,19,2025-12-14,Morden,Farley,3,0
+3602,2025-26,19,2025-12-14,Ashby,Eskdale,0,5
+3603,2025-26,19,2025-12-14,Glenholm,Penrith,10,0
+3604,2025-26,19,2025-12-14,Islip,Netley,4,0
+3605,2025-26,19,2025-12-14,Lanark,Barnet Vale,1,0
+3606,2025-26,19,2025-12-14,Orwell,Rydal,7,2
+3607,2025-26,19,2025-12-14,Jedburgh,Stoke Edith,1,1
+3608,2025-26,19,2025-12-14,Thirsk,Quarry Bank,10,0
+3609,2025-26,19,2025-12-14,Kirkby,Corrin,6,0
+3610,2025-26,19,2025-12-14,Dalby,Hartwell,10,1
+3611,2025-26,20,2026-01-11,Eskdale,Morden,0,2
+3612,2025-26,20,2026-01-11,Penrith,Farley,2,2
+3613,2025-26,20,2026-01-11,Netley,Ashby,1,0
+3614,2025-26,20,2026-01-11,Barnet Vale,Glenholm,0,10
+3615,2025-26,20,2026-01-11,Rydal,Islip,6,0
+3616,2025-26,20,2026-01-11,Stoke Edith,Lanark,5,0
+3617,2025-26,20,2026-01-11,Quarry Bank,Orwell,0,10
+3618,2025-26,20,2026-01-11,Corrin,Jedburgh,4,0
+3619,2025-26,20,2026-01-11,Hartwell,Thirsk,0,4
+3620,2025-26,20,2026-01-11,Dalby,Kirkby,1,0
+3621,2025-26,21,2026-01-18,Morden,Penrith,6,0
+3622,2025-26,21,2026-01-18,Eskdale,Netley,7,0
+3623,2025-26,21,2026-01-18,Farley,Barnet Vale,6,0
+3624,2025-26,21,2026-01-18,Ashby,Rydal,0,10
+3625,2025-26,21,2026-01-18,Glenholm,Stoke Edith,3,0
+3626,2025-26,21,2026-01-18,Islip,Quarry Bank,5,0
+3627,2025-26,21,2026-01-18,Lanark,Corrin,0,5
+3628,2025-26,21,2026-01-18,Orwell,Hartwell,7,0
+3629,2025-26,21,2026-01-18,Jedburgh,Dalby,1,8
+3630,2025-26,21,2026-01-18,Thirsk,Kirkby,2,3
+3631,2025-26,22,2026-01-25,Netley,Morden,0,10
+3632,2025-26,22,2026-01-25,Barnet Vale,Penrith,0,2
+3633,2025-26,22,2026-01-25,Rydal,Eskdale,5,0
+3634,2025-26,22,2026-01-25,Stoke Edith,Farley,5,1
+3635,2025-26,22,2026-01-25,Quarry Bank,Ashby,0,1
+3636,2025-26,22,2026-01-25,Corrin,Glenholm,3,1
+3637,2025-26,22,2026-01-25,Hartwell,Islip,4,0
+3638,2025-26,22,2026-01-25,Dalby,Lanark,7,0
+3639,2025-26,22,2026-01-25,Kirkby,Orwell,2,1
+3640,2025-26,22,2026-01-25,Thirsk,Jedburgh,10,0
+3641,2025-26,23,2026-02-01,Morden,Barnet Vale,10,0
+3642,2025-26,23,2026-02-01,Netley,Rydal,0,10
+3643,2025-26,23,2026-02-01,Penrith,Stoke Edith,1,4
+3644,2025-26,23,2026-02-01,Eskdale,Quarry Bank,8,0
+3645,2025-26,23,2026-02-01,Farley,Corrin,0,4
+3646,2025-26,23,2026-02-01,Ashby,Hartwell,0,10
+3647,2025-26,23,2026-02-01,Glenholm,Dalby,1,3
+3648,2025-26,23,2026-02-01,Islip,Kirkby,0,10
+3649,2025-26,23,2026-02-01,Lanark,Thirsk,0,9
+3650,2025-26,23,2026-02-01,Orwell,Jedburgh,10,0
+3651,2025-26,24,2026-02-08,Rydal,Morden,2,0
+3652,2025-26,24,2026-02-08,Stoke Edith,Barnet Vale,10,0
+3653,2025-26,24,2026-02-08,Quarry Bank,Netley,0,1
+3654,2025-26,24,2026-02-08,Corrin,Penrith,10,0
+3655,2025-26,24,2026-02-08,Hartwell,Eskdale,4,0
+3656,2025-26,24,2026-02-08,Dalby,Farley,7,0
+3657,2025-26,24,2026-02-08,Kirkby,Ashby,10,0
+3658,2025-26,24,2026-02-08,Thirsk,Glenholm,4,0
+3659,2025-26,24,2026-02-08,Jedburgh,Islip,5,0
+3660,2025-26,24,2026-02-08,Orwell,Lanark,10,0
+3661,2025-26,25,2026-02-15,Morden,Stoke Edith,2,0
+3662,2025-26,25,2026-02-15,Rydal,Quarry Bank,10,0
+3663,2025-26,25,2026-02-15,Barnet Vale,Corrin,0,10
+3664,2025-26,25,2026-02-15,Netley,Hartwell,1,10
+3665,2025-26,25,2026-02-15,Penrith,Dalby,0,10
+3666,2025-26,25,2026-02-15,Eskdale,Kirkby,1,10
+3667,2025-26,25,2026-02-15,Farley,Thirsk,1,8
+3668,2025-26,25,2026-02-15,Ashby,Jedburgh,0,10
+3669,2025-26,25,2026-02-15,Glenholm,Orwell,1,1
+3670,2025-26,25,2026-02-15,Islip,Lanark,0,2
+3671,2025-26,26,2026-02-22,Quarry Bank,Morden,0,10
+3672,2025-26,26,2026-02-22,Corrin,Stoke Edith,2,1
+3673,2025-26,26,2026-02-22,Hartwell,Rydal,0,1
+3674,2025-26,26,2026-02-22,Dalby,Barnet Vale,10,0
+3675,2025-26,26,2026-02-22,Kirkby,Netley,10,0
+3676,2025-26,26,2026-02-22,Thirsk,Penrith,10,0
+3677,2025-26,26,2026-02-22,Jedburgh,Eskdale,2,0
+3678,2025-26,26,2026-02-22,Orwell,Farley,6,0
+3679,2025-26,26,2026-02-22,Lanark,Ashby,10,0
+3680,2025-26,26,2026-02-22,Islip,Glenholm,0,8
+3681,2025-26,27,2026-03-01,Morden,Corrin,0,4
+3682,2025-26,27,2026-03-01,Quarry Bank,Hartwell,0,10
+3683,2025-26,27,2026-03-01,Stoke Edith,Dalby,0,2
+3684,2025-26,27,2026-03-01,Rydal,Kirkby,1,3
+3685,2025-26,27,2026-03-01,Barnet Vale,Thirsk,0,10
+3686,2025-26,27,2026-03-01,Netley,Jedburgh,0,10
+3687,2025-26,27,2026-03-01,Penrith,Orwell,0,10
+3688,2025-26,27,2026-03-01,Eskdale,Lanark,0,5
+3689,2025-26,27,2026-03-01,Farley,Islip,5,1
+3690,2025-26,27,2026-03-01,Ashby,Glenholm,0,10
+3691,2025-26,28,2026-03-08,Hartwell,Morden,0,1
+3692,2025-26,28,2026-03-08,Dalby,Corrin,1,0
+3693,2025-26,28,2026-03-08,Kirkby,Quarry Bank,10,0
+3694,2025-26,28,2026-03-08,Thirsk,Stoke Edith,8,0
+3695,2025-26,28,2026-03-08,Jedburgh,Rydal,1,1
+3696,2025-26,28,2026-03-08,Orwell,Barnet Vale,10,0
+3697,2025-26,28,2026-03-08,Lanark,Netley,10,0
+3698,2025-26,28,2026-03-08,Islip,Penrith,0,0
+3699,2025-26,28,2026-03-08,Glenholm,Eskdale,10,0
+3700,2025-26,28,2026-03-08,Ashby,Farley,0,10
+3701,2025-26,29,2026-03-15,Morden,Dalby,1,1
+3702,2025-26,29,2026-03-15,Hartwell,Kirkby,1,9
+3703,2025-26,29,2026-03-15,Corrin,Thirsk,0,6
+3704,2025-26,29,2026-03-15,Quarry Bank,Jedburgh,0,10
+3705,2025-26,29,2026-03-15,Stoke Edith,Orwell,1,4
+3706,2025-26,29,2026-03-15,Rydal,Lanark,4,0
+3707,2025-26,29,2026-03-15,Barnet Vale,Islip,1,2
+3708,2025-26,29,2026-03-15,Netley,Glenholm,0,10
+3709,2025-26,29,2026-03-15,Penrith,Ashby,2,0
+3710,2025-26,29,2026-03-15,Eskdale,Farley,1,5
+3711,2025-26,30,2026-03-22,Kirkby,Morden,9,0
+3712,2025-26,30,2026-03-22,Thirsk,Dalby,4,1
+3713,2025-26,30,2026-03-22,Jedburgh,Hartwell,0,1
+3714,2025-26,30,2026-03-22,Orwell,Corrin,2,0
+3715,2025-26,30,2026-03-22,Lanark,Quarry Bank,10,0
+3716,2025-26,30,2026-03-22,Islip,Stoke Edith,0,6
+3717,2025-26,30,2026-03-22,Glenholm,Rydal,2,0
+3718,2025-26,30,2026-03-22,Ashby,Barnet Vale,2,2
+3719,2025-26,30,2026-03-22,Farley,Netley,10,0
+3720,2025-26,30,2026-03-22,Eskdale,Penrith,6,0
+3721,2025-26,31,2026-03-29,Morden,Thirsk,1,7
+3722,2025-26,31,2026-03-29,Kirkby,Jedburgh,4,0
+3723,2025-26,31,2026-03-29,Dalby,Orwell,0,2
+3724,2025-26,31,2026-03-29,Hartwell,Lanark,0,2
+3725,2025-26,31,2026-03-29,Corrin,Islip,10,0
+3726,2025-26,31,2026-03-29,Quarry Bank,Glenholm,0,10
+3727,2025-26,31,2026-03-29,Stoke Edith,Ashby,10,1
+3728,2025-26,31,2026-03-29,Rydal,Farley,3,1
+3729,2025-26,31,2026-03-29,Barnet Vale,Eskdale,0,4
+3730,2025-26,31,2026-03-29,Netley,Penrith,1,0
+3731,2025-26,32,2026-04-05,Jedburgh,Morden,1,1
+3732,2025-26,32,2026-04-05,Orwell,Thirsk,0,1
+3733,2025-26,32,2026-04-05,Lanark,Kirkby,0,9
+3734,2025-26,32,2026-04-05,Islip,Dalby,1,9
+3735,2025-26,32,2026-04-05,Glenholm,Hartwell,5,1
+3736,2025-26,32,2026-04-05,Ashby,Corrin,0,10
+3737,2025-26,32,2026-04-05,Farley,Quarry Bank,10,0
+3738,2025-26,32,2026-04-05,Eskdale,Stoke Edith,1,4
+3739,2025-26,32,2026-04-05,Penrith,Rydal,0,10
+3740,2025-26,32,2026-04-05,Netley,Barnet Vale,1,0
+3741,2025-26,33,2026-04-12,Morden,Orwell,0,2
+3742,2025-26,33,2026-04-12,Jedburgh,Lanark,2,0
+3743,2025-26,33,2026-04-12,Thirsk,Islip,10,0
+3744,2025-26,33,2026-04-12,Kirkby,Glenholm,3,1
+3745,2025-26,33,2026-04-12,Dalby,Ashby,10,0
+3746,2025-26,33,2026-04-12,Hartwell,Farley,0,1
+3747,2025-26,33,2026-04-12,Corrin,Eskdale,6,1
+3748,2025-26,33,2026-04-12,Quarry Bank,Penrith,2,2
+3749,2025-26,33,2026-04-12,Stoke Edith,Netley,10,0
+3750,2025-26,33,2026-04-12,Rydal,Barnet Vale,10,0
+3751,2025-26,34,2026-04-19,Lanark,Morden,1,2
+3752,2025-26,34,2026-04-19,Islip,Orwell,0,10
+3753,2025-26,34,2026-04-19,Glenholm,Jedburgh,3,0
+3754,2025-26,34,2026-04-19,Ashby,Thirsk,0,10
+3755,2025-26,34,2026-04-19,Farley,Kirkby,0,6
+3756,2025-26,34,2026-04-19,Eskdale,Dalby,0,5
+3757,2025-26,34,2026-04-19,Penrith,Hartwell,0,4
+3758,2025-26,34,2026-04-19,Netley,Corrin,0,10
+3759,2025-26,34,2026-04-19,Barnet Vale,Quarry Bank,0,0
+3760,2025-26,34,2026-04-19,Rydal,Stoke Edith,2,1
+3761,2025-26,35,2026-04-26,Morden,Islip,9,0
+3762,2025-26,35,2026-04-26,Lanark,Glenholm,0,8
+3763,2025-26,35,2026-04-26,Orwell,Ashby,10,0
+3764,2025-26,35,2026-04-26,Jedburgh,Farley,1,0
+3765,2025-26,35,2026-04-26,Thirsk,Eskdale,10,0
+3766,2025-26,35,2026-04-26,Kirkby,Penrith,10,0
+3767,2025-26,35,2026-04-26,Dalby,Netley,10,0
+3768,2025-26,35,2026-04-26,Hartwell,Barnet Vale,10,0
+3769,2025-26,35,2026-04-26,Corrin,Rydal,1,2
+3770,2025-26,35,2026-04-26,Quarry Bank,Stoke Edith,0,10
+3771,2025-26,36,2026-05-03,Glenholm,Morden,2,1
+3772,2025-26,36,2026-05-03,Ashby,Islip,0,0
+3773,2025-26,36,2026-05-03,Farley,Lanark,4,0
+3774,2025-26,36,2026-05-03,Eskdale,Orwell,0,10
+3775,2025-26,36,2026-05-03,Penrith,Jedburgh,0,10
+3776,2025-26,36,2026-05-03,Netley,Thirsk,0,10
+3777,2025-26,36,2026-05-03,Barnet Vale,Kirkby,0,10
+3778,2025-26,36,2026-05-03,Rydal,Dalby,0,3
+3779,2025-26,36,2026-05-03,Stoke Edith,Hartwell,1,0
+3780,2025-26,36,2026-05-03,Quarry Bank,Corrin,0,10
+3781,2025-26,37,2026-05-10,Morden,Ashby,10,0
+3782,2025-26,37,2026-05-10,Glenholm,Farley,7,0
+3783,2025-26,37,2026-05-10,Islip,Eskdale,1,3
+3784,2025-26,37,2026-05-10,Lanark,Penrith,9,0
+3785,2025-26,37,2026-05-10,Orwell,Netley,10,0
+3786,2025-26,37,2026-05-10,Jedburgh,Barnet Vale,10,0
+3787,2025-26,37,2026-05-10,Thirsk,Rydal,8,0
+3788,2025-26,37,2026-05-10,Kirkby,Stoke Edith,7,0
+3789,2025-26,37,2026-05-10,Dalby,Quarry Bank,10,0
+3790,2025-26,37,2026-05-10,Hartwell,Corrin,2,2
+3791,2025-26,38,2026-05-17,Farley,Morden,0,2
+3792,2025-26,38,2026-05-17,Eskdale,Ashby,5,0
+3793,2025-26,38,2026-05-17,Penrith,Glenholm,0,10
+3794,2025-26,38,2026-05-17,Netley,Islip,3,5
+3795,2025-26,38,2026-05-17,Barnet Vale,Lanark,0,10
+3796,2025-26,38,2026-05-17,Rydal,Orwell,0,4
+3797,2025-26,38,2026-05-17,Stoke Edith,Jedburgh,0,4
+3798,2025-26,38,2026-05-17,Quarry Bank,Thirsk,0,10
+3799,2025-26,38,2026-05-17,Corrin,Kirkby,0,4
+3800,2025-26,38,2026-05-17,Hartwell,Dalby,1,3

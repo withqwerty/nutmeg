@@ -1,0 +1,26 @@
+{
+  "locks": [
+    {
+      "at": "2026-10-09T21:36:13Z",
+      "run_id": "R1",
+      "reason": null,
+      "by": null,
+      "previous": null,
+      "choices": [
+        {
+          "key": "metric: expected threat (xT) added by passes and carries, per 90",
+          "hash": "6ed983487783238a"
+        },
+        {
+          "key": "filter: at least 900 league minutes",
+          "hash": "aa689b7429674281"
+        },
+        {
+          "key": "method: compare each signing with the median of the existing squad",
+          "hash": "bac01cab06194061"
+        }
+      ],
+      "hash": "0e35f849a487e317"
+    }
+  ]
+}

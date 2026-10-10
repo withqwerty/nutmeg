@@ -87,8 +87,14 @@ jobs:
               fi
             done
           done
-          # The SessionStart hook must emit valid JSON
-          CLAUDE_PLUGIN_ROOT="$PWD" sh -c 'cat "${CLAUDE_PLUGIN_ROOT}/hooks/session-start.json"' | python3 -m json.tool > /dev/null || {
+          # The SessionStart hook must emit valid JSON with the plugin path filled in
+          hook_cmd=$(python3 -c "import json; print(json.load(open('hooks/hooks.json'))['hooks']['SessionStart'][0]['hooks'][0]['command'])")
+          CLAUDE_PLUGIN_ROOT="$PWD" sh -c "$hook_cmd" > /tmp/session-start.out
+          if grep -q '@PLUGIN_ROOT@' /tmp/session-start.out; then
+            echo "ERROR: SessionStart output still has the @PLUGIN_ROOT@ placeholder"
+            errors=$((errors + 1))
+          fi
+          python3 -m json.tool /tmp/session-start.out > /dev/null || {
             echo "ERROR: hooks/session-start.json is not valid JSON"
             errors=$((errors + 1))
           }
@@ -156,3 +162,20 @@ jobs:
           agents=$(ls agents/*.md 2>/dev/null | wc -l | tr -d ' ')
           refs=$(find skills -name "*.md" -path "*/references/*" 2>/dev/null | wc -l | tr -d ' ')
           echo "Skills: $skills | Agents: $agents | Reference docs: $refs"
+
+  core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Run the core with no install
+        run: python3 core/nutmeg.py --help
+
+      - name: Test the core package
+        run: |
+          python3 -m pip install --quiet pytest
+          python3 -m pytest core/tests evals/_scaffold/tests

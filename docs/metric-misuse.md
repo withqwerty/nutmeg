@@ -7,8 +7,8 @@ Before you judge a player or team from a stat, check that the stat can support t
 | Save percentage | Goalkeeper shot-stopping | Goals prevented: post-shot xG (xGOT) faced minus goals conceded |
 | Distance or sprint counts | Effort or quality | Frame as physical load only, with role, system and game state; or leave out |
 | Possession share | Team quality | xG created and conceded; possession describes style and depends on the score |
-| Tackle and interception counts | Defensive quality | Possession-adjusted rates, labelled as style, not quality |
-| Tackle win rate (won / (won + lost)) | Tackling ability | A rate that also counts challenges lost and fouls when tackling; check the provider's definitions |
+| Tackle and interception counts | Defensive quality | Possession-adjusted rates, labelled as style, not quality. Say plainly that even adjusted counts describe how much a player defends, not how well; judge quality on other evidence (dribbled past, errors, chances conceded) |
+| Tackle win rate (won / (won + lost)) | Tackling ability | Say what it leaves out: challenges where the player is dribbled past and fouls when tackling, so a player who avoids risky tackles looks good. Use a rate that counts them, and check the provider's definitions |
 | Goals minus xG over one season | Finishing skill | Several hundred shots and xGOT vs xG; otherwise no verdict |
 | With-or-without-you win rates | A player's impact | What the player controls in his role; WOWY has too many confounders in football |
 | Pass completion | Passing ability | Pass length, pressure and progression; expected pass completion where the data has it |

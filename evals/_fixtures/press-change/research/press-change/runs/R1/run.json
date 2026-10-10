@@ -1,0 +1,35 @@
+{
+  "id": "R1",
+  "file": "analysis.py",
+  "interpreter": "python3",
+  "interpreter_version": "Python 3.14.0",
+  "argv": [
+    "python3",
+    "analysis.py"
+  ],
+  "cwd": ".",
+  "code": [
+    {
+      "path": "analysis.py",
+      "sha256": "656e9ff2466f5c363143c0e9a8d25974617758266f14258ed88aceb023445556"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "data/matches.csv",
+      "sha256": "60b145456fd268e63e1958a7d38d42aa5610bc17238de48037b03eeba7426066"
+    }
+  ],
+  "sends": [],
+  "started": "2026-10-09T21:37:23Z",
+  "duration_seconds": 0.04,
+  "exit_code": 0,
+  "status": "ok",
+  "gate": {
+    "shown": false,
+    "queued_for_review": false,
+    "changed_since_gate": []
+  },
+  "outputs": [],
+  "inputs_modified": []
+}

@@ -1,0 +1,12 @@
+{
+  "_why": "Ratchet: the size at the last accepted change plus a small margin. Raising one is a decision; give the reason in the commit. Check with `python3 evals/_scaffold/footprint.py --check`.",
+  "hook_tokens": 800,
+  "always_on_tokens": 1150,
+  "on_invoke_tokens": {
+    "default": 3100,
+    "research": 5000,
+    "brainstorm": 3100,
+    "learn": 3100
+  },
+  "hook_research_tokens": 1200
+}

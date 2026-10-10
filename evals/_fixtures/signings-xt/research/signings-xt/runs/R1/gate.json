@@ -1,0 +1,52 @@
+{
+  "kind": "run",
+  "recorded": true,
+  "project": "research/signings-xt",
+  "created": "2026-10-09T21:36:13Z",
+  "command": null,
+  "file": "analysis.py",
+  "interpreter": "python3",
+  "argv": [
+    "python3",
+    "analysis.py"
+  ],
+  "cwd": ".",
+  "services": {
+    "detected": [],
+    "declared": [],
+    "local_modules": [],
+    "packages": [],
+    "ai_provider": "what the run prints goes back to the AI model in this session",
+    "approved": []
+  },
+  "inputs": [
+    {
+      "path": "data/players.csv",
+      "sha256": "c8cd2a367fa7336b97fe12768d1d0fb448a0e9ae750dab1936b33bdb6fe3e353",
+      "bytes": 244,
+      "columns": [
+        "player",
+        "signed_summer_2026",
+        "minutes",
+        "xt_passes",
+        "xt_carries"
+      ],
+      "provenance": {
+        "source": "club event feed export (Opta-based), season to date",
+        "sha256": "c8cd2a367fa7336b97fe12768d1d0fb448a0e9ae750dab1936b33bdb6fe3e353"
+      }
+    }
+  ],
+  "code": [
+    {
+      "path": "analysis.py",
+      "sha256": "3a0fda6b51294aca88c0e1b1315602ca52e5732bfa220c93e2006cc89700184b",
+      "lines": 19,
+      "text": "import argparse\nimport csv\nimport statistics\n\nparser = argparse.ArgumentParser()\nparser.add_argument(\"--min-minutes\", type=int, default=900)\nparser.add_argument(\"--compare\", choices=(\"median\", \"mean\"), default=\"median\")\nargs = parser.parse_args()\n\nwith open(\"data/players.csv\") as handle:\n    rows = [r for r in csv.DictReader(handle) if int(r[\"minutes\"]) >= args.min_minutes]\nfor r in rows:\n    r[\"xt_p90\"] = (float(r[\"xt_passes\"]) + float(r[\"xt_carries\"])) * 90 / int(r[\"minutes\"])\nsquad = [r[\"xt_p90\"] for r in rows if r[\"signed_summer_2026\"] == \"no\"]\nbaseline = statistics.median(squad) if args.compare == \"median\" else statistics.mean(squad)\nprint(f\"existing squad {args.compare} xT per 90: {baseline:.2f} (n={len(squad)}, min {args.min_minutes} minutes)\")\nfor r in sorted(rows, key=lambda r: -r[\"xt_p90\"]):\n    if r[\"signed_summer_2026\"] == \"yes\":\n        print(f\"{r['player']}: {r['xt_p90']:.2f} xT per 90 from {r['minutes']} minutes\")\n"
+    }
+  ],
+  "changes": null,
+  "problems": [],
+  "gate_shown": false,
+  "changed_since_gate": []
+}

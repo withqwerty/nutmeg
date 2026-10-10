@@ -1,0 +1,6 @@
+{"at": "2026-10-09T21:36:13Z", "author": "Fan Analyst", "data_in_git": "yes", "data_in_git_from": "user", "kind": "project_created"}
+{"at": "2026-10-09T21:36:13Z", "by": "Fan Analyst", "kind": "data_added", "path": "data/players.csv", "sha256": "c8cd2a367fa7336b97fe12768d1d0fb448a0e9ae750dab1936b33bdb6fe3e353", "source": "club event feed export (Opta-based), season to date"}
+{"at": "2026-10-09T21:36:13Z", "by": null, "choices": 3, "hash": "0e35f849a487e317", "kind": "plan_locked", "reason": null, "run_id": "R1"}
+{"at": "2026-10-09T21:36:13Z", "changed_since_gate": [], "file": "analysis.py", "gate_shown": false, "kind": "run", "queued_for_review": false, "run_id": "R1", "status": "ok"}
+{"at": "2026-10-09T21:36:13Z", "changed_since_gate": [], "file": "analysis.py", "gate_shown": false, "kind": "run", "queued_for_review": false, "run_id": "R2", "status": "ok"}
+{"at": "2026-10-09T21:36:13Z", "changed_since_gate": [], "file": "analysis.py", "gate_shown": false, "kind": "run", "queued_for_review": false, "run_id": "R3", "status": "ok"}

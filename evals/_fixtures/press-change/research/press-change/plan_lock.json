@@ -1,0 +1,22 @@
+{
+  "locks": [
+    {
+      "at": "2026-10-09T21:37:23Z",
+      "run_id": "R1",
+      "reason": null,
+      "by": null,
+      "previous": null,
+      "choices": [
+        {
+          "key": "metric: PPDA: opponent passes allowed per defensive action, per match",
+          "hash": "a1a2edecec345ef9"
+        },
+        {
+          "key": "method: difference in mean PPDA, last 15 matches before v first 15 after, all games, with a 95% interval",
+          "hash": "b3408883ba7af7c0"
+        }
+      ],
+      "hash": "2aa1e97929327b17"
+    }
+  ]
+}

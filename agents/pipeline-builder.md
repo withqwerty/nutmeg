@@ -34,7 +34,11 @@ tools:
   - Grep
   - Agent
   - mcp__plugin_nutmeg_football-docs__search_docs
+  - mcp__plugin_nutmeg_football-docs__get_metric
+  - mcp__plugin_nutmeg_football-docs__list_metrics
   - mcp__football-docs__search_docs
+  - mcp__football-docs__get_metric
+  - mcp__football-docs__list_metrics
   - AskUserQuestion
 ---
 

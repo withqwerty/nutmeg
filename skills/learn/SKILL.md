@@ -1,8 +1,8 @@
 ---
 name: nutmeg-learn
-description: "Learn about football analytics concepts and explore provider documentation. Use when the user asks what a metric means (xG, PPDA, expected threat, xT), wants learning resources, papers, or courses, is new to football analytics, or wants a learning path. Also use when the user asks about data provider documentation — qualifier IDs, coordinate systems, event types, API schemas, field mappings, identity surfaces, provider ID schemes — or wants to compare providers, look something up in the docs, or find out what data a provider offers."
+description: "Explain football analytics concepts and provider documentation: what a metric means (xG, PPDA, xT), learning paths and resources, and provider details such as qualifier IDs, coordinate systems, event types, schemas, ID schemes, coverage, or comparing providers."
 argument-hint: "[concept, 'getting started', or provider query]"
-allowed-tools: ["Read", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs", "mcp__plugin_nutmeg_football-docs__list_providers", "mcp__football-docs__list_providers", "mcp__plugin_nutmeg_football-docs__compare_providers", "mcp__football-docs__compare_providers", "mcp__plugin_nutmeg_football-docs__resolve_entity", "mcp__football-docs__resolve_entity", "mcp__plugin_nutmeg_football-docs__get_provider_docs", "mcp__football-docs__get_provider_docs", "mcp__plugin_nutmeg_football-docs__resolve_provider_id", "mcp__football-docs__resolve_provider_id"]
+allowed-tools: ["Read", "mcp__plugin_nutmeg_football-docs__search_docs", "mcp__football-docs__search_docs", "mcp__plugin_nutmeg_football-docs__list_providers", "mcp__football-docs__list_providers", "mcp__plugin_nutmeg_football-docs__compare_providers", "mcp__football-docs__compare_providers", "mcp__plugin_nutmeg_football-docs__resolve_entity", "mcp__football-docs__resolve_entity", "mcp__plugin_nutmeg_football-docs__get_provider_docs", "mcp__football-docs__get_provider_docs", "mcp__plugin_nutmeg_football-docs__resolve_provider_id", "mcp__football-docs__resolve_provider_id", "mcp__plugin_nutmeg_football-docs__get_metric", "mcp__football-docs__get_metric", "mcp__plugin_nutmeg_football-docs__list_metrics", "mcp__football-docs__list_metrics"]
 ---
 
 # Learn
@@ -13,61 +13,22 @@ Teach football analytics concepts, recommend resources, provide a learning path,
 
 Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 
+When the user asks what a metric means, read its football-docs metric card with `get_metric` (`list_metrics` shows the cards) and explain that variants exist, naming their IDs; use `search_docs` for metrics without a card.
+
 ## First: check profile
 
 Read `.nutmeg.user.md`. If it doesn't exist, continue with sensible defaults (Python and pandas, intermediate level) and suggest running `/nutmeg` setup at the end.
 
 ## Glossary of core concepts
 
-### Chance quality metrics
+The glossary is in `${CLAUDE_PLUGIN_ROOT}/docs/glossary.md`: chance quality (xG, npxG, xGOT, xA, xT), possession and
+pressing (PPDA, high press, counterpressure, build-up, possession value), passing, shooting and defensive terms,
+and per 90. Read it when the user asks what a term means, and explain at their level. The research workspace page
+links the same entries. For a provider's own definition of a metric or event, use `search_docs`; the glossary
+gives the general meaning only.
 
-| Metric | What it means | Intuition |
-|--------|--------------|-----------|
-| xG (Expected Goals) | Probability a shot results in a goal (0-1) | "How good was the chance?" |
-| xGOT (xG on Target) | xG adjusted for shot placement in the goal | "How good was the finish?" |
-| xA (Expected Assists) | xG of the shot that resulted from a pass | "How good was the chance created?" |
-| xT (Expected Threat) | Value added by moving the ball to a more dangerous area | "How much did this pass/carry increase goal threat?" |
-| PSxG (Post-Shot xG) | Same as xGOT. StatsBomb terminology. |
-
-### Possession and pressing
-
-| Metric | What it means |
-|--------|--------------|
-| PPDA | Passes allowed per defensive action. Lower = more pressing |
-| High press | Defensive actions in the opponent's defensive third |
-| Counterpressure | Immediate defensive reaction after losing the ball |
-| Build-up | How a team progresses the ball from defence to attack |
-| Possession value | How much each action contributes to scoring probability |
-
-### Passing
-
-| Metric | What it means |
-|--------|--------------|
-| Progressive pass | Pass that moves the ball significantly toward the opponent's goal |
-| Key pass | Pass directly leading to a shot |
-| Assist | Pass directly leading to a goal |
-| Through ball | Pass played into space behind the defence |
-| Switch of play | Long pass crossing the centre of the pitch |
-| Pass completion % | Successful passes / total passes (misleading in isolation) |
-
-### Shooting
-
-| Metric | What it means |
-|--------|--------------|
-| Shots per 90 | Shot volume normalised by playing time |
-| Conversion rate | Goals / shots (noisy, small sample issues) |
-| Big chance | A chance an analyst judges the player should reasonably score. It is a coded label, not an xG threshold; check the provider's definition with `search_docs` |
-| Shot on target % | Shots on target / total shots |
-
-### Defensive
-
-| Metric | What it means |
-|--------|--------------|
-| Tackles won | Successful tackle attempts |
-| Interceptions | Reading and intercepting opponent passes |
-| Clearances | Defensive clearances (often under pressure) |
-| Blocks | Blocking shots or passes |
-| Aerial duels won | Headers contested and won |
+When the user needs to explain a concept to someone else, or keeps coming back to it, offer once to write it up
+as an explainer page they can edit and share; follow `${CLAUDE_PLUGIN_ROOT}/docs/understanding.md` section 2.
 
 ### Per-90 normalisation
 

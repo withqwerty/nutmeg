@@ -1,0 +1,28 @@
+{
+  "files": [
+    {
+      "path": "data/players.csv",
+      "sha256": "c8cd2a367fa7336b97fe12768d1d0fb448a0e9ae750dab1936b33bdb6fe3e353",
+      "bytes": 244,
+      "source": "club event feed export (Opta-based), season to date",
+      "licence": "club internal",
+      "retrieved": null,
+      "added_at": "2026-10-09T21:36:13Z",
+      "added_by": "Fan Analyst",
+      "note": null,
+      "profile": {
+        "rows": 7,
+        "columns": [
+          "player",
+          "signed_summer_2026",
+          "minutes",
+          "xt_passes",
+          "xt_carries"
+        ],
+        "duplicate_rows": 0,
+        "repeated_ids": {},
+        "empty_columns": []
+      }
+    }
+  ]
+}
