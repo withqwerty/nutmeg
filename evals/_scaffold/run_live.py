@@ -90,6 +90,26 @@ def agent_env(work):
     return dict(os.environ, NUTMEG_USER_CONFIG=str(Path(work) / ".nutmeg-user.json"), PIP_REQUIRE_VIRTUALENV="1")
 
 
+def result_efficiency(event):
+    """What the agent run cost, from its result event. Cost is the headline; token classes are kept apart because a
+    cache read costs a small fraction of other input. `modelUsage` covers subagents and compaction too (`usage` covers
+    the main loop only)."""
+    tokens = {"input": 0, "cache_write": 0, "cache_read": 0, "output": 0}
+    for usage in (event.get("modelUsage") or {}).values():
+        tokens["input"] += usage.get("inputTokens") or 0
+        tokens["cache_write"] += usage.get("cacheCreationInputTokens") or 0
+        tokens["cache_read"] += usage.get("cacheReadInputTokens") or 0
+        tokens["output"] += usage.get("outputTokens") or 0
+    if not any(tokens.values()):  # older versions: main loop only
+        usage = event.get("usage") or {}
+        tokens = {"input": usage.get("input_tokens") or 0, "cache_write": usage.get("cache_creation_input_tokens") or 0,
+                  "cache_read": usage.get("cache_read_input_tokens") or 0, "output": usage.get("output_tokens") or 0}
+    return {"cost": event.get("total_cost_usd"), "tokens": tokens, "turns": event.get("num_turns"),
+            "seconds": round((event.get("duration_ms") or 0) / 1000, 1), "subtype": event.get("subtype"),
+            "terminal_reason": event.get("terminal_reason"), "is_error": bool(event.get("is_error")),
+            "hit_turn_limit": event.get("subtype") == "error_max_turns"}
+
+
 # --- spend cap ------------------------------------------------------------------------------------------------------
 # With NUTMEG_EVAL_BUDGET_USD and NUTMEG_EVAL_SPEND_FILE set, every agent and judge call adds its reported cost to the
 # spend file (one line per call, locked, so parallel runs share one total). A new agent run starts only while the
@@ -174,6 +194,7 @@ def run_once(name, model, keep, judge_model, eval_dir=EVALS):
             continue
     trace = "\n".join(lines)
     calls, last, cost = [], "", 0.0  # (tool name, JSON of its input)
+    efficiency = {}  # tokens, turns and time the agent used: nutmeg's own cost to a user, not the judge's
     for event in events:
         if event.get("type") == "assistant":
             for block in event["message"].get("content", []):
@@ -184,6 +205,7 @@ def run_once(name, model, keep, judge_model, eval_dir=EVALS):
         if event.get("type") == "result":
             last = event.get("result") or last
             cost = event.get("total_cost_usd") or 0.0
+            efficiency.update(result_efficiency(event))
     reported = any(event.get("type") == "result" for event in events)
     # A run that timed out reports no cost but still spent money: count an estimate.
     record_spend(cost if reported else UNREPORTED_RUN_USD, f"agent {name}" + ("" if reported else " (estimate)"))
@@ -215,12 +237,19 @@ def run_once(name, model, keep, judge_model, eval_dir=EVALS):
     if not keep:
         shutil.rmtree(work, ignore_errors=True)
     mcp.unlink(missing_ok=True)
-    return {"case": name, "verdicts": verdicts, "judged": judged, "cost": cost, "last": last,
+    efficiency["tool_calls"] = len(calls)
+    efficiency["nutmeg_calls"] = sum(1 for tool, payload in calls if tool == "Bash" and "nutmeg.py" in payload)
+    return {"case": name, "verdicts": verdicts, "judged": judged, "cost": cost, "last": last, "efficiency": efficiency,
             "bash": [payload for tool, payload in calls if tool == "Bash"],
             "work": str(work) if keep else None}
 
 
 JUDGE_VOTES = 3
+# A judge needs no tools, MCP servers, slash commands or Claude Code's long system prompt: a lean call costs far less.
+JUDGE_FLAGS = ["--system-prompt", "You grade responses against a criterion. Reply with PASS or FAIL on the first line, "
+               "then one sentence of reason.", "--tools", "", "--disallowedTools", "mcp__*", "--strict-mcp-config",
+               "--setting-sources", "project", "--disable-slash-commands", "--no-session-persistence",
+               "--output-format", "json"]
 FILE_CHARS = 20000
 
 
@@ -242,8 +271,7 @@ def judge_votes(criteria, response, model, votes=JUDGE_VOTES):
     for _ in range(votes):
         check_budget()
         try:
-            out = subprocess.run(["claude", "-p", prompt, "--model", model, "--setting-sources", "project",
-                                  "--strict-mcp-config", "--max-turns", "1", "--output-format", "json"],
+            out = subprocess.run(["claude", "-p", prompt, "--model", model, *JUDGE_FLAGS],
                                  capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=300)
             try:
                 data = json.loads(out.stdout)

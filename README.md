@@ -133,6 +133,17 @@ The research cases that grant Bash (`--tag gate`, `--tag check` and `research-pr
 
 To score the public suite and a private held-out set together, set `NUTMEG_HOLDOUT_DIR` to the held-out folder (it must be outside this repository) and run `python3 evals/_scaffold/run_suites.py`. It prints one score per suite, writes results to a folder outside the repository, and runs cases that grant Bash live. Without `NUTMEG_HOLDOUT_DIR` it scores only the public suite and says so. `--loop` refuses to start until the held-out set has at least 10 cases.
 
+### Efficiency
+
+nutmeg should not use up a week's allowance on one task, so every eval reports cost beside the score:
+
+- Each live run prints its list-price cost, turns, calls to the nutmeg CLI, and tokens by class (input, cache write, cache read, output), and says when a run ended at its turn limit or with an error. `summary.json` holds per-case medians, pass@1 and pass^k.
+- `run_suites.py --runs 3 --compare <earlier summary.json>` compares two versions case by case and prints each change with a standard error. Use three runs for any keep-or-revert decision; one run is a smoke test only.
+- A change is kept only if the score holds and the cost per case does not rise; a rise needs a reason.
+- `python3 evals/_scaffold/footprint.py --check` measures what nutmeg adds to every session (the hook text, and skill and agent descriptions from `claude plugin details`) and what each skill costs when it loads, against the budgets in `evals/_scaffold/footprint_budget.json`.
+
+To see what nutmeg costs you in your own sessions, run `/usage` in Claude Code: on paid plans it shows the share of usage by plugin and skill.
+
 ## License
 
 MIT

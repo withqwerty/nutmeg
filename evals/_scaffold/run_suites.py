@@ -195,8 +195,14 @@ def run_live_case(eval_dir, name, args, out=None, label="holdout"):
             folder = Path(out) / label
             folder.mkdir(parents=True, exist_ok=True)
             (folder / f"{name}-run{n + 1}.json").write_text(json.dumps(outcome, indent=2) + "\n")
+            eff = outcome.get("efficiency") or {}
+            tok = eff.get("tokens") or {}
             print(f"    run {n + 1}: " + ", ".join(f"{g} {'PASS' if ok else 'FAIL'}" for g, ok in verdicts.items())
-                  + f" · ${outcome['cost']:.2f}", flush=True)
+                  + f" · ${outcome['cost']:.2f} · {eff.get('turns')} turns · {eff.get('nutmeg_calls')} nutmeg calls"
+                  + f" · tokens in {tok.get('input', 0):,}/cache-write {tok.get('cache_write', 0):,}"
+                  + f"/cache-read {tok.get('cache_read', 0):,}/out {tok.get('output', 0):,}"
+                  + (f" · ENDED: {eff.get('subtype')}" if eff.get("subtype") not in (None, "success") else ""),
+                  flush=True)
     return sum(scores) / max(1, len(scores)), None
 
 
@@ -217,9 +223,99 @@ def score_suite(label, eval_dir, eval_dir_name, cases, args, out, root=ROOT):
         if score is None:  # skipped before any run (the spend cap): not scored, so it does not count as a zero
             print(f"  {label:8} {name:32} {engine:6} skipped ({error})", flush=True)
             continue
-        rows.append({"suite": label, "case": name, "engine": engine, "score": round(score, 3), "error": error})
+        row = {"suite": label, "case": name, "engine": engine, "score": round(score, 3), "error": error}
+        if engine == "live" and out is not None:
+            row["efficiency"] = case_efficiency(Path(out) / label, name)
+        rows.append(row)
         print(f"  {label:8} {name:32} {engine:6} {score:.2f}" + (f"  ({error[:80]})" if error else ""), flush=True)
     return rows
+
+
+def _median(values):
+    values = sorted(v for v in values if v is not None)
+    if not values:
+        return None
+    mid = len(values) // 2
+    return values[mid] if len(values) % 2 else (values[mid - 1] + values[mid]) / 2
+
+
+def case_efficiency(folder, name):
+    """Over a case's live runs: median cost, turns and nutmeg calls; turn-limit and error endings; the share of runs
+    where every grader passed (pass@1) and whether all of them did (pass^k)."""
+    runs = []
+    for path in sorted(Path(folder).glob(f"{name}-run*.json")):
+        try:
+            outcome = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        eff = outcome.get("efficiency") or {}
+        verdicts = outcome.get("verdicts") or {}
+        runs.append({"cost": outcome.get("cost"), "turns": eff.get("turns"), "nutmeg_calls": eff.get("nutmeg_calls"),
+                     "turn_limit": bool(eff.get("hit_turn_limit")),
+                     "error": eff.get("subtype") not in (None, "success", "error_max_turns"),
+                     "all_pass": bool(verdicts) and all(verdicts.values())})
+    if not runs:
+        return None
+    return {"cost": _median(r["cost"] for r in runs), "turns": _median(r["turns"] for r in runs),
+            "nutmeg_calls": _median(r["nutmeg_calls"] for r in runs),
+            "turn_limit_hits": sum(r["turn_limit"] for r in runs), "errors": sum(r["error"] for r in runs),
+            "pass_at_1": round(sum(r["all_pass"] for r in runs) / len(runs), 3),
+            "pass_all_k": all(r["all_pass"] for r in runs), "runs": len(runs)}
+
+
+def suite_efficiency(rows):
+    """Medians over a suite's cases; turn-limit hits and errors in total; mean pass@1 and the share passing pass^k."""
+    effs = [r["efficiency"] for r in rows if r.get("efficiency")]
+    if not effs:
+        return None
+    return {"cost": _median(e["cost"] for e in effs), "turns": _median(e["turns"] for e in effs),
+            "nutmeg_calls": _median(e["nutmeg_calls"] for e in effs),
+            "turn_limit_hits": sum(e["turn_limit_hits"] for e in effs), "errors": sum(e["errors"] for e in effs),
+            "pass_at_1": round(sum(e["pass_at_1"] for e in effs) / len(effs), 3),
+            "pass_all_k": round(sum(e["pass_all_k"] for e in effs) / len(effs), 3), "cases": len(effs)}
+
+
+def paired(now_rows, before_rows, key):
+    """Case-by-case comparison: mean difference in score (or mean log ratio for cost) with a standard error."""
+    import math
+    before = {(r["suite"], r["case"]): r for r in before_rows}
+    diffs = []
+    for row in now_rows:
+        old = before.get((row["suite"], row["case"]))
+        if old is None:
+            continue
+        if key == "score":
+            diffs.append(row["score"] - old["score"])
+        else:
+            a, b = (old.get("efficiency") or {}).get(key), (row.get("efficiency") or {}).get(key)
+            if a and b:
+                diffs.append(math.log(b / a))
+    if len(diffs) < 2:
+        return None
+    mean_d = sum(diffs) / len(diffs)
+    sd = math.sqrt(sum((d - mean_d) ** 2 for d in diffs) / (len(diffs) - 1))
+    return {"mean": mean_d, "se": sd / math.sqrt(len(diffs)), "n": len(diffs)}
+
+
+def compare_lines(now, before):
+    """Paired, case-by-case changes against an earlier summary.json, with standard errors."""
+    out = []
+    for label in ("public", "holdout"):
+        now_rows = [r for r in now.get("rows", []) if r["suite"] == label]
+        if not now_rows:
+            continue
+        before_rows = [r for r in before.get("rows", []) if r["suite"] == label]
+        parts = [f"{label}:"]
+        s = paired(now_rows, before_rows, "score")
+        if s:
+            parts.append(f"score {s['mean']:+.3f} ± {s['se']:.3f} (n={s['n']})")
+        for key in ("cost", "turns", "nutmeg_calls"):
+            c = paired(now_rows, before_rows, key)
+            if c:
+                import math
+                parts.append(f"{key} {math.exp(c['mean']) - 1:+.0%} (± {c['se']:.2f} log)")
+        out.append(" · ".join(parts))
+    return out
 
 
 def mean(rows):
@@ -237,6 +333,7 @@ def main(argv=None, root=ROOT, environ=None):
     parser.add_argument("--engine", choices=["auto", "plugin", "live"], default="auto")
     parser.add_argument("--out", help="results folder, outside the repository (default: a new temporary folder)")
     parser.add_argument("--keep", action="store_true", help="keep each live run's work folder")
+    parser.add_argument("--compare", help="an earlier summary.json: print the change in score and efficiency")
     parser.add_argument("--loop", action="store_true",
                         help="hill-climbing check: refuse unless the held-out set has at least 10 cases")
     args = parser.parse_args(argv)
@@ -282,11 +379,27 @@ def main(argv=None, root=ROOT, environ=None):
             summary["rows"] += rows
             summary["holdout"] = mean(rows)
 
+    summary["efficiency"] = {label: suite_efficiency([r for r in summary["rows"] if r["suite"] == label])
+                             for label in ("public", "holdout")}
     (out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     for label in ("public", "holdout"):
         value = summary[label]
         count = sum(1 for r in summary["rows"] if r["suite"] == label)
         print(f"{label} score: " + (f"{value:.2f} over {count} case(s)" if value is not None else "not run"))
+        eff = summary["efficiency"].get(label)
+        if eff:
+            print(f"  per case (median): ${eff['cost'] or 0:.2f} · {eff['turns']} turns · {eff['nutmeg_calls']} nutmeg "
+                  f"calls; turn-limit hits {eff['turn_limit_hits']}, errors {eff['errors']}; "
+                  f"pass@1 {eff['pass_at_1']:.2f}, pass^k {eff['pass_all_k']:.2f}")
+    if args.compare:
+        try:
+            before = json.loads(Path(args.compare).read_text())
+        except (OSError, json.JSONDecodeError) as exc:
+            print(f"cannot read {args.compare}: {exc}")
+        else:
+            print("compared with " + args.compare + ":")
+            for line in compare_lines(summary, before):
+                print("  " + line)
     for note in summary["notes"]:
         print(note)
     print(f"results: {out}")
