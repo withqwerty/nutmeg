@@ -42,31 +42,64 @@ def resolve_project(args):
 open_ledger = projects.open_ledger
 
 
-def _read_record(args):
-    text = args.json if args.json is not None else sys.stdin.read()
+def _read_records(args):
+    """One claim (a JSON object) or many (a JSON array, or one object per line) from --file, --json or stdin."""
+    if args.file:
+        try:
+            text = (Path.cwd() / args.file).read_text(encoding="utf-8")
+        except OSError as exc:
+            raise UsageError(f"cannot read {args.file}: {exc.strerror}")
+    else:
+        text = args.json if args.json is not None else sys.stdin.read()
     try:
-        record = json.loads(text)
+        parsed = json.loads(text)
+        records = parsed if isinstance(parsed, list) else [parsed]
     except json.JSONDecodeError as exc:
-        raise UsageError(f"the claim is not valid JSON ({exc.msg} at line {exc.lineno})")
-    if args.kind:
-        record["kind"] = args.kind
-    if isinstance(record, dict) and args.headline:
-        record["headline"] = True
-    return record
+        lines = [line for line in text.splitlines() if line.strip()]
+        if len(lines) < 2:
+            raise UsageError(f"the claim is not valid JSON ({exc.msg} at line {exc.lineno})")
+        records = []
+        for n, line in enumerate(lines, start=1):
+            try:
+                records.append(json.loads(line))
+            except json.JSONDecodeError as line_exc:
+                raise UsageError(f"line {n} is not valid JSON ({line_exc.msg}); nothing was added")
+    for record in records:
+        if args.kind and isinstance(record, dict):
+            record.setdefault("kind", args.kind)
+        if isinstance(record, dict) and args.headline:
+            record["headline"] = True
+    return records
 
 
 def cmd_claim_add(args):
+    """Add one claim or a batch. Each claim is validated on its own; a rejected one does not stop the others."""
     project = resolve_project(args)
     ledger = open_ledger(project)
-    record = _read_record(args)
-    if isinstance(record, dict) and (not record.get("id") or not ledger.history(record["id"])):
-        record["author"] = user_name(find_repo_root(project))
-    try:
-        written = ledger.append(record)
-    except ClaimError as exc:
-        raise UsageError(f"claim rejected: {exc}")
-    print(json.dumps({"id": written["id"], "version": written["version"], "status": written["status"]}))
-    return 0
+    author = user_name(find_repo_root(project))
+    records = _read_records(args)
+    written, rejected = [], []
+    for n, record in enumerate(records, start=1):
+        if isinstance(record, dict) and (not record.get("id") or not ledger.history(record["id"])):
+            record["author"] = author
+        try:
+            done = ledger.append(record)
+        except ClaimError as exc:
+            label = record.get("statement", "")[:50] if isinstance(record, dict) else ""
+            rejected.append(f"claim {n} ({label}): {exc}")
+            continue
+        written.append(done)
+    if len(records) == 1 and not rejected:
+        done = written[0]
+        print(json.dumps({"id": done["id"], "version": done["version"], "status": done["status"]}))
+        return 0
+    if written:
+        print(f"Added {len(written)} claim(s): " + ", ".join(f"{w['id']}" for w in written))
+    for line in rejected:
+        print(f"rejected {line}", file=sys.stderr)
+    if rejected and len(records) == 1:
+        raise UsageError(f"claim rejected: {rejected[0].split(': ', 1)[1]}")
+    return 1 if rejected else 0
 
 
 def cmd_claim_list(args):
@@ -717,7 +750,8 @@ def build_parser(parser_class=cards.NutmegParser):
     claim_commands = claim.add_subparsers(dest="claim_command", metavar="<action>")
 
     add = claim_commands.add_parser("add", help="append a claim (JSON from --json or stdin)")
-    add.add_argument("--json", help="the claim as a JSON object")
+    add.add_argument("--json", help="one claim as a JSON object, or many as a JSON array")
+    add.add_argument("--file", help="a JSON array or JSON Lines file of claims: add many in one call")
     add.add_argument("--kind", choices=KINDS, help="set the claim kind")
     add.add_argument("--headline", action="store_true", help="mark a headline claim (needs sign-off when the team requires it)")
     add.set_defaults(handler=cmd_claim_add)

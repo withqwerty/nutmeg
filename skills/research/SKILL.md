@@ -126,10 +126,17 @@ data, a correction), `nutmeg check` marks the claims from that run as stale; run
 Every number, provider fact, ID, citation, definition and interpretation that appears in the
 project's outputs goes into the ledger:
 
+Add claims in batches, not one call each: write them to a JSON Lines file (one claim per line) and add them all
+in one call. Each is checked on its own, and the command lists any it rejects so you can fix just those.
+
 ```bash
-nutmeg claim add --json '{"kind": "computed", "statement": "npxG/90 rose to 0.41", "value": 0.41,
-  "evidence": {"run_id": "R3", "metric": "npxG per 90", "n": 31, "filters": {"min_minutes": 900}},
-  "why": "Per 90 with a 900-minute floor keeps small samples out."}'
+nutmeg claim add --file new-claims.jsonl
+```
+
+where each line looks like:
+
+```json
+{"kind": "computed", "statement": "npxG/90 rose to 0.41", "value": 0.41, "evidence": {"run_id": "R3", "metric": "npxG per 90", "n": 31, "filters": {"min_minutes": 900}}, "why": "Per 90 with a 900-minute floor keeps small samples out."}
 ```
 
 Each kind needs its evidence:
