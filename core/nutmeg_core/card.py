@@ -332,6 +332,15 @@ def _changes(card, project):
     return changes
 
 
+def _provenance(project, rel):
+    """The input's recorded source, or None. Imported late: provenance imports this module."""
+    if project is None:
+        return None
+    from .provenance import lookup
+    entry = lookup(project, rel)
+    return {"source": entry.get("source"), "sha256": entry.get("sha256")} if entry else None
+
+
 def build_run_card(run_args, repo_root, project, cwd, recorded=True, command=None, approved=None):
     repo_root, cwd = Path(repo_root), Path(cwd)
     card = {
@@ -420,7 +429,8 @@ def build_run_card(run_args, repo_root, project, cwd, recorded=True, command=Non
             card["inputs"].append({"path": _rel(resolved, repo_root), "sha256": None})
             continue
         card["inputs"].append({"path": _rel(resolved, repo_root), "sha256": sha256_path(resolved),
-                               "bytes": _size(resolved), "columns": _columns(resolved)})
+                               "bytes": _size(resolved), "columns": _columns(resolved),
+                               "provenance": _provenance(project, _rel(resolved, repo_root))})
     declared = {i["path"] for i in card["inputs"]}
     for rel in found_inputs:
         if rel not in declared:
@@ -540,7 +550,15 @@ def render_text(card):
             continue
         columns = f"; columns: {', '.join(item['columns'])}" if item.get("columns") else ""
         found = " (named in the code, not declared with --input)" if item.get("found_in_code") else ""
-        out.append(f"- {item['path']} · {_human_bytes(item.get('bytes'))} · sha256 {item['sha256'][:12]}{columns}{found}")
+        prov = item.get("provenance")
+        if prov is None:
+            origin = " · no source recorded (`nutmeg data add`)" if card["recorded"] else ""
+        elif prov.get("sha256") != item["sha256"]:
+            origin = f" · from {prov.get('source')}, CHANGED since it was recorded"
+        else:
+            origin = f" · from {prov.get('source')}"
+        out.append(f"- {item['path']} · {_human_bytes(item.get('bytes'))} · sha256 {item['sha256'][:12]}{columns}{found}"
+                   f"{origin}")
 
     changes = card.get("changes")
     if changes and changes["same"]:

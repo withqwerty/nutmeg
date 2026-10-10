@@ -20,8 +20,14 @@ def project(repo):
     (folder / "runs" / "R1").mkdir(parents=True)
     (folder / "runs" / "R1" / "run.json").write_text(json.dumps({"id": "R1", "status": "ok"}))
     ledger = Ledger(folder / "claims.jsonl")
+    for run_id in ("R2", "R3"):
+        (folder / "runs" / run_id).mkdir(parents=True)
+        (folder / "runs" / run_id / "run.json").write_text(json.dumps({"id": run_id, "status": "ok"}))
     ledger.append({"kind": "computed", "statement": "Mendes adds 0.31 xT per 90", "value": 0.31,
-                   "evidence": {"run_id": "R1"}, "headline": True})
+                   "evidence": {"run_id": "R1", "alternatives": [
+                       {"run_id": "R2", "choice": "at least 600 minutes", "value": 0.31},
+                       {"run_id": "R3", "choice": "squad mean instead of median", "value": 0.31}]},
+                   "headline": True})
     ledger.append({"kind": "computed", "statement": "the squad median is 0.14 xT per 90", "value": 0.14,
                    "evidence": {"run_id": "R1"}})
     (folder / "report.md").write_text("Mendes adds 0.31 [C1] against a squad median of 0.14 [C2].\n")
@@ -31,7 +37,7 @@ def project(repo):
 def test_publish_refuses_until_the_author_teaches_back(project, capsys):
     assert main(["publish"]) == 2
     err = capsys.readouterr().err
-    assert "teach-back by Test Analyst" in err and "C1" in err
+    assert "Test Analyst should be able to defend it" in err and "C1" in err
     assert not (project / "published.json").exists()
     assert main(["teachback", *WORDS]) == 0
     assert main(["publish"]) == 0
@@ -42,8 +48,6 @@ def test_teachback_covers_headline_claims_only(project):
     assert main(["teachback", *WORDS]) == 0
     entry = understand.records(project)[-1]
     assert list(entry["covers"]) == ["C1"] and entry["by"] == "Test Analyst"
-    receipt = json.loads((project / "receipts.jsonl").read_text().splitlines()[-1])
-    assert receipt["kind"] == "teachback" and receipt["covers"] == ["C1"]
 
 
 def test_without_headline_claims_the_cited_claims_count(project):
@@ -54,10 +58,11 @@ def test_without_headline_claims_the_cited_claims_count(project):
 
 def test_a_changed_claim_needs_a_new_teachback(project, capsys):
     assert main(["teachback", *WORDS]) == 0
-    Ledger(project / "claims.jsonl").update("C1", value=0.32, statement="Mendes adds 0.32 xT per 90")
+    ledger = Ledger(project / "claims.jsonl")
+    ledger.update("C1", value=0.32, statement="Mendes adds 0.32 xT per 90")
     (project / "report.md").write_text("Mendes adds 0.32 [C1] against a squad median of 0.14 [C2].\n")
     assert main(["publish"]) == 2
-    assert "changed since the teach-back: C1" in capsys.readouterr().err
+    assert "changed since the last talk-through: C1" in capsys.readouterr().err
 
 
 def test_another_persons_teachback_does_not_count(project, monkeypatch, repo, capsys):
@@ -65,12 +70,12 @@ def test_another_persons_teachback_does_not_count(project, monkeypatch, repo, ca
     (repo / "me.json").write_text(json.dumps({"name": "Someone Else"}))
     monkeypatch.setenv("NUTMEG_USER_CONFIG", str(repo / "me.json"))
     assert main(["publish"]) == 2
-    assert "teach-back by Someone Else" in capsys.readouterr().err
+    assert "Someone Else should be able to defend it" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize("field,text,message", [
-    ("--claim", "Mendes is good", "at least 4 words"),
-    ("--claim", "Mendes adds 0.31 [C1] against a squad median of 0.14 [C2].", "repeats report.md"),
+    ("--claim", "Mendes is good", "at least 4"),
+    ("--claim", "Mendes adds 0.31 [C1] against a squad median of 0.14 [C2].", "matches report.md"),
 ])
 def test_teachback_rejects_short_or_copied_words(project, capsys, field, text, message):
     words = list(WORDS)
@@ -93,7 +98,7 @@ def test_publish_card_shows_the_words_and_late_choices(project, repo):
     assert main(["teachback", *WORDS]) == 0
     reason = gate.decide("nutmeg publish", repo, project, repo).reason
     assert "In Test Analyst's own words" in reason and "What would change the answer: a few big games" in reason
-    assert "Changed after seeing results: method: compare with the squad's worst player" in reason
+    assert "after seeing results: method: compare with the squad's worst player" in reason
 
 
 def test_after_results_choice_is_recorded_and_needs_a_note(project, capsys):
@@ -166,7 +171,35 @@ def test_declined_topics_are_listed(project, capsys):
     assert "Declined (do not offer again): what xT is" in capsys.readouterr().out
 
 
-def test_workspace_lists_the_missing_teachback(project):
-    assert "Waiting for the author's teach-back" in workspaces.build(project)
-    main(["teachback", *WORDS])
-    assert "Waiting for the author's teach-back" not in workspaces.build(project)
+def test_teachback_is_personal_and_never_in_the_repository(project, repo, monkeypatch, tmp_path_factory):
+    monkeypatch.setenv("NUTMEG_USER_CONFIG", str(tmp_path_factory.mktemp("home") / "user.json"))
+    main(["teachback", *WORDS, "--clarified", "xT values passes and carries, not shots"])
+    main(["explain", "decline", "what a median is"])
+    store = understand.personal_store(project)
+    assert store.is_file() and repo not in store.parents
+    for path in repo.rglob("*"):
+        if path.is_file() and ".git" not in path.parts:
+            text = path.read_text(errors="replace")
+            assert "a few big games" not in text and "what a median is" not in text, path
+    page = workspaces.build(project)
+    assert "teach-back" not in page.lower() and "a few big games" not in page
+
+
+def test_shown_quotes_count_and_the_card_shows_them(project, repo):
+    quote = "I chose the squad median because a ranking alone would hide whether anyone improved on what we had"
+    assert main(["teachback", "--shown", quote]) == 0
+    reason = gate.decide("nutmeg publish", repo, project, repo).reason
+    assert "Understanding shown in Test Analyst's own messages" in reason and quote in reason
+    assert main(["publish"]) == 0
+
+
+def test_shown_and_answers_together_are_refused(project, capsys):
+    quote = "I chose the squad median because a ranking alone would hide whether anyone improved"
+    assert main(["teachback", "--shown", quote, *WORDS]) == 2
+    assert "either --shown quotes or the three answers" in capsys.readouterr().err
+
+
+def test_clarified_points_show_on_the_card(project, repo):
+    main(["teachback", *WORDS, "--clarified", "xT values passes and carries, not shots"])
+    assert "Cleared up along the way: xT values passes and carries, not shots" in \
+        gate.decide("nutmeg publish", repo, project, repo).reason

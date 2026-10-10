@@ -6,6 +6,6 @@
 {"at": "2026-09-30T10:00:00Z", "evidence": {"run_id": "R2"}, "id": "C6", "kind": "computed", "statement": "Player B minutes", "status": "draft", "value": 2010, "version": 1}
 {"at": "2026-09-30T10:00:00Z", "evidence": {"run_id": "R3"}, "id": "C7", "kind": "computed", "statement": "Player C passes completed", "status": "draft", "value": 1284, "version": 1}
 {"at": "2026-09-30T10:00:00Z", "evidence": {"run_id": "R3"}, "id": "C8", "kind": "computed", "statement": "Player C pass completion", "status": "draft", "value": 0.8842, "version": 1}
-{"at": "2026-09-30T10:00:00Z", "evidence": {"claims": ["C4"]}, "id": "C9", "kind": "interpretation", "statement": "High-press share fits a high line", "status": "supported", "version": 1}
+{"at": "2026-09-30T10:00:00Z", "evidence": {"claims": ["C4"], "limits": "It does not show that the high line causes the pressing, only that the two go together."}, "id": "C9", "kind": "interpretation", "statement": "High-press share fits a high line", "status": "supported", "version": 1}
 {"at": "2026-09-30T10:00:00Z", "evidence": {"provider": "statsbomb", "source": "football-docs: statsbomb events pressure"}, "id": "C10", "kind": "provider_fact", "statement": "StatsBomb pressure definition", "status": "draft", "version": 1}
 {"at": "2026-09-30T10:00:00Z", "evidence": {"citation": "Singh, K. (2019). Introducing Expected Threat", "match": "normalised", "source_id": "web:karun.in/blog/expected-threat.html"}, "id": "C11", "kind": "literature", "statement": "Singh (2019) introduced xT", "status": "draft", "version": 1}

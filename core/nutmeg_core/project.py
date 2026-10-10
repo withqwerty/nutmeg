@@ -278,6 +278,110 @@ def add_choice(project, kind, choice, why, rests_type, rests_ref, after_results=
     plan.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+# --- the locked plan --------------------------------------------------------------------------------------------------
+#
+# The plan as it stood when the first run started is the primary specification: choices made before any result was
+# seen. nutmeg locks it automatically at that run. Later choices, and locked choices that were changed or removed,
+# are deviations: they are allowed, and the publish card and workspace list them, so readers can tell what came
+# after the results. `nutmeg plan lock --reason` locks again (a new phase of work); each lock records the hash of
+# the one before, so the chain shows if a lock file was edited.
+
+PLAN_LOCK = "plan_lock.json"
+
+
+def _choice_key(choice):
+    return f"{choice.get('kind')}: {' '.join(str(choice.get('choice') or '').split())}"
+
+
+def _choice_hash(choice):
+    import hashlib
+    text = "\n".join(str(choice.get(k) or "") for k in ("kind", "choice", "why", "rests_on"))
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
+
+
+def plan_locks(project):
+    path = Path(project) / PLAN_LOCK
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    return data.get("locks", []) if isinstance(data, dict) else []
+
+
+def lock_plan(project, run_id=None, reason=None, by=None):
+    """Lock the plan as it stands now. Returns the lock."""
+    import hashlib
+    project = Path(project)
+    plan = project / "plan.md"
+    choices = parse_choices(plan.read_text(encoding="utf-8")) if plan.is_file() else []
+    locks = plan_locks(project)
+    previous = locks[-1]["hash"] if locks else None
+    lock = {"at": _now(), "run_id": run_id, "reason": reason, "by": by, "previous": previous,
+            "choices": [{"key": _choice_key(c), "hash": _choice_hash(c)} for c in choices]}
+    lock["hash"] = hashlib.sha256(json.dumps(lock, sort_keys=True).encode("utf-8")).hexdigest()[:16]
+    locks.append(lock)
+    (project / PLAN_LOCK).write_text(json.dumps({"locks": locks}, indent=2, ensure_ascii=False) + "\n",
+                                     encoding="utf-8")
+    append_receipt(project, "plan_locked", run_id=run_id, reason=reason, by=by, choices=len(choices), hash=lock["hash"])
+    return lock
+
+
+def lock_chain_ok(project):
+    """True when each lock's hash matches its content and points at the one before."""
+    import hashlib
+    previous = None
+    for lock in plan_locks(project):
+        body = {k: v for k, v in lock.items() if k != "hash"}
+        if lock.get("previous") != previous:
+            return False
+        if hashlib.sha256(json.dumps(body, sort_keys=True).encode("utf-8")).hexdigest()[:16] != lock.get("hash"):
+            return False
+        previous = lock.get("hash")
+    return True
+
+
+def deviations(project):
+    """Choices added, changed or removed since the latest lock: {lock, added, changed, removed}."""
+    project = Path(project)
+    locks = plan_locks(project)
+    if not locks:
+        return {"lock": None, "added": [], "changed": [], "removed": []}
+    lock = locks[-1]
+    plan = project / "plan.md"
+    choices = parse_choices(plan.read_text(encoding="utf-8")) if plan.is_file() else []
+    locked = {c["key"]: c["hash"] for c in lock["choices"]}
+    current = {_choice_key(c): c for c in choices}
+    added = [c for k, c in current.items() if k not in locked]
+    changed = [c for k, c in current.items() if k in locked and _choice_hash(c) != locked[k]]
+    removed = [k for k in locked if k not in current]
+    return {"lock": lock, "added": added, "changed": changed, "removed": removed}
+
+
+def deviation_lines(project):
+    dev = deviations(project)
+    if dev["lock"] is None:
+        plan = Path(project) / "plan.md"
+        late = [c for c in (parse_choices(plan.read_text(encoding="utf-8")) if plan.is_file() else [])
+                if c.get("after_results")]
+        return ["Plan: not locked yet (it locks at the first `nutmeg run`)."] + [
+            f"- after seeing results: {c['kind']}: {c['choice']} ({c['after_results']})" for c in late]
+    lock = dev["lock"]
+    where = f"run {lock['run_id']}" if lock.get("run_id") else (lock.get("reason") or "by hand")
+    out = [f"Plan locked at {where} ({lock['at']})."]
+    for c in dev["added"]:
+        tag = f" · after seeing results ({c['after_results']})" if c.get("after_results") else ""
+        out.append(f"- added after the lock: {c['kind']}: {c['choice']}{tag}")
+    for c in dev["changed"]:
+        out.append(f"- changed after the lock: {c['kind']}: {c['choice']}")
+    for key in dev["removed"]:
+        out.append(f"- removed after the lock: {key}")
+    if not (dev["added"] or dev["changed"] or dev["removed"]):
+        out.append("- no changes since the lock")
+    if not lock_chain_ok(project):
+        out.append("- WARNING: plan_lock.json does not match its own hashes; it was edited by hand")
+    return out
+
+
 def append_receipt(project, kind, **fields):
     """Record an approval, override or setting change in receipts.jsonl."""
     from .redact import Redactor

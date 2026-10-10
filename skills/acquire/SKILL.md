@@ -113,6 +113,12 @@ After acquiring data, always:
 - Verify key fields are present (coordinates, player IDs, timestamps)
 - Check for missing data (some providers have gaps for certain competitions)
 - Warn about coordinate system differences if combining sources
+- Check for duplicated rows and repeated IDs (scrapers often double-count pages)
+- Inside a research project, record each file's source with
+  `python3 "${CLAUDE_PLUGIN_ROOT}/core/nutmeg.py" data add <file> --source "<where it came from>" --licence "<if known>"`;
+  it stores the hash and reports duplicates, repeated IDs and empty columns. Data from an unknown or unofficial
+  source can be wrong or altered: say where it came from in the output, and check a few values against a second
+  source when the numbers matter
 
 ## Entity ID resolution
 

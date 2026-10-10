@@ -23,7 +23,7 @@ from pathlib import Path
 
 from . import card as cards
 from .gate import pending_key
-from .project import append_receipt
+from .project import append_receipt, lock_plan, plan_locks
 from .redact import Redactor, inside_repo
 
 
@@ -138,6 +138,9 @@ def execute(run_args, repo_root, project, cwd, stream=True):
             changed_since_gate.append("command")
 
     run_id = next_run_id(project)
+    if not plan_locks(project):
+        # The plan as it stands before the first result is the primary specification.
+        lock_plan(project, run_id=run_id, by=None)
     folder = project / "runs" / run_id
     (folder / "code").mkdir(parents=True)
     (folder / "outputs").mkdir()
@@ -173,6 +176,14 @@ def execute(run_args, repo_root, project, cwd, stream=True):
         exit_code, stdout, stderr = 127, "", f"could not start {interpreter}: {exc}\n"
     duration = round(time.monotonic() - clock, 3)
 
+    # Intactness: a run must not change the data it reads. Compare each input with its hash before the run.
+    inputs_modified = []
+    for item in current["inputs"]:
+        path = repo_root / item["path"]
+        after = cards.sha256_path(path) if path.exists() else None
+        if item.get("sha256") and after != item["sha256"]:
+            inputs_modified.append(item["path"])
+
     stdout, stderr = redactor.text(stdout), redactor.text(stderr)
     (folder / "stdout.txt").write_text(stdout, encoding="utf-8")
     (folder / "stderr.txt").write_text(stderr, encoding="utf-8")
@@ -202,12 +213,16 @@ def execute(run_args, repo_root, project, cwd, stream=True):
                  "queued_for_review": shown is not None and shown.get("review") == "queued",
                  "changed_since_gate": changed_since_gate},
         "outputs": outputs,
+        "inputs_modified": inputs_modified,
     }
     (folder / "run.json").write_text(json.dumps(record, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     append_receipt(project, "run", run_id=run_id, file=record["file"], status=record["status"],
                    gate_shown=record["gate"]["shown"], queued_for_review=record["gate"]["queued_for_review"],
                    changed_since_gate=changed_since_gate)
 
+    if inputs_modified:
+        sys.stderr.write(f"nutmeg: run {run_id} changed its own input(s): {', '.join(inputs_modified)}. Claims from it "
+                         "will fail `nutmeg check`; write cleaned data to a new file instead.\n")
     if stream:
         if stdout:
             sys.stdout.write(stdout if stdout.endswith("\n") else stdout + "\n")

@@ -13,7 +13,13 @@ Failures:
 - unresolved citation: a literature claim without a resolved source and a
   quote match of "normalised" or better;
 - unsourced fact: a provider fact without a football-docs source;
-- broken link: an interpretation that rests on a missing or withdrawn claim.
+- broken link: an interpretation that rests on a missing or withdrawn claim;
+- stale run: a computed claim cites a run whose input file has changed since the run;
+- input changed by run: a computed claim cites a run that changed its own input;
+- rests on a gap: a number cites a gap claim (something the work could not establish).
+
+Requirements that only matter for sharing (a judgement's limits, a source for each input, alternatives for a
+headline) are checked by `nutmeg publish`, so they do not interrupt the analysis.
 
 Open failures persist in `checks.json`. `nutmeg check --accept <id> --reason`
 records an override in the receipts; the failure then stays closed.
@@ -37,6 +43,7 @@ GOOD_QUOTE_MATCHES = ("exact", "normalised")
 _NUMBER = re.compile(r"(?<![\w.,/:#-])([-+−]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?)(\s?%)?(?![\w/]|\.\d)")
 _CLAIM_REF = re.compile(r"\[(C\d+)(?:\s*,\s*C\d+)*\]")
 _CLAIM_IDS = re.compile(r"C\d+")
+_CLAIM_REF_ANY = re.compile(r"\[C\d+(?:\s*,\s*C\d+)*\]")
 
 # Words after a four-digit number that make it a count, not a year.
 UNITS = ("minutes", "mins", "passes", "shots", "touches", "carries", "actions", "pressures", "duels",
@@ -147,6 +154,16 @@ def _numeric_values(claim):
     return []
 
 
+def _alternative_values(claim):
+    """The values a claim's alternative specifications gave: an output may show them next to the claim's ID."""
+    out = []
+    for alt in (claim.get("evidence") or {}).get("alternatives") or []:
+        value = alt.get("value") if isinstance(alt, dict) else None
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            out.append(float(value))
+    return out
+
+
 def _matches(shown, decimals, percent, value):
     candidates = [value * 100, value] if percent else [value]
     return any(round(c, decimals) == round(shown, decimals) for c in candidates)
@@ -215,14 +232,22 @@ def run_checks(project):
                     failures.append({**where, "kind": "broken link", "id": _failure_id("ref", rel, raw, *bad),
                                      "message": f"{raw} cites {', '.join(bad)}, which is not in the ledger or is withdrawn"})
                     continue
-                if any(_matches(shown, decimals, percent, v) for cid in named for v in _numeric_values(live[cid])):
+                gaps = [cid for cid in named if live[cid]["kind"] == "gap"]
+                if gaps:
+                    failures.append({**where, "kind": "rests on a gap", "id": _failure_id("gap", rel, raw, *gaps),
+                                     "message": f"{raw} cites {', '.join(gaps)}, which records something the work "
+                                                "could not establish; a number cannot rest on it"})
+                    continue
+                if any(_matches(shown, decimals, percent, v) for cid in named
+                       for v in _numeric_values(live[cid]) + _alternative_values(live[cid])):
                     continue
                 values = "; ".join(f"{cid} = {live[cid].get('value')}" for cid in named)
                 failures.append({**where, "kind": "mismatch", "id": _failure_id("mismatch", rel, raw, *named),
                                  "message": f"{raw} does not match the claim it cites ({values})"})
                 continue
             hits = sorted({cid for cid, claim in live.items()
-                           if any(_matches(shown, decimals, percent, v) for v in _numeric_values(claim))})
+                           if any(_matches(shown, decimals, percent, v)
+                                  for v in _numeric_values(claim) + _alternative_values(claim))})
             if len(hits) == 1:
                 continue
             if not hits:
@@ -281,6 +306,7 @@ def run_checks(project):
         if state != "current":
             warnings.append(f"explainer page for explainers/{source.name} is {state}; run `nutmeg explain render`")
 
+    stale_runs = {}
     for cid, claim in live.items():
         evidence = claim.get("evidence") or {}
         if claim["kind"] == "computed":
@@ -289,6 +315,17 @@ def run_checks(project):
                 run = json.loads(run_file.read_text(encoding="utf-8"))
             except (OSError, json.JSONDecodeError):
                 run = None
+            if run is not None:
+                for item in run.get("inputs", []):
+                    path = repo / item.get("path", "")
+                    # A file that is not here (data kept out of git) cannot be compared; that is not a problem.
+                    if item.get("sha256") and path.exists() and sha256_file(path) != item["sha256"]:
+                        stale_runs.setdefault((run.get("id"), item["path"]), []).append(cid)
+                if run.get("inputs_modified"):
+                    failures.append({"kind": "input changed by run", "id": _failure_id("mutated", cid, run.get("id")),
+                                     "claim": cid, "message": f"{cid} ({claim['statement'][:60]}) cites run "
+                                     f"{run.get('id')}, which changed its own input ({', '.join(run['inputs_modified'])}); "
+                                     "restore the input, write cleaned data to a new file, and run again"})
             if run is None:
                 failures.append({"kind": "unrecorded run", "id": _failure_id("run", cid, evidence.get("run_id")),
                                  "claim": cid, "message": f"{cid} ({claim['statement'][:60]}) cites run "
@@ -313,7 +350,47 @@ def run_checks(project):
             if missing:
                 failures.append({"kind": "broken link", "id": _failure_id("interp", cid, *missing), "claim": cid,
                                  "message": f"{cid} rests on {', '.join(missing)}, which is not in the ledger or is withdrawn"})
+    ledger = Ledger(project / "claims.jsonl")
+    for cid, claim in live.items():
+        alternatives = (claim.get("evidence") or {}).get("alternatives") or []
+        for alt in alternatives:
+            run_file = project / "runs" / str(alt.get("run_id")) / "run.json"
+            try:
+                alt_run = json.loads(run_file.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                alt_run = None
+            if alt_run is None or alt_run.get("status") != "ok":
+                failures.append({"kind": "unrecorded alternative", "id": _failure_id("altrun", cid, alt.get("run_id")),
+                                 "claim": cid, "message": f"{cid}: alternative '{alt.get('choice')}' cites run "
+                                 f"{alt.get('run_id')}, which is not a recorded, successful run"})
+        # Every alternative ever recorded for a claim stays: reporting only the agreeable ones is selective.
+        now = {(a.get("run_id"), a.get("choice")) for a in alternatives}
+        dropped = []
+        for version in ledger.history(cid):
+            for alt in ((version.get("evidence") or {}).get("alternatives") or []):
+                key = (alt.get("run_id"), alt.get("choice"))
+                if isinstance(alt, dict) and key not in now and key not in dropped:
+                    dropped.append(key)
+        if dropped:
+            failures.append({"kind": "alternative dropped", "id": _failure_id("altdrop", cid, *[str(k) for k in dropped]),
+                             "claim": cid, "message": f"{cid} no longer lists alternative(s) it had before ("
+                             + "; ".join(f"{c} ({r})" for r, c in dropped) + "); keep every alternative you ran, "
+                             "including those that disagree"})
+
+    for (run_id, path), cids in stale_runs.items():
+        current = sha256_file(repo / path)
+        failures.append({"kind": "stale run", "id": _failure_id("stale", run_id, path, current), "claim": cids[0],
+                         "message": f"{path} has changed since run {run_id}, so {', '.join(sorted(set(cids)))} may be "
+                                    "out of date; run the analysis again and update the claims (or accept with the "
+                                    "user's reason if the change cannot affect them)"})
+
     return failures, warnings
+
+
+def sha256_file(path):
+    """The same hash `nutmeg run` records: a file's bytes, or a folder's file paths and hashes."""
+    from .card import sha256_path
+    return sha256_path(path)
 
 
 def load_state(project):

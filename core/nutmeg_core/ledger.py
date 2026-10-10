@@ -18,7 +18,7 @@ try:  # POSIX only; on other systems appends are not locked
 except ImportError:  # pragma: no cover
     fcntl = None
 
-KINDS = ("computed", "provider_fact", "identity", "literature", "definition", "interpretation")
+KINDS = ("computed", "provider_fact", "identity", "literature", "definition", "interpretation", "gap")
 
 # Evidence fields each kind must carry. Fields that a check verifies later
 # (a provider fact's docs source, a citation's quote match) are optional here,
@@ -30,6 +30,8 @@ REQUIRED_EVIDENCE = {
     "literature": ("citation",),
     "definition": ("definition",),
     "interpretation": ("claims",),
+    # Something the work set out to establish and could not: the reason says why (no data, too small a sample).
+    "gap": ("reason",),
 }
 
 STATUSES = ("draft", "verified", "disputed", "withdrawn")
@@ -97,6 +99,26 @@ def validate(record):
 
     if kind == "computed" and "value" not in record:
         raise ClaimError("value", "a computed claim needs the value it shows")
+    if kind == "gap" and "value" in record:
+        raise ClaimError("value", "a gap records what could not be established; it has no value")
+    if kind == "interpretation" and "limits" in evidence and not (
+            isinstance(evidence["limits"], str) and evidence["limits"].strip()):
+        raise ClaimError("evidence.limits", "say in one sentence what this judgement does not show")
+    alternatives = evidence.get("alternatives")
+    if alternatives is not None:
+        if not isinstance(alternatives, list):
+            raise ClaimError("evidence.alternatives", "must be a list of {run_id, choice, value} (or holds for a judgement)")
+        for alt in alternatives:
+            if not isinstance(alt, dict) or not alt.get("run_id") or not str(alt.get("choice") or "").strip():
+                raise ClaimError("evidence.alternatives", "each alternative needs run_id and choice (what differs)")
+            if kind == "interpretation":
+                if not isinstance(alt.get("holds"), bool):
+                    raise ClaimError("evidence.alternatives", "for a judgement, each alternative says holds: true or false")
+            elif not isinstance(alt.get("value"), (int, float)) or isinstance(alt.get("value"), bool):
+                raise ClaimError("evidence.alternatives", "each alternative needs the numeric value it gave")
+    if "no_alternatives" in evidence and not (isinstance(evidence["no_alternatives"], str)
+                                              and evidence["no_alternatives"].strip()):
+        raise ClaimError("evidence.no_alternatives", "say in one sentence why no defensible alternative exists")
     if kind == "interpretation":
         linked = evidence["claims"]
         if not isinstance(linked, list) or not all(isinstance(c, str) and c for c in linked):

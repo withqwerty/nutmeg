@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 from . import __version__, card as cards, check as checks, figure as figures, project as projects, publish as publishing
-from . import bundle as bundling, review, run as runs, understand, why as whys, workspace as workspaces
+from . import bundle as bundling, provenance, review, run as runs, understand, why as whys, workspace as workspaces
 from .config import (LEVELS, PERSONAS, STAGES, ConfigError, data_in_git_policy, load_effective, load_team,
                      save_user, team_signoff_required, user_config_path, user_name)
 from .gate import acknowledge_settings, pending_key
@@ -161,6 +161,23 @@ def cmd_plan_choose(args):
         raise UsageError(str(exc))
     marked = " (marked as made after seeing the results)" if args.after_results is not None else ""
     print(f"Added {args.kind}: {args.choice} to plan.md{marked}")
+    if projects.plan_locks(project):
+        print("The plan was locked at the first run, so this choice is listed as a deviation on the publish card. "
+              "Keep the locked choice as the primary result unless the user decides otherwise.")
+    return 0
+
+
+def cmd_plan_lock(args):
+    project = resolve_project(args)
+    if not args.reason:
+        raise UsageError("say why you lock again with --reason, for example 'phase 2: opponent analysis'")
+    lock = projects.lock_plan(project, reason=args.reason, by=user_name(find_repo_root(project)))
+    print(f"Locked {len(lock['choices'])} plan choice(s) ({lock['hash']}).")
+    return 0
+
+
+def cmd_plan_diff(args):
+    print("\n".join(projects.deviation_lines(resolve_project(args))))
     return 0
 
 
@@ -320,28 +337,28 @@ def cmd_teachback(args):
     project = resolve_project(args)
     repo = find_repo_root(project)
     by = user_name(repo)
+    words = {"claim": args.claim, "rests_on": args.rests_on, "would_change": args.would_change}
     if not args.show:
-        words = {"claim": args.claim, "rests_on": args.rests_on, "would_change": args.would_change}
-        if not all(words.values()):
-            raise UsageError("give --claim, --rests-on and --would-change in the user's own words (or --show)")
+        if not args.shown and not all(words.values()):
+            raise UsageError("give --shown quotes from the user's messages, or --claim, --rests-on and --would-change "
+                             "in their own words (or --show)")
         covers = [c.strip() for c in (args.covers or "").split(",") if c.strip()] or None
         try:
-            entry = understand.record(project, by, words, covers)
+            entry = understand.record(project, by, words=words, covers=covers,
+                                      shown=args.shown, clarified=args.clarified)
         except understand.UnderstandError as exc:
-            raise UsageError(f"teach-back not recorded: {exc}")
-        print(f"Recorded {by}'s teach-back for {', '.join(sorted(entry['covers']))}. The publish card shows these words.")
+            raise UsageError(f"not recorded yet: {exc}")
+        print(f"Recorded for {', '.join(sorted(entry['covers']))}, in your own nutmeg folder (not the repository). "
+              "Only your publish card shows it.")
     state = understand.status(project, by)
     gap = understand.describe_gap(state)
-    latest = state["latest"]
-    if args.show and latest:
-        print(f"Latest teach-back by {by} ({latest['at']}):")
-        for field in understand.FIELDS:
-            print(f"  {understand.LABELS[field]}: {latest[field]}")
+    if args.show and state["latest"]:
+        print("\n".join(understand.summary_lines(state["latest"])))
     if gap:
-        print(f"Publish still needs a teach-back by {by}: {gap}")
+        print(f"Before publishing, {by} still needs to talk through: {gap}")
         return 1
     if args.show:
-        print(f"The teach-back covers every claim a publish needs ({', '.join(state['needed']) or 'none'}).")
+        print(f"Ready to publish: it covers {', '.join(state['needed']) or 'nothing yet'}.")
     return 0
 
 
@@ -407,6 +424,36 @@ def cmd_explain_decline(args):
     project = resolve_project(args)
     understand.decline(project, args.topic, user_name(find_repo_root(project)))
     print(f"Recorded: do not offer an explainer on {args.topic!r} again in this project.")
+    return 0
+
+
+def cmd_data_add(args):
+    project = resolve_project(args)
+    repo = find_repo_root(project)
+    try:
+        entry = provenance.add(project, repo, str(Path.cwd() / args.file), args.source, user_name(repo),
+                               licence=args.licence, retrieved=args.retrieved, note=args.note)
+    except provenance.ProvenanceError as exc:
+        raise UsageError(str(exc))
+    prof = entry.get("profile") or {}
+    size = f"{prof['rows']} rows, {len(prof.get('columns', []))} columns; " if prof else ""
+    print(f"Recorded {entry['path']} ({size}sha256 {entry['sha256'][:12]}) from {entry['source']}.")
+    for concern in provenance.concerns(entry):
+        print(f"- look at this before analysis: {concern}")
+    return 0
+
+
+def cmd_data_list(args):
+    project = resolve_project(args)
+    repo = find_repo_root(project)
+    files = provenance.load(project)["files"]
+    if not files:
+        print("No data files recorded yet; `nutmeg data add <file> --source ...` records one.")
+    for entry in files:
+        print(f"{entry['path']} · {provenance.state(repo, entry)} · from {entry.get('source')}"
+              f"{' · licence ' + entry['licence'] if entry.get('licence') else ''}")
+        for concern in provenance.concerns(entry):
+            print(f"  - {concern}")
     return 0
 
 
@@ -539,9 +586,13 @@ def build_parser(parser_class=cards.NutmegParser):
     choose.add_argument("--rests-ref", required=True,
                         help="the reference: a football-docs page, rule, paper, claim ID or the user's words")
     choose.add_argument("--after-results", metavar="NOTE",
-                        help="this choice was made after the results were seen: say what it replaces and who asked")
+                        help="this choice was made after the results were seen: say what it replaces (the method, not the person)")
     choose.set_defaults(handler=cmd_plan_choose)
     plan_commands.add_parser("check", help="check every choice has a reason").set_defaults(handler=cmd_plan_check)
+    locker = plan_commands.add_parser("lock", help="lock the plan again for a new phase (it locks at the first run)")
+    locker.add_argument("--reason", help="why, for example 'phase 2: opponent analysis'")
+    locker.set_defaults(handler=cmd_plan_lock)
+    plan_commands.add_parser("diff", help="show changes since the plan was locked").set_defaults(handler=cmd_plan_diff)
 
     run = commands.add_parser("run", help="run a .py, .R or .sql file and record it")
     cards.add_run_arguments(run)
@@ -607,7 +658,12 @@ def build_parser(parser_class=cards.NutmegParser):
     queue.add_argument("--note", help="what you checked")
     queue.set_defaults(handler=cmd_queue)
 
-    teachback = commands.add_parser("teachback", help="record the user's own words for the work before publishing")
+    teachback = commands.add_parser("teachback", help="record that you can defend the work before publishing "
+                                    "(kept in your own nutmeg folder, never in the repository)")
+    teachback.add_argument("--shown", action="append", default=[],
+                           help="a sentence from the user's own messages that shows they understand (repeat)")
+    teachback.add_argument("--clarified", action="append", default=[],
+                           help="a point cleared up along the way, for explainers (repeat)")
     teachback.add_argument("--claim", help="what the work claims, in the user's words")
     teachback.add_argument("--rests-on", help="what that rests on (the main assumption or evidence), in their words")
     teachback.add_argument("--would-change", help="what would change the answer, in their words")
@@ -629,6 +685,17 @@ def build_parser(parser_class=cards.NutmegParser):
     explain_decline = explain_commands.add_parser("decline", help="record that the user declined an explainer topic")
     explain_decline.add_argument("topic")
     explain_decline.set_defaults(handler=cmd_explain_decline)
+
+    data = commands.add_parser("data", help="record where each input file came from (data/manifest.json)")
+    data_commands = data.add_subparsers(dest="data_command", metavar="<action>")
+    data_add = data_commands.add_parser("add", help="record a file's source, licence, hash and a short profile")
+    data_add.add_argument("file")
+    data_add.add_argument("--source", required=True, help="where it came from: a URL, a provider and product, or a person")
+    data_add.add_argument("--licence", help="the licence or terms, if known")
+    data_add.add_argument("--retrieved", help="when it was retrieved, for example 2026-10-09")
+    data_add.add_argument("--note", help="anything else a reader should know")
+    data_add.set_defaults(handler=cmd_data_add)
+    data_commands.add_parser("list", help="list recorded files and whether they changed").set_defaults(handler=cmd_data_list)
 
     signoff = commands.add_parser("signoff", help="verify a claim with your name (a teammate's check)")
     signoff.add_argument("claim_id")

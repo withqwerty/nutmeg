@@ -1,7 +1,7 @@
 """`nutmeg publish`: approve a project's outputs for publication.
 
 Publish refuses while `nutmeg check` has open problems, while the person who
-publishes has not put the claims in their own words (`nutmeg teachback`), and
+publishes has not shown they can defend the claims (`nutmeg teachback`), and
 while an explainer page is older than its Markdown source. Otherwise it records
 what was published (each output file and figure with its hash) in
 `published.json` and a receipt, and with `--to DIR` copies the outputs there.
@@ -13,17 +13,19 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import check as checks
-from . import understand
+from . import provenance, understand
 from .card import sha256_path
 from .config import user_name
 from .figure import IMAGE_TYPES, load_all
 from .project import append_receipt
 from .bundle import RedactionError, write_redacted
-from .project import parse_choices
+from .ledger import Ledger
+from .project import deviation_lines, parse_choices
 from .redact import Redactor, inside_repo
 from .why import sample_rows
 
 PREVIEW_ROWS = 3
+MIN_ALTERNATIVES = 2
 
 
 class PublishError(ValueError):
@@ -66,8 +68,36 @@ def preview(project, repo_root, by=None):
             "first_rows": rows,
         })
     after = [c for c in parse_choices(_read(project / "plan.md")) if c.get("after_results")]
+    claims = Ledger(project / "claims.jsonl").claims()
+    live = {cid: c for cid, c in claims.items() if c.get("status") != "withdrawn"}
+    cited = set()
+    for path in checks.output_files(project):
+        for ref in checks._CLAIM_REF_ANY.finditer(path.read_text(encoding="utf-8", errors="replace")):
+            cited.update(checks._CLAIM_IDS.findall(ref.group(0)))
+    no_limits = [cid for cid in sorted(cited) if cid in live and live[cid]["kind"] == "interpretation"
+                 and not (live[cid].get("evidence") or {}).get("limits")]
+    unsourced = []
+    for cid in sorted(cited):
+        run_id = (live.get(cid, {}).get("evidence") or {}).get("run_id")
+        try:
+            run = json.loads((project / "runs" / str(run_id) / "run.json").read_text(encoding="utf-8")) if run_id else {}
+        except (OSError, json.JSONDecodeError):
+            run = {}
+        for item in run.get("inputs", []):
+            if item.get("path") not in unsourced and provenance.lookup(project, item.get("path")) is None:
+                unsourced.append(item.get("path"))
+    headline = [c for c in claims.values() if c.get("headline") and c.get("status") != "withdrawn"
+                and c["kind"] in ("computed", "interpretation")]
+    robustness = []
+    for claim in headline:
+        evidence = claim.get("evidence") or {}
+        robustness.append({"id": claim["id"], "kind": claim["kind"], "value": claim.get("value"),
+                           "statement": claim["statement"], "alternatives": evidence.get("alternatives") or [],
+                           "no_alternatives": evidence.get("no_alternatives")})
     return {"outputs": outputs, "figures": figures, "open": state["open"], "by": by,
-            "teachback": understand.status(project, by), "stale_pages": stale_pages, "after_results": after}
+            "teachback": understand.status(project, by), "stale_pages": stale_pages, "after_results": after,
+            "robustness": robustness, "plan": deviation_lines(project), "no_limits": no_limits,
+            "unsourced": unsourced}
 
 
 def _read(path):
@@ -82,10 +112,38 @@ def blockers(data):
     out = [f"open problem from `nutmeg check`: {checks.describe(f)}" for f in data["open"]]
     gap = understand.describe_gap(data["teachback"])
     if gap:
-        out.append(f"teach-back by {data['by']}: {gap}. Ask {data['by']} to say, in their own words, what the work "
-                   "claims, what it rests on and what would change the answer; correct a wrong reading first; then "
-                   "record their words with `nutmeg teachback`")
+        out.append(f"before this goes out, {data['by']} should be able to defend it ({gap}). If their messages "
+                   "already show they understand it, quote them with `nutmeg teachback --shown`; otherwise talk it "
+                   "through as docs/understanding.md says (a quick reviewer-style check for experts, a guided "
+                   "talk-through for learners) and record their words with `nutmeg teachback`")
     out += [f"explainer page older than its source: {p}; run `nutmeg explain render`" for p in data["stale_pages"]]
+    for cid in data.get("no_limits", []):
+        out.append(f"{cid} is a judgement the outputs cite: add evidence.limits, one sentence on what it does not show")
+    for path in data.get("unsourced", []):
+        out.append(f"input {path} has no recorded source: `nutmeg data add {path} --source \"...\"`")
+    for item in data.get("robustness", []):
+        if len(item["alternatives"]) < MIN_ALTERNATIVES and not item["no_alternatives"]:
+            out.append(f"headline {item['id']} ({item['statement'][:60]}) shows one specification only: run "
+                       f"{MIN_ALTERNATIVES} or more defensible alternatives (another cut-off, comparison or window) as "
+                       "recorded runs and add them as evidence.alternatives, or say why there are none in "
+                       "evidence.no_alternatives")
+    return out
+
+
+def robustness_lines(data):
+    out = []
+    for item in data.get("robustness", []):
+        alts = item["alternatives"]
+        if item["kind"] == "interpretation":
+            held = sum(1 for a in alts if a.get("holds"))
+            detail = "; ".join(f"{a['choice']}: {'holds' if a.get('holds') else 'does NOT hold'}" for a in alts)
+            out.append(f"{item['id']} holds under {held} of {len(alts)} alternative(s){': ' + detail if detail else ''}")
+        elif alts:
+            values = [a["value"] for a in alts] + ([item["value"]] if isinstance(item["value"], (int, float)) else [])
+            detail = "; ".join(f"{a['choice']}: {a['value']}" for a in alts)
+            out.append(f"{item['id']} = {item['value']}; alternatives {detail}; range {min(values)} to {max(values)}")
+        if item["no_alternatives"]:
+            out.append(f"{item['id']}: no alternatives ({item['no_alternatives']})")
     return out
 
 
@@ -96,12 +154,9 @@ def render_preview(data, project_label):
         out.append(f"REFUSED: publish will refuse ({len(blocked)} reason(s)):")
         out += [f"- {line}" for line in blocked[:10]]
         return "\n".join(out)
-    latest = data["teachback"]["latest"]
-    if latest:
-        out.append(f"In {latest.get('by')}'s own words ({latest.get('at')}):")
-        out += [f"  {understand.LABELS[f]}: {latest.get(f)}" for f in understand.FIELDS]
-    for choice in data.get("after_results", []):
-        out.append(f"Changed after seeing results: {choice['kind']}: {choice['choice']} ({choice['after_results']})")
+    out += understand.summary_lines(data["teachback"]["latest"])
+    out += data.get("plan", [])
+    out += robustness_lines(data)
     out.append("Outputs: " + (", ".join(data["outputs"]) or "none"))
     if not data["figures"]:
         out.append("Figures: none registered (`nutmeg figure register`)")

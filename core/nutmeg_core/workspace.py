@@ -2,8 +2,8 @@
 
 The page shows, in order: when it was generated and how big the ledger is,
 the review queue (open check problems, runs waiting for review, disputed
-claims, headline claims waiting for sign-off or for the author's teach-back,
-explainer pages older than their source), the question, the plan with
+claims, headline claims waiting for sign-off, explainer pages older than
+their source; the teach-back is personal and never shown here), the question, the plan with
 its reasons, the ledger (disputed and failing claims first, each with its
 `why` card), the figures with their footnotes, the runs, and the glossary
 entries the page links to.
@@ -25,7 +25,7 @@ from . import glossary, understand
 from .config import ConfigError, team_signoff_required
 from .figure import load_all as load_figures
 from .ledger import Ledger
-from .project import find_repo_root, parse_choices
+from .project import deviation_lines, find_repo_root, parse_choices
 from .redact import Redactor
 from .run import review_queue
 from .why import why_lines
@@ -185,10 +185,6 @@ def build(project, repo_root=None, now=None):
         if signoff_required and claim.get("headline") and not claim.get("signer"):
             queue.append(f'<li><strong>Waiting for sign-off</strong> <a href="#{r.esc(claim["id"])}">'
                          f"{r.esc(claim['id'])}</a> {r.esc(claim['statement'])}</li>")
-    gap = understand.describe_gap(understand.status(project))
-    if gap:
-        queue.append(f"<li><strong>Waiting for the author's teach-back</strong> {r.esc(gap)}; publish refuses "
-                     "until the author puts the work in their own words</li>")
     for source in understand.explainers(project):
         state = understand.page_state(source)
         if state != "current":
@@ -214,6 +210,7 @@ def build(project, repo_root=None, now=None):
                     f"<td><span class=\"tag\">{r.esc(rests_type)}</span> {r.inline(rests_ref)}</td></tr>")
     plan_html = ("<table><thead><tr><th>Kind</th><th>Choice</th><th>Why</th><th>Rests on</th></tr></thead><tbody>"
                  + "".join(rows) + "</tbody></table>") if rows else '<p class="empty">No plan choices yet.</p>'
+    plan_html += "<ul>" + "".join(f"<li>{r.esc(line.lstrip('- '))}</li>" for line in deviation_lines(project)) + "</ul>"
 
     # Ledger
     r.section()

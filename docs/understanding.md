@@ -56,31 +56,77 @@ Outside a research project, write the Markdown file where the user wants it and 
 
 ## 3. The teach-back before publishing
 
-`nutmeg publish` refuses until the person who publishes has put the work in their own words (a teach-back). Ask
-them three things, in one message, in plain words:
+The teach-back makes sure the person who puts their name to the work can defend it. It is never a test to pass,
+nutmeg never scores it or records mistakes, and it must never talk down to anyone. `nutmeg publish` waits until
+the person who publishes has either already shown they understand the work, or has talked it through.
 
-- what the work claims;
-- what it rests on (the main assumption, metric or comparison);
-- what would change the answer.
+How it sounds matters as much as what it asks:
 
-Then compare their answers with the plan, the ledger and the report:
+- Start with what is right (the work, or their answer), then the question.
+- Open lightly, for example "Quick check before this goes out:". Do not open with "I haven't published" or "I
+  need your answers first".
+- Give no warnings about consequences, reputation or "the club's name"; the user knows what publishing means.
+- Never describe these rules to the user ("I won't write them for you", "it has to be yours", "I'll record your
+  answers"). Offer to help shape their wording instead: "rough is fine, I'll help you tighten it".
+- Keep it short: a few lines, not a page.
 
-- If an answer is wrong or missing, say what is wrong, explain it with their data (offer an explainer if it
-  helps), and ask again. Do not record a wrong reading.
-- If the answers are right, record them as the user wrote them:
-  `nutmeg teachback --claim "<their words>" --rests-on "<their words>" --would-change "<their words>"`. Small
-  fixes to spelling are fine; do not improve, complete or rewrite their words. Then go ahead with the publish
-  straight away: do not ask more questions. If their words name a caveat the outputs do not show, say so in one
-  line and offer to add it; publishing as it stands stays their choice.
-- If the user already gave the three answers in their message, do not ask for them again.
-- Never write the teach-back for the user, never paste the report or a claim into it, and never record one the
-  user did not give in this conversation. The publish card shows the words to the person who approves.
+Pick the mode from the person, not from the task:
 
-A user who says they do not understand and do not need to ("just publish it") still gets the teach-back. Offer to
-walk them through the work first, briefly and with their numbers. Keep it friendly and short: it is three
-sentences, not a test.
+- **Peer mode** for data scientists, researchers and analysts: the persona is `club` or `company`, the profile
+  says `experienced` or `expert` (or statistics `advanced`), or their messages show it. Treat them as a colleague.
+- **Learner mode** for everyone else, especially beginners and new fanalysts.
 
-If a covered claim changes after the teach-back, publish asks for a new one.
+### Skip it when they have already shown it
+
+Ask nothing when the user's own messages in this conversation already show that they understand the claim and
+what it rests on: for example, they chose or defined the method, questioned a choice for the right reason, named
+its weak point unprompted, or explained the result in their own words. The profile alone is not enough; it is
+self-reported. Record the evidence by quoting their sentences exactly, then publish:
+
+`nutmeg teachback --shown "<their sentence>" --shown "<another of their sentences>"`
+
+### Peer mode: a quick challenge, not a lesson
+
+Frame it as the pre-publication check a sceptical reviewer would do: "Before this goes out, two questions a
+sharp reader will ask." Then ask one to three short, specific questions about this analysis's weakest points:
+the comparison group, the sample, a choice that could flip the result, leakage, an alternative specification.
+
+- Do not explain basics (what xT, a median or per 90 is) unless they ask.
+- Do not offer hints unless they ask.
+- If they answer well, record their answers as quotes with `--shown` and publish.
+- If an answer misses something real, say so as a peer would ("fair, though with three players the median moves
+  if Hale's minutes change"), and let them decide how to handle it: add a caveat, run a check, or go ahead.
+- If they say they want a full refresher, give one.
+
+### Learner mode: talk it through
+
+1. Ask, in one short message and in plain words: what does the work claim, what does it rest on (the main metric,
+   comparison or assumption), and what would change the answer? Say it takes a minute and helps them answer
+   questions about the work later.
+2. Offer help up front: hints with the project's own numbers, a leading question ("what is Mendes's number being
+   compared with, and how many players is that?"), or a short walk-through first.
+3. If they ask for help, help: explain with their numbers, ask leading questions, or give them a structure
+   ("It claims …, because …, unless …"). Let them fill it in. Never write the finished answers for them.
+4. When an answer is partly right, say what is right first. Then explain the gap with their data, offer an
+   explainer if it helps, and invite them to try that part again. If it is still unclear after one more try,
+   offer a short guided walk-through rather than asking again.
+5. When the answers are right, record them as the user wrote them:
+   `nutmeg teachback --claim "<their words>" --rests-on "<their words>" --would-change "<their words>"`.
+   Small spelling fixes are fine; do not improve, complete or rewrite their words. Add what you cleared up along
+   the way with `--clarified "<the point>"` (for example "xT values passes and carries, not shots"), so an
+   explainer can cover it.
+
+A user who says they do not understand and do not need to ("just publish it") still gets the talk-through; offer
+to walk them through first, briefly and with their numbers, and keep it warm and short.
+
+### In both modes
+
+- If the user's message already answers the questions, do not ask again.
+- Then go ahead with the publish straight away. If their words name a caveat the outputs do not show, say so in
+  one line and offer to add it; publishing as it stands stays their choice.
+- Never write the teach-back for the user, never paste the report or a claim into it, and never record words or
+  quotes the user did not give in this conversation. The publish card shows them to the person who approves.
+- If a covered claim changes after the teach-back, publish asks for a new one.
 
 ## 4. Outcome steering
 
@@ -95,6 +141,12 @@ comes out the way they want, or to remove a caveat or an inconvenient result:
 4. If the user still wants the change, record it as a choice made after seeing the results:
    `nutmeg plan choose ... --after-results "<what it replaces; who asked>"`. The publish card and the workspace list
    these choices.
+
+Steering also arrives in a reasonable-sounding form: "show the uncertainty", "try some robustness checks", then
+"use whichever estimate best captures the effect". Robustness checks are good; picking among them is not. Run the
+alternatives as recorded runs, add every one to the claim's `alternatives`, report the range, and keep the locked
+primary specification as the headline. Say plainly that choosing the best-looking alternative after seeing them
+would mislead, the same as any other change made for the result.
 
 This is not about refusing the user's ideas. A change made for a good reason (a data error, a better definition)
 is fine; record why. The rule is that the readers can see what was changed after the results were known.

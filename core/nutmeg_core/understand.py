@@ -1,13 +1,18 @@
 """Help the author understand the work before it is shared.
 
-Teach-back: before `nutmeg publish`, the person who publishes puts the work in
-their own words: what it claims, what that rests on, and what would change the
-answer. `nutmeg teachback` records the words in `teachback.jsonl` with a
-fingerprint of each claim they cover (the headline claims, or the claims the
-outputs cite when there are no headline claims). A later change to a covered
-claim needs a new teach-back. nutmeg cannot judge the words; the skills compare
-them with the plan and correct a wrong reading first. The publish gate card
-shows the words to the person who approves.
+Teach-back: before `nutmeg publish`, the person who publishes shows they can
+defend the work. Either their own messages already show it (`--shown` quotes),
+or they talk it through: what it claims, what that rests on, and what would
+change the answer (`--claim`, `--rests-on`, `--would-change`). Each record
+carries a fingerprint of each claim it covers (the headline claims, or the
+claims the outputs cite when there are no headline claims); a later change to a
+covered claim needs a new one. nutmeg cannot judge the words; the skills do,
+and never talk down to anyone.
+
+The teach-back is personal. Records and declined explainer topics live in the
+user's own nutmeg folder (next to the user config), never in the repository, a
+bundle, the workspace page or a published output. Only the publish gate card,
+which the person publishing sees, shows them.
 
 Explainers: Markdown pages in `explainers/` that the user can edit.
 `nutmeg explain render` turns each into one self-contained HTML page to share,
@@ -25,14 +30,15 @@ from pathlib import Path
 
 from . import glossary
 from .ledger import CONTENT_FIELDS, Ledger
+from .config import user_config_path
 from .project import append_receipt, find_repo_root
 from .redact import Redactor
 
-TEACHBACK_FILE = "teachback.jsonl"
 EXPLAINERS = "explainers"
 FIELDS = ("claim", "rests_on", "would_change")
 LABELS = {"claim": "What it claims", "rests_on": "What it rests on", "would_change": "What would change the answer"}
 MIN_WORDS = 4
+MIN_SHOWN_WORDS = 6
 COPY_CHARS = 40  # a field that repeats this many characters of an output or claim is copied, not the user's words
 SLUG = re.compile(r"^[a-z0-9][a-z0-9-]{0,62}$")
 IMAGE_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif",
@@ -84,8 +90,15 @@ def needed(project):
     return {cid: live[cid] for cid in ids}
 
 
-def records(project):
-    path = Path(project) / TEACHBACK_FILE
+def personal_store(project):
+    """The user's own file for this project's teach-backs and declined topics: outside the repository."""
+    project = Path(project).resolve()
+    key = hashlib.sha256(str(project).encode("utf-8")).hexdigest()[:16]
+    return user_config_path().parent / "teachback" / f"{project.name}-{key}.jsonl"
+
+
+def _personal(project, kind=None):
+    path = personal_store(project)
     out = []
     if not path.is_file():
         return out
@@ -94,9 +107,24 @@ def records(project):
             record = json.loads(line)
         except json.JSONDecodeError:
             continue
-        if isinstance(record, dict) and isinstance(record.get("covers"), dict):
+        if isinstance(record, dict) and (kind is None or record.get("kind", "teachback") == kind):
             out.append(record)
     return out
+
+
+def _append_personal(project, entry):
+    path = personal_store(project)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(entry, ensure_ascii=False, sort_keys=True) + "\n")
+    try:
+        path.chmod(0o600)
+    except OSError:
+        pass
+
+
+def records(project):
+    return [r for r in _personal(project, "teachback") if isinstance(r.get("covers"), dict)]
 
 
 def status(project, by=None):
@@ -129,19 +157,33 @@ def _copied_from(project, text):
     return None
 
 
-def record(project, by, words, covers=None):
-    """Record the person's own words for the claims a publish needs. `words` maps each of FIELDS to text."""
+def _check_words(project, label, text, minimum):
+    if len(text.split()) < minimum:
+        raise UnderstandError(f"{label}: a few more words would help (at least {minimum}), in the user's own words")
+    source = _copied_from(project, text)
+    if source:
+        raise UnderstandError(f"{label} matches {source}; the teach-back is the user's own words, not the outputs")
+
+
+def record(project, by, words=None, covers=None, shown=None, clarified=None):
+    """Record that the person can defend the claims a publish needs.
+
+    Either `words` maps each of FIELDS to the user's own answers, or `shown` lists sentences the user wrote in the
+    conversation that already show it. `clarified` lists points cleared up along the way (for explainers)."""
     project = Path(project)
-    for field in FIELDS:
-        text = (words.get(field) or "").strip()
-        if len(text.split()) < MIN_WORDS:
-            raise UnderstandError(f"--{field.replace('_', '-')}: give at least {MIN_WORDS} words in the user's own words")
-        source = _copied_from(project, text)
-        if source:
-            raise UnderstandError(f"--{field.replace('_', '-')} repeats {source}; a teach-back is the user's own "
-                                  "words, not a copy of the outputs")
-    if len({_norm(words[f]) for f in FIELDS}) < len(FIELDS):
-        raise UnderstandError("the three answers are the same; each answers a different question")
+    words = {f: (words or {}).get(f) for f in FIELDS}
+    shown = [q.strip() for q in (shown or []) if q and q.strip()]
+    clarified = [c.strip() for c in (clarified or []) if c and c.strip()]
+    if shown and any(words.values()):
+        raise UnderstandError("give either --shown quotes or the three answers, not both")
+    if shown:
+        for quote in shown:
+            _check_words(project, "--shown", quote, MIN_SHOWN_WORDS)
+    else:
+        for field in FIELDS:
+            _check_words(project, f"--{field.replace('_', '-')}", (words.get(field) or "").strip(), MIN_WORDS)
+        if len({_norm(words[f]) for f in FIELDS}) < len(FIELDS):
+            raise UnderstandError("the three answers are the same; each answers a different question")
     need = needed(project)
     if covers:
         claims = Ledger(project / "claims.jsonl").claims()
@@ -153,22 +195,40 @@ def record(project, by, words, covers=None):
         chosen = need
     if not chosen:
         raise UnderstandError("no headline claims and no claims cited in the outputs yet; there is nothing to cover")
-    entry = {"at": _now(), "by": by, **{f: words[f].strip() for f in FIELDS},
-             "covers": {cid: fingerprint(c) for cid, c in chosen.items()}}
+    entry = {"kind": "teachback", "at": _now(), "by": by, "covers": {cid: fingerprint(c) for cid, c in chosen.items()}}
+    if shown:
+        entry["shown"] = shown
+    else:
+        entry.update({f: words[f].strip() for f in FIELDS})
+    if clarified:
+        entry["clarified"] = clarified
     entry = Redactor.for_repo(find_repo_root(project)).obj(entry)
-    with (project / TEACHBACK_FILE).open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(entry, ensure_ascii=False, sort_keys=True) + "\n")
-    append_receipt(project, "teachback", by=by, covers=sorted(entry["covers"]))
+    _append_personal(project, entry)
     return entry
 
 
 def describe_gap(state):
     parts = []
     if state["missing"]:
-        parts.append(f"not yet in the author's own words: {', '.join(state['missing'])}")
+        parts.append(f"not yet talked through: {', '.join(state['missing'])}")
     if state["stale"]:
-        parts.append(f"changed since the teach-back: {', '.join(state['stale'])}")
+        parts.append(f"changed since the last talk-through: {', '.join(state['stale'])}")
     return "; ".join(parts)
+
+
+def summary_lines(entry):
+    """The teach-back as the publish card shows it (only to the person publishing)."""
+    if not entry:
+        return []
+    if entry.get("shown"):
+        out = [f"Understanding shown in {entry.get('by')}'s own messages ({entry.get('at')}):"]
+        out += [f'  "{q}"' for q in entry["shown"]]
+    else:
+        out = [f"In {entry.get('by')}'s own words ({entry.get('at')}):"]
+        out += [f"  {LABELS[f]}: {entry.get(f)}" for f in FIELDS]
+    if entry.get("clarified"):
+        out.append("  Cleared up along the way: " + "; ".join(entry["clarified"]))
+    return out
 
 
 # --- explainers ----------------------------------------------------------------------------------------------------
@@ -209,21 +269,11 @@ def new(project, slug, title):
 
 
 def decline(project, topic, by):
-    append_receipt(project, "explainer_declined", topic=topic, by=by)
+    _append_personal(project, {"kind": "explainer_declined", "at": _now(), "by": by, "topic": topic})
 
 
 def declined(project):
-    path = Path(project) / "receipts.jsonl"
-    out = []
-    if path.is_file():
-        for line in path.read_text(encoding="utf-8").splitlines():
-            try:
-                record = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if record.get("kind") == "explainer_declined":
-                out.append(record.get("topic"))
-    return out
+    return [r.get("topic") for r in _personal(project, "explainer_declined")]
 
 
 def source_hash(text):
@@ -298,14 +348,28 @@ def render(md_path, project=None, repo_root=None, now=None):
             if claim is None:
                 continue
             evidence = claim.get("evidence") or {}
-            basis = (f"run {evidence['run_id']} of the project's analysis" if evidence.get("run_id")
+            if claim["kind"] == "gap":
+                basis = f"not established: {evidence.get('reason')}"
+            elif claim["kind"] == "interpretation":
+                basis = (f"a judgement resting on {', '.join(evidence.get('claims', []))}"
+                         + (f"; it does not show {evidence['limits'].rstrip('.')}" if evidence.get("limits") else ""))
+            else:
+                basis = None
+            basis = basis or (f"run {evidence['run_id']} of the project's analysis" if evidence.get("run_id")
                      else evidence.get("citation") or evidence.get("source") or evidence.get("definition")
                      or ("rests on " + ", ".join(evidence.get("claims", [])) if evidence.get("claims") else ""))
             value = (f" = {claim['value']}" if "value" in claim and str(claim["value"]) not in claim["statement"]
                      else "")
+            alts = evidence.get("alternatives") or []
+            if alts and claim["kind"] == "interpretation":
+                basis_extra = f" · holds under {sum(1 for a in alts if a.get('holds'))} of {len(alts)} alternatives"
+            elif alts:
+                basis_extra = " · alternatives: " + "; ".join(f"{a['choice']} {a['value']}" for a in alts)
+            else:
+                basis_extra = ""
             status = READER_STATUS.get(claim.get("status", "draft"), claim.get("status", "draft"))
             rows.append(f'<li id="n-{r.esc(cid)}"><strong>{r.esc(cid)}</strong> {r.esc(claim["statement"])}{r.esc(value)}'
-                        f'<span class="basis"> · {r.esc(basis)} · {r.esc(status)}</span></li>')
+                        f'<span class="basis"> · {r.esc(basis)}{r.esc(basis_extra)} · {r.esc(status)}</span></li>')
         if rows:
             sources_html = "<section><h2>Where the numbers come from</h2><ul class=\"sources\">" + "".join(rows) + "</ul></section>"
     glossary_html = "".join(f'<dt id="g-{r.esc(e["slug"])}">{r.esc(e["term"])}</dt><dd>{r.esc(e["meaning"])}</dd>'
