@@ -29,7 +29,8 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-EVALS = ROOT / "evals"
+# The regression suite lives in a private repository; NUTMEG_EVALS_DIR points at it.
+EVALS = Path(os.environ["NUTMEG_EVALS_DIR"]).expanduser() if os.environ.get("NUTMEG_EVALS_DIR") else ROOT / "evals"
 
 
 def frontmatter(text):
@@ -75,7 +76,8 @@ def exec_grade(folder, grader, work, timeout=180):
     try:
         shutil.copytree(work, copy, symlinks=True, ignore=shutil.ignore_patterns(".git"))
         result = subprocess.run([sys.executable, str(script), str(copy)], capture_output=True, text=True,
-                                timeout=timeout, stdin=subprocess.DEVNULL, env=dict(os.environ, PIP_REQUIRE_VIRTUALENV="1"))
+                                timeout=timeout, stdin=subprocess.DEVNULL,
+                                env=dict(os.environ, PIP_REQUIRE_VIRTUALENV="1", NUTMEG_PLUGIN_ROOT=str(ROOT)))
         tail = (result.stdout + result.stderr).strip()[-600:]
         return result.returncode == 0, [("PASS " if result.returncode == 0 else "FAIL ") + tail]
     except subprocess.TimeoutExpired:

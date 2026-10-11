@@ -49,22 +49,22 @@ def fake_runners(monkeypatch):
     return calls
 
 
-def test_without_holdout_only_public_runs_and_says_so(layout, fake_runners, capsys):
+def test_without_holdout_only_the_regression_suite_runs_and_says_so(layout, fake_runners, capsys):
     root, _, out = layout
     assert run_suites.main(["--out", str(out)], root=root, environ={}) == 0
     printed = capsys.readouterr().out
-    assert "public score: 0.75 over 2 case(s)" in printed
+    assert "regression score: 0.75 over 2 case(s)" in printed
     assert "holdout score: not run" in printed
     assert "NUTMEG_HOLDOUT_DIR is not set" in printed
     summary = json.loads((out / "summary.json").read_text())
-    assert summary["holdout"] is None and summary["public"] == 0.75
+    assert summary["holdout"] is None and summary["regression"] == 0.75
 
 
 def test_with_holdout_both_scores_print_and_the_link_is_removed(layout, fake_runners, capsys):
     root, holdout, out = layout
     assert run_suites.main(["--out", str(out)], root=root, environ={"NUTMEG_HOLDOUT_DIR": str(holdout)}) == 0
     printed = capsys.readouterr().out
-    assert "public score: 0.75" in printed and "holdout score: 0.75" in printed
+    assert "regression score: 0.75" in printed and "holdout score: 0.75" in printed
     # The plugin engine saw the linked folder with the mocks; the link is gone afterwards.
     plugin_holdout = [c for c in fake_runners if c[0] == "plugin" and c[1] == run_suites.LINK_DIR]
     assert plugin_holdout == [("plugin", run_suites.LINK_DIR, "secret-two", True, True)]
@@ -286,3 +286,37 @@ def test_spend_cap_refuses_new_runs_and_counts_parallel_spend(tmp_path, monkeypa
         rl.check_budget()
     with pytest.raises(rl.BudgetExceeded):
         rl.run_once("anything", "m", False, "j")
+
+
+def test_a_private_regression_suite_is_linked_with_its_own_mock(tmp_path, fake_runners, capsys):
+    root = tmp_path / "plugin"
+    (root / "evals" / "_scaffold").mkdir(parents=True)  # the public repository keeps only the harness
+    regression = tmp_path / "private-evals"
+    (regression / "mocks" / "football-docs").mkdir(parents=True)
+    make_case(regression, "reg-plain")
+    make_case(regression, "reg-bash", tools=("Read", "Bash(python3:*)"))
+    out = tmp_path / "results"
+    assert run_suites.main(["--out", str(out), "--suite", "public"], root=root,
+                           environ={"NUTMEG_EVALS_DIR": str(regression)}) == 0
+    assert "regression score: 0.75 over 2 case(s)" in capsys.readouterr().out
+    plugin = [c for c in fake_runners if c[0] == "plugin"]
+    assert plugin == [("plugin", run_suites.LINK_DIR, "reg-plain", True, True)]
+    live = [c for c in fake_runners if c[0] == "live"]
+    assert live and live[0][2] == "reg-bash" and live[0][1].endswith(run_suites.LINK_DIR)
+    assert not (root / run_suites.LINK_DIR).exists()
+
+
+def test_without_a_regression_suite_it_says_how_to_set_one(tmp_path, fake_runners, capsys):
+    root = tmp_path / "plugin"
+    (root / "evals" / "_scaffold").mkdir(parents=True)
+    assert run_suites.main(["--out", str(tmp_path / "r")], root=root, environ={}) == 0
+    printed = capsys.readouterr().out
+    assert "regression score: not run" in printed and "NUTMEG_EVALS_DIR is not set" in printed
+
+
+def test_a_regression_suite_inside_the_repository_is_refused(tmp_path, fake_runners, capsys):
+    root = tmp_path / "plugin"
+    inside = root / "private-evals"
+    make_case(inside, "c")
+    assert run_suites.main(["--out", str(tmp_path / "r")], root=root, environ={"NUTMEG_EVALS_DIR": str(inside)}) == 2
+    assert "must live outside the public repository" in capsys.readouterr().err

@@ -46,7 +46,7 @@ docs/
   entity-resolution-routing.md  # Reep lookup, joins and routing
 
 hooks/             # SessionStart hook: injects the core football-data and research-project rules every session
-evals/             # claude plugin eval suite + football-docs replay mock (see README "Evals")
+evals/_scaffold/   # eval harness only; the cases are private (NUTMEG_EVALS_DIR, NUTMEG_HOLDOUT_DIR; see README "Evals")
 
 .mcp.json          # Declares football-docs MCP server dependency
 ```
