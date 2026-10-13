@@ -96,7 +96,8 @@ Rules (they hold for `resolve_entity` too):
   `retired` or `removed` is one the provider no longer uses.
 - A target whose `reep_id` differs from the entity's came through an ID merged
   into it (football-docs marks these "(via merged <id>)"). It is a valid ID for the
-  entity. The hosted API does not list these; a local register does.
+  entity. The hosted API does not list these; a local register (the catalogue
+  from `reep catalog sync`, or the file at `REEP_DUCKDB_PATH`) does.
 - `search` is for discovery only. Names are not unique and the register has no
   dates of birth. Confirm a name hit with a provider ID, club or season.
 - If a lookup returns no match, report the entity as unresolved. Do not supply
