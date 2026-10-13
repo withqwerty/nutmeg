@@ -91,7 +91,8 @@ Rules (they hold for `resolve_entity` too):
 - Check `data.status` before using `data.reep_id`: `found`, `not_found`,
   `ambiguous` or `withdrawn`. A withdrawn ID has no Reep ID; report its reason.
 - For a stored Reep ID, `current` says `active`, `retired`, `redirected` (store
-  `current_id` instead) or `withdrawn` (stop using it).
+  `current_id` instead), `withdrawn` (stop using it) or `unknown` (no current ID
+  could be found; report it as unresolved).
 - For joins, use only live provider IDs: a target whose `upstream_status` is
   `retired` or `removed` is one the provider no longer uses.
 - A target whose `reep_id` differs from the entity's came through an ID merged
