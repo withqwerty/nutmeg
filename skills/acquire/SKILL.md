@@ -124,7 +124,7 @@ After acquiring data, always:
 
 When joining data from different providers (e.g. FBref stats with Transfermarkt valuations), join through **Reep Register IDs**, not names. Read `${CLAUDE_PLUGIN_ROOT}/docs/entity-resolution-routing.md` for the full routing.
 
-Look up an entity with the reep MCP tools (the plugin's `reep` server):
+If the user has added the optional `reep` MCP server (see the routing doc), look up an entity with its tools:
 
 ```
 resolve(provider="transfermarkt", namespace="spieler", external_id="568177")   # Reep ID
@@ -134,7 +134,7 @@ search(query="Cole Palmer", entity_type="player")                              #
 ```
 
 - The tools read a local copy of the Reep release. If `status()` shows `backend` as `null`, tell the user the download is about 210 MB (free, no key) and ask them to run `uvx --from reep reep catalog sync`.
-- If the reep tools are not available (for example, `uvx` is not installed), use `resolve_entity` from football-docs; the routing doc has its set-up.
+- If the reep tools are not available, use `resolve_entity` from football-docs; the routing doc has its set-up. When a task needs many lookups, offer the user the one-line set-up of the reep server from the routing doc.
 - A name search is a shortlist. It can miss players whose register label is their full legal name, so prefer a provider ID.
 - An entity that does not resolve stays unresolved: report it, and never supply an ID from memory.
 

@@ -47,13 +47,25 @@ search_docs(query="lineup squad career membership current team", provider="<prov
 
 ## Looking Up IDs
 
-The Reep Register is published as a CC0 release. Nutmeg has two ways to read it.
-Use the first one that works.
+The Reep Register is published as a CC0 release. Nutmeg has two ways to read it:
+the optional reep tools, and football-docs' `resolve_entity`. Use the reep tools when
+the user has added them; otherwise use `resolve_entity`.
 
-### 1. The reep tools (recommended)
+### 1. The reep tools (optional)
 
-The nutmeg plugin starts a second MCP server, `reep`, with `uvx` (part of
-[uv](https://docs.astral.sh/uv/)). Its tools are read-only:
+The `reep` MCP server is not part of the plugin. A user who joins data from more
+than one provider can add it once, for all projects. It needs `uvx` (part of
+[uv](https://docs.astral.sh/uv/)):
+
+```bash
+claude mcp add --scope user reep -- uvx --from 'reep[mcp]' reep mcp
+uvx --from reep reep catalog sync    # download the register: about 210 MB, free, no key
+```
+
+Then restart Claude Code. Offer this when a task needs many ID lookups, translations
+between providers, or Reep IDs in the user's database. Do not add it without asking.
+
+Its tools are read-only:
 
 | Tool | Use it to |
 |---|---|
@@ -65,17 +77,14 @@ The nutmeg plugin starts a second MCP server, `reep`, with `uvx` (part of
 | `providers(provider?)` | list providers, namespaces and entity types |
 | `status()` | show the local register copy and its release stamp |
 
-With the plugin, the tool names carry the plugin prefix (for example
-`mcp__plugin_nutmeg_reep__resolve`).
+The full tool names are `mcp__reep__resolve`, `mcp__reep__translate` and so on.
 
-Set-up, once per machine:
-
-1. Call `status()`. If `backend` is `null`, the register is not downloaded.
-2. Tell the user that the download is about 210 MB (free, no key), then ask them to
-   run `uvx --from reep reep catalog sync`. The copy is shared by the MCP server and
-   the `reep` command.
-3. If `uvx` is not installed, the `reep` server does not start. Tell the user to
-   install uv, or use `resolve_entity` (below).
+- If `status()` shows `backend` as `null`, the register is not downloaded. Tell the
+  user that the download is about 210 MB (free, no key), then ask them to run
+  `uvx --from reep reep catalog sync`. The MCP server and the `reep` command share
+  the copy.
+- If the server is listed as failed in `/mcp`, `uvx` is probably not installed. Tell
+  the user to install uv, or use `resolve_entity` (below).
 
 Rules:
 
@@ -96,9 +105,10 @@ example `uvx --from reep reep translate transfermarkt/spieler/568177 --to fbref 
 `uvx --from reep reep skill print` prints the full agent guide for the command.
 The documentation is at https://reep.football/docs/python/.
 
-### 2. `resolve_entity` (football-docs)
+### 2. `resolve_entity` (football-docs, the default)
 
-Use this when the reep tools are not available. Without set-up, `resolve_entity`
+football-docs ships with the plugin, so this tool is there without extra set-up.
+Use it when the reep tools are not available. Without set-up, `resolve_entity`
 maps no IDs: it explains the set-up and returns the DuckDB query that would answer
 the question. There are two ways to enable it:
 

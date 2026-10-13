@@ -47,7 +47,7 @@ If multiple: "Which is your primary goal?"
 
 ## Q7: Joining providers (optional)
 "Will you join data from more than one provider (for example FBref stats with Transfermarkt values)?"
-- **Yes** — offer to download a local copy of the Reep Register (about 210 MB, free) with `uvx --from reep reep catalog sync`, following "Looking Up IDs" in `docs/entity-resolution-routing.md` in the nutmeg plugin folder. Record the release stamp in the profile (the reep `status()` tool prints it).
+- **Yes** — offer to add the optional reep MCP server and download a local copy of the Reep Register (about 210 MB, free), following "The reep tools (optional)" in `docs/entity-resolution-routing.md` in the nutmeg plugin folder. It needs uv. Record the release stamp in the profile (the reep `status()` tool prints it). If the user does not want it, `resolve_entity` from football-docs still works.
 - **No / later** — skip. Nutmeg will offer it when a join comes up.
 
 ## Q8: How nutmeg works with you
