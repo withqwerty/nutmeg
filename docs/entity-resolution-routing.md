@@ -58,7 +58,7 @@ would answer the question. There are two ways to enable it:
      - with the nutmeg plugin, export `REEP_DUCKDB_PATH` in the shell that starts
        Claude Code, then restart it (the plugin's server inherits that environment);
      - with a server you added yourself:
-       `claude mcp add football-docs -e REEP_DUCKDB_PATH=/absolute/path/reep-register-v1.duckdb -- npx -y football-docs@0.17.0`
+       `claude mcp add football-docs -e REEP_DUCKDB_PATH=/absolute/path/reep-register-v1.duckdb -- npx -y football-docs@0.17.2`
        (or `"env": {"REEP_DUCKDB_PATH": "..."}` in your MCP JSON).
   3. Record the release stamp. `resolve_entity` prints it; the current stamp is at
      `https://data.reep.football/releases/latest.json`.

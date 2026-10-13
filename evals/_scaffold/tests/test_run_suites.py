@@ -320,3 +320,18 @@ def test_a_regression_suite_inside_the_repository_is_refused(tmp_path, fake_runn
     make_case(inside, "c")
     assert run_suites.main(["--out", str(tmp_path / "r")], root=root, environ={"NUTMEG_EVALS_DIR": str(inside)}) == 2
     assert "must live outside the public repository" in capsys.readouterr().err
+
+
+def test_cases_and_the_replay_mock_are_copied_not_linked(tmp_path):
+    """`claude plugin eval` refuses case and mocks folders that are symbolic links."""
+    root = tmp_path / "plugin"
+    root.mkdir()
+    suite = tmp_path / "private-evals"
+    (suite / "mocks" / "football-docs").mkdir(parents=True)
+    (suite / "mocks" / "football-docs" / "_server.md").write_text("mock")
+    make_case(suite, "c")
+    with run_suites.linked_holdout(suite, ["c"], root, suite / "mocks") as link:
+        assert not (link / "mocks").is_symlink()
+        assert (link / "mocks" / "football-docs" / "_server.md").read_text() == "mock"
+        assert (link / "c" / "prompt.md").is_file() and not (link / "c").is_symlink()
+    assert not (root / run_suites.LINK_DIR).exists() and (suite / "mocks" / "football-docs" / "_server.md").is_file()

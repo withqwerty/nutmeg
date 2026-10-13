@@ -8,7 +8,7 @@ Usage (from the nutmeg repo root):
 
 NUTMEG_EVALS_DIR is the regression suite (the cases we tune against; it also holds the football-docs replay mock).
 NUTMEG_HOLDOUT_DIR is the held-out set (never tuned against). For `claude plugin eval`, which only reads cases below
-the plugin, the runner links the cases and the replay mock into a gitignored `evals-holdout/` folder and removes it
+the plugin, the runner copies the cases and the replay mock into a gitignored `evals-holdout/` folder and removes it
 afterwards, whatever happens. Results go to a folder outside the repository (a new temporary folder unless --out
 names one), so no case text lands here.
 
@@ -130,7 +130,7 @@ def check_link_free(root=ROOT):
 
 @contextmanager
 def linked_holdout(holdout, cases, root=ROOT, mocks=None):
-    """Link private cases and the replay mocks below the plugin; always remove the links.
+    """Copy private cases and the replay mock below the plugin, for `claude plugin eval`; always remove them.
 
     An exclusive lock, held from the stale-folder cleanup to the final removal, keeps two runs apart: the second
     one refuses instead of deleting the first one's links.
@@ -151,9 +151,12 @@ def linked_holdout(holdout, cases, root=ROOT, mocks=None):
                                        f"{LOCK_FILE}\n")
             mocks = mocks or mocks_dir(None, root)
             if mocks is not None:
-                (link / "mocks").symlink_to(mocks, target_is_directory=True)
+                # A copy, not a link: `claude plugin eval` refuses a mocks folder that is a symbolic link.
+                shutil.copytree(mocks, link / "mocks", symlinks=False)
             for name in cases:
-                (link / name).symlink_to(holdout / name, target_is_directory=True)
+                # Copies, not links: `claude plugin eval` refuses case folders that are symbolic links. The folder
+                # is gitignored and removed below whatever happens, so no private case stays in the repository.
+                shutil.copytree(holdout / name, link / name, symlinks=False)
             yield link
         finally:
             shutil.rmtree(link, ignore_errors=True)
