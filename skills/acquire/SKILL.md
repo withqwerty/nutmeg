@@ -133,7 +133,7 @@ current(reep_id="rp53af22bbeaa667")                                            #
 search(query="Cole Palmer", entity_type="player")                              # candidates only
 ```
 
-- The tools read a local copy of the Reep release. If `status()` shows `backend` as `null`, tell the user the download is about 210 MB (free, no key) and ask them to run `uvx --from reep reep catalog sync`.
+- The tools read a local copy of the Reep release. If `status()` shows `backend` as `null`, tell the user the download is about 210 MB (free, no key) and ask them to run `uvx --from 'reep>=0.1,<0.2' reep catalog sync`.
 - If the reep tools are not available, use `resolve_entity` from football-docs; the routing doc has its set-up. When a task needs many lookups, offer the user the one-line set-up of the reep server from the routing doc.
 - A name search is a shortlist. It can miss players whose register label is their full legal name, so prefer a provider ID.
 - An entity that does not resolve stays unresolved: report it, and never supply an ID from memory.

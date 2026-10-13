@@ -58,42 +58,42 @@ than one provider can add it once, for all projects. It needs `uvx` (part of
 [uv](https://docs.astral.sh/uv/)):
 
 ```bash
-claude mcp add --scope user reep -- uvx --from 'reep[mcp]' reep mcp
-uvx --from reep reep catalog sync    # download the register: about 210 MB, free, no key
+claude mcp add --scope user reep -- uvx --from 'reep[mcp]>=0.1,<0.2' reep mcp
+uvx --from 'reep>=0.1,<0.2' reep catalog sync    # the register: about 210 MB, free, no key
+```
+
+A user who already has the register file for `resolve_entity` (below) can reuse it
+instead of the download; reep then reads that file as it is, so the user replaces
+it each week as before:
+
+```bash
+claude mcp add --scope user reep -e REEP_DUCKDB_PATH=/absolute/path/reep-register-v1.duckdb -- uvx --from 'reep[mcp]>=0.1,<0.2' reep mcp
 ```
 
 Then restart Claude Code. Offer this when a task needs many ID lookups, translations
 between providers, or Reep IDs in the user's database. Do not add it without asking.
 
-Its tools are read-only:
+Its read-only tools are `resolve`, `translate`, `current`, `entity`, `search`,
+`providers` and `status` (full names `mcp__reep__resolve` and so on). The server's
+own instructions describe them, and `uvx --from 'reep>=0.1,<0.2' reep skill print`
+prints the full guide; follow those.
 
-| Tool | Use it to |
-|---|---|
-| `resolve(provider, namespace, external_id)` | find the Reep ID of a provider ID |
-| `translate(provider, namespace, external_id, to)` | get another provider's IDs for the same entity |
-| `current(reep_id)` | check a stored Reep ID (merged, retired or withdrawn) |
-| `entity(reep_id)` | show an entity with all its provider IDs |
-| `search(query, entity_type?)` | list candidates by name, for the user to confirm |
-| `providers(provider?)` | list providers, namespaces and entity types |
-| `status()` | show the local register copy and its release stamp |
-
-The full tool names are `mcp__reep__resolve`, `mcp__reep__translate` and so on.
-
-- If `status()` shows `backend` as `null`, the register is not downloaded. Tell the
-  user that the download is about 210 MB (free, no key), then ask them to run
-  `uvx --from reep reep catalog sync`. The MCP server and the `reep` command share
-  the copy.
+- If `status()` shows `backend` as `null`, there is no register. Tell the user the
+  download is about 210 MB (free, no key) and ask them to run the `catalog sync`
+  line above, or to reuse their register file.
 - If the server is listed as failed in `/mcp`, `uvx` is probably not installed. Tell
   the user to install uv, or use `resolve_entity` (below).
 
-Rules:
+Rules (they hold for `resolve_entity` too):
 
 - A provider ID is a triple: provider, namespace and external ID. Check the
   namespaces with `providers(provider="<provider>")`; never look up a bare number.
-- `resolve` returns `status`: `found`, `not_found`, `ambiguous` or `withdrawn`.
-  Use `reep_id` only when the status is `found`.
-- `translate` lists live IDs first; `upstream_status` is `retired` or `removed`
-  when the provider no longer uses an ID.
+- Check `data.status` before using `data.reep_id`: `found`, `not_found`,
+  `ambiguous` or `withdrawn`. A withdrawn ID has no Reep ID; report its reason.
+- For a stored Reep ID, `current` says `active`, `retired`, `redirected` (store
+  `current_id` instead) or `withdrawn` (stop using it).
+- For joins, use only live provider IDs: a target whose `upstream_status` is
+  `retired` or `removed` is one the provider no longer uses.
 - `search` is for discovery only. Names are not unique and the register has no
   dates of birth. Confirm a name hit with a provider ID, club or season.
 - If a lookup returns no match, report the entity as unresolved. Do not supply
@@ -101,8 +101,7 @@ Rules:
 - Keep the release stamp (`release_stamp` in each result) with your output.
 
 Outside an MCP client, the same lookups run from the shell with `--json`, for
-example `uvx --from reep reep translate transfermarkt/spieler/568177 --to fbref --json`.
-`uvx --from reep reep skill print` prints the full agent guide for the command.
+example `uvx --from 'reep>=0.1,<0.2' reep translate transfermarkt/spieler/568177 --to fbref --json`.
 The documentation is at https://reep.football/docs/python/.
 
 ### 2. `resolve_entity` (football-docs, the default)
@@ -164,6 +163,10 @@ providers' ID columns. It writes to the user's database, so:
 
 The database drivers are extras: `reep[postgres]`, `reep[mysql]`, `reep[mssql]` or
 `reep[db]`.
+
+If `reep sync` stops and asks for a snapshot (its catalogue was updated from
+changelogs, which keep stale provider status), run
+`uvx --from 'reep>=0.1,<0.2' reep catalog sync --method snapshot`, then sync again.
 
 ## Matching Code
 
