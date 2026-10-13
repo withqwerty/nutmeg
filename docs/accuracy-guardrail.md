@@ -55,7 +55,7 @@ Football data providers change their APIs, schemas, event types, qualifier IDs, 
 **When handling entity resolution:**
 - Use `entity-resolution-routing.md` (in this folder) to route the request.
 - Use `football-docs` for provider facts and quirks.
-- Use the Reep Register (`resolve_entity`, or the release DuckDB) for public ID lookup.
+- Use the Reep Register (the reep tools, `resolve_entity`, or the release DuckDB) for public ID lookup.
 - Never state a provider ID from memory. An ID comes from the Reep Register, the user's data, or a provider response.
 - "No match" in Reep is not evidence that the entity does not exist. Say it is unresolved; do not fill the gap from memory.
 - Point reusable matching/candidate code to `reep-toolkit`.

@@ -3,6 +3,10 @@
     "football-docs": {
       "command": "npx",
       "args": ["-y", "football-docs@0.17.2"]
+    },
+    "reep": {
+      "command": "uvx",
+      "args": ["--from", "reep[mcp]>=0.1", "reep", "mcp"]
     }
   }
 }

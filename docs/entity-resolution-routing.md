@@ -19,7 +19,8 @@ Use this routing whenever the user asks about:
 |---|---|
 | "What does this provider ID represent?" | Use `football-docs` identity-surface docs with `search_docs`. |
 | "Which fields are safe evidence for this provider?" | Use `football-docs`; search for `identity surfaces`, `id schemes`, and provider quirks. |
-| "Resolve this public player/team/coach ID." | Use the Reep Register lookup via `resolve_entity` (see "Looking up IDs" below). |
+| "Resolve this public player/team/coach ID." | Use the reep tools (`resolve`, `translate`, `current`), or `resolve_entity` when they are not available (see "Looking Up IDs" below). |
+| "Fill Reep IDs into my database." | Use the `reep sync` command: a dry run first, `--apply` only when the user agrees (see "Filling a database" below). |
 | "Join two providers' data." | Join through Reep IDs: `(provider, namespace, id)` → Reep ID → the other provider's ID. Report unmatched rows; never join on names alone. |
 | "Write matching or candidate-recovery code." | Point to `reep-toolkit` for public guides, provider cards, schemas, templates and reference scripts. |
 | "How should a partner/team run an entity-resolution process?" | Mention the matching logic pack only if the user has access to that private material. |
@@ -46,11 +47,62 @@ search_docs(query="lineup squad career membership current team", provider="<prov
 
 ## Looking Up IDs
 
-The Reep Register is published as a CC0 release (DuckDB and CSV). Without set-up,
-`resolve_entity` maps no IDs: it explains the set-up and returns the DuckDB query that
-would answer the question. There are two ways to enable it:
+The Reep Register is published as a CC0 release. Nutmeg has two ways to read it.
+Use the first one that works.
 
-- **Local file (free, no key; recommended).**
+### 1. The reep tools (recommended)
+
+The nutmeg plugin starts a second MCP server, `reep`, with `uvx` (part of
+[uv](https://docs.astral.sh/uv/)). Its tools are read-only:
+
+| Tool | Use it to |
+|---|---|
+| `resolve(provider, namespace, external_id)` | find the Reep ID of a provider ID |
+| `translate(provider, namespace, external_id, to)` | get another provider's IDs for the same entity |
+| `current(reep_id)` | check a stored Reep ID (merged, retired or withdrawn) |
+| `entity(reep_id)` | show an entity with all its provider IDs |
+| `search(query, entity_type?)` | list candidates by name, for the user to confirm |
+| `providers(provider?)` | list providers, namespaces and entity types |
+| `status()` | show the local register copy and its release stamp |
+
+With the plugin, the tool names carry the plugin prefix (for example
+`mcp__plugin_nutmeg_reep__resolve`).
+
+Set-up, once per machine:
+
+1. Call `status()`. If `backend` is `null`, the register is not downloaded.
+2. Tell the user that the download is about 210 MB (free, no key), then ask them to
+   run `uvx --from reep reep catalog sync`. The copy is shared by the MCP server and
+   the `reep` command.
+3. If `uvx` is not installed, the `reep` server does not start. Tell the user to
+   install uv, or use `resolve_entity` (below).
+
+Rules:
+
+- A provider ID is a triple: provider, namespace and external ID. Check the
+  namespaces with `providers(provider="<provider>")`; never look up a bare number.
+- `resolve` returns `status`: `found`, `not_found`, `ambiguous` or `withdrawn`.
+  Use `reep_id` only when the status is `found`.
+- `translate` lists live IDs first; `upstream_status` is `retired` or `removed`
+  when the provider no longer uses an ID.
+- `search` is for discovery only. Names are not unique and the register has no
+  dates of birth. Confirm a name hit with a provider ID, club or season.
+- If a lookup returns no match, report the entity as unresolved. Do not supply
+  an ID from memory.
+- Keep the release stamp (`release_stamp` in each result) with your output.
+
+Outside an MCP client, the same lookups run from the shell with `--json`, for
+example `uvx --from reep reep translate transfermarkt/spieler/568177 --to fbref --json`.
+`uvx --from reep reep skill print` prints the full agent guide for the command.
+The documentation is at https://reep.football/docs/python/.
+
+### 2. `resolve_entity` (football-docs)
+
+Use this when the reep tools are not available. Without set-up, `resolve_entity`
+maps no IDs: it explains the set-up and returns the DuckDB query that would answer
+the question. There are two ways to enable it:
+
+- **Local file (free, no key).**
   1. Download the release once: `curl -L -o reep-register-v1.duckdb https://reep.football/downloads/duckdb`
      (one DuckDB file of about 780 MB; a new release comes out each week, and
      `resolve_entity` says when your copy is out of date).
@@ -76,18 +128,32 @@ resolve_entity(reep_id="rp53af22bbeaa667")
 resolve_entity(name="Cole Palmer", type="player")   # shortlist only
 ```
 
-- Provider + namespace + id is the reliable path. Check the provider's
-  namespaces with `search_docs(query="identity surfaces", provider="<provider>")`.
-- A name search returns a shortlist, and it can miss players whose register
-  label is their full legal name. Confirm a name hit with a provider ID, club or
-  season before you use it.
-- If a lookup returns no match, report the entity as unresolved. Do not supply
-  an ID from memory.
+A name search returns a shortlist, and it can miss players whose register label is
+their full legal name.
 
-For bulk joins, query the release DuckDB directly (its `bridges` table maps
-`provider`, `namespace` and `external_id` to `reep_id`). Follow redirects for
-merged or withdrawn IDs as the release documentation describes, and keep the
-release stamp with your output.
+### Bulk joins
+
+For a join on a data frame or a file, query the release DuckDB directly (its
+`bridges` table maps `provider`, `namespace` and `external_id` to `reep_id`), or
+pipe one ID per line into `reep resolve - --json`. Follow redirects for merged or
+withdrawn IDs as the release documentation describes, keep unmatched rows, and
+keep the release stamp with your output.
+
+### Filling a database
+
+When the user keeps provider IDs in their own database (PostgreSQL, MySQL, SQL
+Server or SQLite), the `reep sync` command fills a Reep ID column and other
+providers' ID columns. It writes to the user's database, so:
+
+1. `reep init` writes a `reep.yml` that names the tables and columns. Help the user
+   fill it in.
+2. Run `reep sync <target> --json` without `--apply` and show the planned counts.
+3. Add `--apply` only when the user agrees.
+4. Exit code 4 means rows need review: `reep review --output reep-review.csv`
+   writes them for a person to check. Do not resolve them by guessing.
+
+The database drivers are extras: `reep[postgres]`, `reep[mysql]`, `reep[mssql]` or
+`reep[db]`.
 
 ## Matching Code
 
