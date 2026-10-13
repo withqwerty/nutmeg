@@ -61,7 +61,11 @@ answering. Nutmeg should route the work, not become the source of truth:
 
 - provider ID grains, quirks, and source access constraints come from
   `football-docs`;
-- public ID lookup uses Reep Register through `resolve_entity` when available;
+- public ID lookup uses the Reep Register: the optional reep MCP tools
+  (`resolve`, `translate`, `current`) when the user has added them, otherwise
+  `resolve_entity`;
+- filling Reep IDs into the user's own database uses `reep sync` (a dry run
+  first, `--apply` only when the user agrees);
 - reusable matching guidance and reference scripts belong in `reep-toolkit`;
 - the matching logic pack is mentioned only for users who have access to that
   private partner material.

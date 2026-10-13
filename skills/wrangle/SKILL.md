@@ -58,7 +58,7 @@ Common joins in football data:
 
 **Joining providers:** join through Reep Register IDs, not names (see `${CLAUDE_PLUGIN_ROOT}/docs/entity-resolution-routing.md`). Names differ across providers ("Man City" / "Manchester City"), players share names, and a fuzzy name match fails silently.
 
-- Look up IDs with `resolve_entity`, or query the Reep release DuckDB for bulk joins.
+- Look up IDs with the reep tools (`resolve`, `translate`) or `resolve_entity`, or query the Reep release DuckDB for bulk joins.
 - Keep rows that do not resolve, and report how many there are per provider. Never drop them silently.
 - Use a hand-made name map only as a last resort for entities Reep does not cover, and mark those rows as name-matched so the user can check them.
 

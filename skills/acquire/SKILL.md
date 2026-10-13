@@ -124,19 +124,21 @@ After acquiring data, always:
 
 When joining data from different providers (e.g. FBref stats with Transfermarkt valuations), join through **Reep Register IDs**, not names. Read `${CLAUDE_PLUGIN_ROOT}/docs/entity-resolution-routing.md` for the full routing.
 
-Look up an entity with the `resolve_entity` MCP tool (from football-docs):
+If the user has added the optional `reep` MCP server (see the routing doc), look up an entity with its tools:
 
 ```
-resolve_entity(provider="transfermarkt", namespace="spieler", id="568177")   # most reliable
-resolve_entity(reep_id="rp53af22bbeaa667")
-resolve_entity(name="Cole Palmer", type="player")                             # shortlist only
+resolve(provider="transfermarkt", namespace="spieler", external_id="568177")   # Reep ID
+translate(provider="transfermarkt", namespace="spieler", external_id="568177", to="fbref")
+current(reep_id="rp53af22bbeaa667")                                            # stored ID still valid?
+search(query="Cole Palmer", entity_type="player")                              # candidates only
 ```
 
-- The tool reads a local copy of the Reep release. If it returns set-up steps instead of results, help the user download the release DuckDB and set `REEP_DUCKDB_PATH` (see the routing doc).
+- The tools read a local copy of the Reep release. If `status()` shows `backend` as `null`, tell the user the download is about 210 MB (free, no key) and ask them to run `uvx --from 'reep>=0.1,<0.2' reep catalog sync`.
+- If the reep tools are not available, use `resolve_entity` from football-docs; the routing doc has its set-up. When a task needs many lookups, offer the user the one-line set-up of the reep server from the routing doc.
 - A name search is a shortlist. It can miss players whose register label is their full legal name, so prefer a provider ID.
 - An entity that does not resolve stays unresolved: report it, and never supply an ID from memory.
 
-For bulk joins, query the release DuckDB directly (the `bridges` table maps `provider`, `namespace` and `external_id` to `reep_id`), keep unmatched rows, and record the release stamp with the output. For reusable matching guidance and reference scripts, point to `reep-toolkit`. Do not define new Reep doctrine inside Nutmeg.
+For bulk joins, query the release DuckDB directly (the `bridges` table maps `provider`, `namespace` and `external_id` to `reep_id`) or pipe one ID per line into `reep resolve - --json`, keep unmatched rows, and record the release stamp with the output. For reusable matching guidance and reference scripts, point to `reep-toolkit`. Do not define new Reep doctrine inside Nutmeg.
 
 ## Self-discovery
 
