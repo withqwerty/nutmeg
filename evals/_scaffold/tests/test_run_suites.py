@@ -90,6 +90,15 @@ def test_auto_engine_sends_cases_with_an_exec_grader_live(layout, fake_runners):
     assert engines == {"public-plain": "live", "public-bash": "live"}
 
 
+def test_auto_engine_sends_cases_with_an_extra_mcp_server_live(layout, fake_runners):
+    root, _, out = layout
+    prompt = root / "evals" / "public-plain" / "prompt.md"
+    prompt.write_text(prompt.read_text().replace("---\n\n", "extra_mcp: [reep]\n---\n\n", 1))
+    run_suites.main(["--out", str(out)], root=root, environ={})
+    engines = {name: engine for engine, _, name, _, _ in fake_runners}
+    assert engines["public-plain"] == "live"
+
+
 def test_the_link_is_removed_when_a_run_fails(layout, monkeypatch):
     root, holdout, out = layout
 

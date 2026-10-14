@@ -70,3 +70,15 @@ def test_exec_grade_refuses_a_script_outside_the_graders_folder(tmp_path):
     (folder / "outside.py").write_text("")
     ok, notes = run_live.exec_grade(folder, {"script": "../outside.py"}, work)
     assert not ok and "not found" in notes[0]
+
+
+def test_mcp_servers_add_an_extra_server_with_its_env(monkeypatch):
+    servers, allowed = run_live.mcp_servers({"extra_mcp": ["reep"]}, environ={"REEP_DUCKDB_PATH": "/r.duckdb", "HOME": "/h"})
+    assert "football-docs" in servers and servers["reep"]["args"][-1] == "mcp"
+    assert servers["reep"]["env"] == {"REEP_DUCKDB_PATH": "/r.duckdb"}
+    assert "mcp__reep" in allowed
+
+
+def test_mcp_servers_default_to_the_plugin_ones_only():
+    servers, allowed = run_live.mcp_servers({}, environ={})
+    assert set(servers) == {"football-docs"} and "mcp__reep" not in allowed

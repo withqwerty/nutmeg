@@ -168,6 +168,31 @@ def record_spend(cost, label):
         fcntl.flock(handle, fcntl.LOCK_UN)
 
 
+# Optional MCP servers a case can add with `extra_mcp: [name]`, set up as nutmeg's docs tell users to add them.
+EXTRA_MCP = {
+    "reep": {"command": "uvx", "args": ["--from", "reep[mcp]>=0.1,<0.2", "reep", "mcp"],
+             "env_from": ("REEP_DUCKDB_PATH", "REEP_API_KEY")},
+}
+
+
+def mcp_servers(meta, environ=os.environ):
+    """The plugin's servers plus the extra ones the case asks for, and the tool prefixes to allow."""
+    servers = dict(json.loads((ROOT / ".mcp.json").read_text())["mcpServers"])
+    allowed = ["mcp__plugin_nutmeg_football-docs", "mcp__football-docs"]
+    extra = meta.get("extra_mcp") or []
+    for name in [extra] if isinstance(extra, str) else extra:
+        if name not in EXTRA_MCP:
+            raise ValueError(f"unknown extra_mcp server: {name}")
+        spec = EXTRA_MCP[name]
+        server = {"command": spec["command"], "args": list(spec["args"])}
+        env = {key: environ[key] for key in spec["env_from"] if environ.get(key)}
+        if env:
+            server["env"] = env
+        servers[name] = server
+        allowed.append(f"mcp__{name}")
+    return servers, allowed
+
+
 def run_once(name, model, keep, judge_model, eval_dir=EVALS):
     check_budget(reserve=float(os.environ.get("NUTMEG_EVAL_RESERVE_USD") or RUN_RESERVE_USD))
     folder, meta, prompt, graders = load_case(name, eval_dir)
@@ -177,9 +202,10 @@ def run_once(name, model, keep, judge_model, eval_dir=EVALS):
     if (folder / "scaffold.sh").exists():
         subprocess.run(["bash", str(folder / "scaffold.sh")], cwd=work, check=True)
     mcp = work.parent / f"{work.name}-mcp.json"
-    mcp.write_text(json.dumps({"mcpServers": json.loads((ROOT / ".mcp.json").read_text())["mcpServers"]}))
+    servers, mcp_tools = mcp_servers(meta)
+    mcp.write_text(json.dumps({"mcpServers": servers}))
     allowed = meta.get("allowed_tools") or ["Read", "Glob", "Grep", "Skill"]
-    allowed = list(allowed) + ["mcp__plugin_nutmeg_football-docs", "mcp__football-docs"]
+    allowed = list(allowed) + mcp_tools
     cmd = ["claude", "-p", prompt, "--plugin-dir", str(ROOT), "--model", model, "--setting-sources", "project",
            "--strict-mcp-config", "--mcp-config", str(mcp), "--allowedTools", ",".join(allowed),
            "--max-turns", str(meta.get("max_turns", 10)), "--output-format", "stream-json", "--verbose"]
