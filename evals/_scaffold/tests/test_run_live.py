@@ -82,3 +82,11 @@ def test_mcp_servers_add_an_extra_server_with_its_env(monkeypatch):
 def test_mcp_servers_default_to_the_plugin_ones_only():
     servers, allowed = run_live.mcp_servers({}, environ={})
     assert set(servers) == {"football-docs"} and "mcp__reep" not in allowed
+
+
+def test_exec_grade_takes_the_graders_own_time_limit(tmp_path):
+    folder, work = _exec_case(tmp_path, "import time; time.sleep(2)\n")
+    ok, notes = run_live.exec_grade(folder, {"script": "check.py", "timeout_seconds": "1"}, work)
+    assert not ok and "timed out" in notes[0]
+    ok, _ = run_live.exec_grade(folder, {"script": "check.py", "timeout_seconds": "10"}, work)
+    assert ok

@@ -67,13 +67,14 @@ def exec_grade(folder, grader, work, reply="", timeout=180):
     """Run a trusted check script from the case's graders/ folder against a copy of the run's work folder.
 
     The script gets the copy's path, so it can change the data and rerun the agent's code without touching the run
-    itself. The run's last message is in the file NUTMEG_EVAL_REPLY names, outside the copy, so a check can run code
+    itself. A grader's `timeout_seconds` raises the default limit for checks that rerun a whole analysis. The run's last message is in the file NUTMEG_EVAL_REPLY names, outside the copy, so a check can run code
     the agent gave in its reply. The grader passes when the script exits 0; its last output lines are kept as the
     reason."""
     graders_dir = (Path(folder) / "graders").resolve()
     script = (graders_dir / str(grader.get("script", ""))).resolve()
     if not script.is_file() or graders_dir not in script.parents:
         return False, [f"FAIL exec grader script not found in graders/: {grader.get('script')}"]
+    timeout = int(grader.get("timeout_seconds") or timeout)
     scratch = Path(tempfile.mkdtemp(prefix="nutmeg-exec-"))
     copy, reply_file = scratch / "work", scratch / "reply.md"
     try:
