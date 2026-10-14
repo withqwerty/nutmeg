@@ -131,11 +131,11 @@ Both folders must be outside this repository. `run_suites.py` prints one score p
 
 ### Efficiency
 
-nutmeg should not use up a week's allowance on one task, so every eval reports cost beside the score:
+nutmeg should not use up a subscription's 5-hour or weekly allowance on one task, so every eval reports tokens beside the score:
 
-- Each live run prints its list-price cost, turns, calls to the nutmeg CLI, and tokens by class (input, cache write, cache read, output), and says when a run ended at its turn limit or with an error. `summary.json` holds per-case medians, pass@1 and pass^k.
+- Each live run prints its uncached tokens (input, cache writes and output, which count in full against usage limits) and its cache reads apart (they count less, by an amount Anthropic does not publish), then turns, calls to the nutmeg CLI and the list-price cost for API users. It says when a run ended at its turn limit or with an error. `summary.json` holds per-case medians, pass@1 and pass^k.
 - `run_suites.py --runs 3 --compare <earlier summary.json>` compares two versions case by case and prints each change with a standard error. Use three runs for any keep-or-revert decision; one run is a smoke test only.
-- A change is kept only if the score holds and the cost per case does not rise; a rise needs a reason.
+- A change is kept only if the score holds and the uncached tokens and cache reads per case do not rise; a rise needs a reason.
 - `python3 evals/_scaffold/footprint.py --check` measures what nutmeg adds to every session (the hook text, and skill and agent descriptions from `claude plugin details`) and what each skill costs when it loads, against the budgets in `evals/_scaffold/footprint_budget.json`.
 
 To see what nutmeg costs you in your own sessions, run `/usage` in Claude Code: on paid plans it shows the share of usage by plugin and skill.

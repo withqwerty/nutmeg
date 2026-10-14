@@ -352,3 +352,22 @@ def test_cases_and_the_replay_mock_are_copied_not_linked(tmp_path):
         assert (link / "mocks" / "football-docs" / "_server.md").read_text() == "mock"
         assert (link / "c" / "prompt.md").is_file() and not (link / "c").is_symlink()
     assert not (root / run_suites.LINK_DIR).exists() and (suite / "mocks" / "football-docs" / "_server.md").is_file()
+
+
+def test_case_efficiency_reports_uncached_tokens_and_cache_reads_apart(tmp_path):
+    for n, (inp, write, read, out) in enumerate([(10, 1000, 50000, 200), (20, 3000, 90000, 400)], 1):
+        (tmp_path / f"c-run{n}.json").write_text(json.dumps({
+            "cost": 0.1 * n, "verdicts": {"g": True},
+            "efficiency": {"turns": 5, "nutmeg_calls": 1, "subtype": "success",
+                           "tokens": {"input": inp, "cache_write": write, "cache_read": read, "output": out}}}))
+    eff = run_suites.case_efficiency(tmp_path, "c")
+    assert eff["uncached_tokens"] == (1210 + 3420) / 2 and eff["cache_reads"] == 70000
+
+
+def test_compare_includes_token_changes():
+    row = lambda u, c: {"suite": "regression", "case": "x", "score": 1.0,
+                        "efficiency": {"uncached_tokens": u, "cache_reads": c, "cost": 0.1, "turns": 5, "nutmeg_calls": 1}}
+    before = {"rows": [row(1000, 10000), dict(row(1000, 10000), case="y")]}
+    now = {"rows": [row(1100, 10000), dict(row(1100, 10000), case="y")]}
+    line = run_suites.compare_lines(now, before)[0]
+    assert "uncached_tokens +10%" in line and "cache_reads +0%" in line

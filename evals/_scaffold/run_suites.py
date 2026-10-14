@@ -226,9 +226,9 @@ def run_live_case(eval_dir, name, args, out=None, label="holdout"):
             eff = outcome.get("efficiency") or {}
             tok = eff.get("tokens") or {}
             print(f"    run {n + 1}: " + ", ".join(f"{g} {'PASS' if ok else 'FAIL'}" for g, ok in verdicts.items())
-                  + f" · ${outcome['cost']:.2f} · {eff.get('turns')} turns · {eff.get('nutmeg_calls')} nutmeg calls"
-                  + f" · tokens in {tok.get('input', 0):,}/cache-write {tok.get('cache_write', 0):,}"
-                  + f"/cache-read {tok.get('cache_read', 0):,}/out {tok.get('output', 0):,}"
+                  + f" · {uncached(tok):,} uncached tokens + {tok.get('cache_read', 0):,} cache reads"
+                  + f" · {eff.get('turns')} turns · {eff.get('nutmeg_calls')} nutmeg calls · ${outcome['cost']:.2f}"
+                  + f" (in {tok.get('input', 0):,}/cache-write {tok.get('cache_write', 0):,}/out {tok.get('output', 0):,})"
                   + (f" · ENDED: {eff.get('subtype')}" if eff.get("subtype") not in (None, "success") else ""),
                   flush=True)
     return sum(scores) / max(1, len(scores)), None
@@ -267,8 +267,15 @@ def _median(values):
     return values[mid] if len(values) % 2 else (values[mid - 1] + values[mid]) / 2
 
 
+def uncached(tokens):
+    """Tokens that count in full against a subscription's usage limits: input, cache writes and output. Cache reads
+    count less, by an amount Anthropic does not publish, so they are reported apart rather than weighted."""
+    tokens = tokens or {}
+    return (tokens.get("input") or 0) + (tokens.get("cache_write") or 0) + (tokens.get("output") or 0)
+
+
 def case_efficiency(folder, name):
-    """Over a case's live runs: median cost, turns and nutmeg calls; turn-limit and error endings; the share of runs
+    """Over a case's live runs: median uncached tokens, cache reads, turns, nutmeg calls and cost; turn-limit and error endings; the share of runs
     where every grader passed (pass@1) and whether all of them did (pass^k)."""
     runs = []
     for path in sorted(Path(folder).glob(f"{name}-run*.json")):
@@ -278,13 +285,17 @@ def case_efficiency(folder, name):
             continue
         eff = outcome.get("efficiency") or {}
         verdicts = outcome.get("verdicts") or {}
+        tokens = eff.get("tokens") or {}
         runs.append({"cost": outcome.get("cost"), "turns": eff.get("turns"), "nutmeg_calls": eff.get("nutmeg_calls"),
+                     "uncached_tokens": uncached(tokens) if tokens else None, "cache_reads": tokens.get("cache_read"),
                      "turn_limit": bool(eff.get("hit_turn_limit")),
                      "error": eff.get("subtype") not in (None, "success", "error_max_turns"),
                      "all_pass": bool(verdicts) and all(verdicts.values())})
     if not runs:
         return None
-    return {"cost": _median(r["cost"] for r in runs), "turns": _median(r["turns"] for r in runs),
+    return {"uncached_tokens": _median(r["uncached_tokens"] for r in runs),
+            "cache_reads": _median(r["cache_reads"] for r in runs),
+            "cost": _median(r["cost"] for r in runs), "turns": _median(r["turns"] for r in runs),
             "nutmeg_calls": _median(r["nutmeg_calls"] for r in runs),
             "turn_limit_hits": sum(r["turn_limit"] for r in runs), "errors": sum(r["error"] for r in runs),
             "pass_at_1": round(sum(r["all_pass"] for r in runs) / len(runs), 3),
@@ -296,7 +307,9 @@ def suite_efficiency(rows):
     effs = [r["efficiency"] for r in rows if r.get("efficiency")]
     if not effs:
         return None
-    return {"cost": _median(e["cost"] for e in effs), "turns": _median(e["turns"] for e in effs),
+    return {"uncached_tokens": _median(e.get("uncached_tokens") for e in effs),
+            "cache_reads": _median(e.get("cache_reads") for e in effs),
+            "cost": _median(e["cost"] for e in effs), "turns": _median(e["turns"] for e in effs),
             "nutmeg_calls": _median(e["nutmeg_calls"] for e in effs),
             "turn_limit_hits": sum(e["turn_limit_hits"] for e in effs), "errors": sum(e["errors"] for e in effs),
             "pass_at_1": round(sum(e["pass_at_1"] for e in effs) / len(effs), 3),
@@ -304,7 +317,8 @@ def suite_efficiency(rows):
 
 
 def paired(now_rows, before_rows, key):
-    """Case-by-case comparison: mean difference in score (or mean log ratio for cost) with a standard error."""
+    """Case-by-case comparison: mean difference in score (or mean log ratio for tokens, cost, turns) with a standard
+    error."""
     import math
     before = {(r["suite"], r["case"]): r for r in before_rows}
     diffs = []
@@ -337,7 +351,7 @@ def compare_lines(now, before):
         s = paired(now_rows, before_rows, "score")
         if s:
             parts.append(f"score {s['mean']:+.3f} ± {s['se']:.3f} (n={s['n']})")
-        for key in ("cost", "turns", "nutmeg_calls"):
+        for key in ("uncached_tokens", "cache_reads", "turns", "nutmeg_calls", "cost"):
             c = paired(now_rows, before_rows, key)
             if c:
                 import math
@@ -439,8 +453,9 @@ def main(argv=None, root=ROOT, environ=None):
         print(f"{label} score: " + (f"{value:.2f} over {count} case(s)" if value is not None else "not run"))
         eff = summary["efficiency"].get(label)
         if eff:
-            print(f"  per case (median): ${eff['cost'] or 0:.2f} · {eff['turns']} turns · {eff['nutmeg_calls']} nutmeg "
-                  f"calls; turn-limit hits {eff['turn_limit_hits']}, errors {eff['errors']}; "
+            print(f"  per case (median): {eff.get('uncached_tokens') or 0:,} uncached tokens + "
+                  f"{eff.get('cache_reads') or 0:,} cache reads · {eff['turns']} turns · {eff['nutmeg_calls']} nutmeg "
+                  f"calls · ${eff['cost'] or 0:.2f}; turn-limit hits {eff['turn_limit_hits']}, errors {eff['errors']}; "
                   f"pass@1 {eff['pass_at_1']:.2f}, pass^k {eff['pass_all_k']:.2f}")
     if args.compare:
         try:
