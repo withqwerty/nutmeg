@@ -12,7 +12,8 @@ repository with the case's scaffold, loads this plugin with only the
 football-docs MCP server, and allows the case's `allowed_tools`. Graders:
 regex (target trace, last message or file:<glob>) and tool_used run locally;
 exec graders run a trusted check script from the case's graders/ folder against a
-copy of the work folder (it may change the data and rerun the agent's code);
+copy of the work folder (it may change the data and rerun the agent's code; the
+last message is in the file that NUTMEG_EVAL_REPLY names, outside the copy);
 llm graders ask the judge model for PASS or FAIL about the last message, plus
 the files a `target: file:<glob>` names. The real football-docs server is used,
 not the replay mock. Hooks run, so a gate "ask" is denied (no user), as in a
@@ -62,22 +63,26 @@ def load_case(name, eval_dir=EVALS):
     return folder, meta, prompt.strip(), graders
 
 
-def exec_grade(folder, grader, work, timeout=180):
+def exec_grade(folder, grader, work, reply="", timeout=180):
     """Run a trusted check script from the case's graders/ folder against a copy of the run's work folder.
 
     The script gets the copy's path, so it can change the data and rerun the agent's code without touching the run
-    itself. The grader passes when the script exits 0; its last output lines are kept as the reason."""
+    itself. The run's last message is in the file NUTMEG_EVAL_REPLY names, outside the copy, so a check can run code
+    the agent gave in its reply. The grader passes when the script exits 0; its last output lines are kept as the
+    reason."""
     graders_dir = (Path(folder) / "graders").resolve()
     script = (graders_dir / str(grader.get("script", ""))).resolve()
     if not script.is_file() or graders_dir not in script.parents:
         return False, [f"FAIL exec grader script not found in graders/: {grader.get('script')}"]
     scratch = Path(tempfile.mkdtemp(prefix="nutmeg-exec-"))
-    copy = scratch / "work"
+    copy, reply_file = scratch / "work", scratch / "reply.md"
     try:
         shutil.copytree(work, copy, symlinks=True, ignore=shutil.ignore_patterns(".git"))
+        reply_file.write_text(reply or "")
         result = subprocess.run([sys.executable, str(script), str(copy)], capture_output=True, text=True,
                                 timeout=timeout, stdin=subprocess.DEVNULL,
-                                env=dict(os.environ, PIP_REQUIRE_VIRTUALENV="1", NUTMEG_PLUGIN_ROOT=str(ROOT)))
+                                env=dict(os.environ, PIP_REQUIRE_VIRTUALENV="1", NUTMEG_PLUGIN_ROOT=str(ROOT),
+                                         NUTMEG_EVAL_REPLY=str(reply_file)))
         tail = (result.stdout + result.stderr).strip()[-600:]
         return result.returncode == 0, [("PASS " if result.returncode == 0 else "FAIL ") + tail]
     except subprocess.TimeoutExpired:
@@ -232,7 +237,7 @@ def run_once(name, model, keep, judge_model, eval_dir=EVALS):
             low, high = int(grader.get("min", 1)), grader.get("max")
             verdicts[gname] = count >= low and (high is None or count <= int(high))
         elif kind == "exec":
-            verdicts[gname], judged[gname] = exec_grade(folder, grader, work)
+            verdicts[gname], judged[gname] = exec_grade(folder, grader, work, last)
         elif kind == "llm":
             response = judge_input(last, grader.get("target", ""), work)
             verdicts[gname], judged[gname] = judge_votes(grader["body"], response, judge_model)

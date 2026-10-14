@@ -57,6 +57,14 @@ def test_exec_grade_works_on_a_copy_and_leaves_the_run_unchanged(tmp_path):
     assert ok and (work / "result.txt").read_text() == "42"
 
 
+def test_exec_grade_gives_the_last_message_outside_the_copy(tmp_path):
+    folder, work = _exec_case(tmp_path, "import os, sys, pathlib\nreply = pathlib.Path(os.environ['NUTMEG_EVAL_REPLY'])\n"
+                                        "assert pathlib.Path(sys.argv[1]) not in reply.parents\n"
+                                        "sys.exit(0 if reply.read_text() == 'def f(): pass' else 1)\n")
+    ok, notes = run_live.exec_grade(folder, {"script": "check.py"}, work, "def f(): pass")
+    assert ok, notes
+
+
 def test_exec_grade_refuses_a_script_outside_the_graders_folder(tmp_path):
     folder, work = _exec_case(tmp_path, "")
     (folder / "outside.py").write_text("")

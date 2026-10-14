@@ -68,6 +68,11 @@ def needs_bash(eval_dir, name):
     return any(t == "Bash" or t.startswith("Bash(") for t in allowed_tools(eval_dir, name))
 
 
+def has_exec_grader(eval_dir, name):
+    """exec graders run only in the live harness; `claude plugin eval` does not know them."""
+    return any(g.get("type") == "exec" for g in run_live.load_case(name, eval_dir)[3].values())
+
+
 def holdout_dir(value, root=ROOT, variable="NUTMEG_HOLDOUT_DIR", what="the held-out set"):
     """A private case folder, or None. It must exist and must not sit inside this repository."""
     if not value:
@@ -231,7 +236,7 @@ def run_live_case(eval_dir, name, args, out=None, label="holdout"):
 def engine_for(eval_dir, name, engine):
     if engine != "auto":
         return engine
-    return "live" if needs_bash(eval_dir, name) else "plugin"
+    return "live" if needs_bash(eval_dir, name) or has_exec_grader(eval_dir, name) else "plugin"
 
 
 def score_suite(label, eval_dir, eval_dir_name, cases, args, out, root=ROOT):

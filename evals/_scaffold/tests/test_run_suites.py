@@ -82,6 +82,14 @@ def test_auto_engine_sends_bash_cases_live(layout, fake_runners):
     assert engines == {"public-plain": "plugin", "public-bash": "live", "secret-two": "plugin", "secret-one": "live"}
 
 
+def test_auto_engine_sends_cases_with_an_exec_grader_live(layout, fake_runners):
+    root, _, out = layout
+    (root / "evals" / "public-plain" / "graders" / "check.md").write_text("---\ntype: exec\nscript: check.py\n---\n")
+    run_suites.main(["--out", str(out)], root=root, environ={})
+    engines = {name: engine for engine, _, name, _, _ in fake_runners}
+    assert engines == {"public-plain": "live", "public-bash": "live"}
+
+
 def test_the_link_is_removed_when_a_run_fails(layout, monkeypatch):
     root, holdout, out = layout
 
