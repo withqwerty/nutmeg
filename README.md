@@ -113,7 +113,7 @@ docs/
 
 ## Providers covered
 
-Nutmeg does not keep its own provider facts. Coverage, fields, IDs, access terms and rate limits come from football-docs, which indexes 26 providers and tools, including Opta, StatsBomb, Wyscout, SkillCorner, Sportradar, SportMonks, Impect, FBref, Understat, kloppy, socceraction, mplsoccer and databallpy. Ask nutmeg "which providers do you cover?" or call `list_providers` for the current list.
+Nutmeg does not keep its own provider facts. Coverage, fields, IDs, access terms and rate limits come from football-docs, which indexes the providers and tools, including Opta, StatsBomb, Wyscout, SkillCorner, Sportradar, SportMonks, Impect, FBref, Understat, kloppy, socceraction, mplsoccer and databallpy. Ask nutmeg "which providers do you cover?" or call `list_providers` for the current list.
 
 Cross-provider player, team and match IDs come from the [Reep Register](https://reep.football) (CC0). football-docs' `resolve_entity` tool looks them up: it reads the register DuckDB or uses an API key ([set-up steps](docs/entity-resolution-routing.md#looking-up-ids)). For many lookups, add the optional `reep` MCP server (needs [uv](https://docs.astral.sh/uv/)): `claude mcp add --scope user reep -- uvx --from 'reep[mcp]>=0.1,<0.2' reep mcp`, then `uvx --from 'reep>=0.1,<0.2' reep catalog sync` to download the free register (about 210 MB). The same `reep` command fills Reep IDs into your own database (`reep sync`); see the [reep documentation](https://reep.football/docs/python/).
 
