@@ -64,10 +64,10 @@ uvx --from 'reep>=0.1,<0.2' reep catalog sync    # the register: about 210 MB, f
 
 A user who already has the register file for `resolve_entity` (below) can reuse it
 instead of the download; reep then reads that file as it is, so the user replaces
-it each week as before:
+it with each new download release as before (weekly or less often):
 
 ```bash
-claude mcp add --scope user reep -e REEP_DUCKDB_PATH=/absolute/path/reep-register-v1.duckdb -- uvx --from 'reep[mcp]>=0.1,<0.2' reep mcp
+claude mcp add --scope user reep -e REEP_DUCKDB_PATH=/absolute/path/reep-register.duckdb -- uvx --from 'reep[mcp]>=0.1,<0.2' reep mcp
 ```
 
 Then restart Claude Code. Offer this when a task needs many ID lookups, translations
@@ -117,14 +117,14 @@ maps no IDs: it explains the set-up and returns the DuckDB query that would answ
 the question. There are two ways to enable it:
 
 - **Local file (free, no key).**
-  1. Download the release once: `curl -L -o reep-register-v1.duckdb https://reep.football/downloads/duckdb`
-     (one DuckDB file of about 780 MB; a new release comes out each week, and
-     `resolve_entity` says when your copy is out of date).
+  1. Download the release once: `curl -L -o reep-register.duckdb https://reep.football/downloads/duckdb`
+     (one DuckDB file of about 1.2 GB; a new download release comes out weekly or
+     less often, and `resolve_entity` says when your copy is out of date).
   2. Point the football-docs server at it with the file's absolute path:
      - with the nutmeg plugin, export `REEP_DUCKDB_PATH` in the shell that starts
        Claude Code, then restart it (the plugin's server inherits that environment);
      - with a server you added yourself:
-       `claude mcp add football-docs -e REEP_DUCKDB_PATH=/absolute/path/reep-register-v1.duckdb -- npx -y football-docs@0.17.4`
+       `claude mcp add football-docs -e REEP_DUCKDB_PATH=/absolute/path/reep-register.duckdb -- npx -y football-docs@0.17.7`
        (or `"env": {"REEP_DUCKDB_PATH": "..."}` in your MCP JSON).
   3. Record the release stamp. `resolve_entity` prints it; the current stamp is at
      `https://data.reep.football/releases/latest.json`.

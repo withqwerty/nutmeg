@@ -77,7 +77,7 @@ statistics_level: basic | intermediate | advanced
 providers: [statsbomb-open, fbref, understat, ...]
 goals: [explore, content, academic, product, professional]
 primary_goal: content
-reep_duckdb_path: /absolute/path/reep-register-v1.duckdb   # optional
+reep_duckdb_path: /absolute/path/reep-register.duckdb   # optional
 reep_release: 20260926T145536Z                            # optional, stamp of that file
 initialized: YYYY-MM-DD
 ---
