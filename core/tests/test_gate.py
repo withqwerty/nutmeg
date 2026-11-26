@@ -178,3 +178,14 @@ def test_config_set_hooks_turns_them_on_and_off(project, repo, capsys):
     assert "Research hooks (run gate and stop check): on (your setting)" in capsys.readouterr().out
     assert main(["config", "set", "--hooks", "off"]) == 0
     assert "off (turn on with `nutmeg config set --hooks on`)" in capsys.readouterr().out
+
+
+def test_hooks_stay_on_when_another_user_setting_is_broken(project, repo):
+    path = Path(os.environ["NUTMEG_USER_CONFIG"])
+    path.write_text(json.dumps({"hooks": True, "autonomy_run": "L9"}))
+    env = dict(os.environ, CLAUDE_PROJECT_DIR=str(repo))
+    payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": "nutmeg run analysis.py"}, "cwd": str(repo)})
+    result = subprocess.run(["/bin/sh", str(WRAPPER), "gate_hook.py"], input=payload, capture_output=True,
+                            text=True, env=env, cwd=repo)
+    out = json.loads(result.stdout)["hookSpecificOutput"]
+    assert out["permissionDecision"] == "ask" and "config is broken" in out["permissionDecisionReason"]
