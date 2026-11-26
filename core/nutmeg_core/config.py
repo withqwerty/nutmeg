@@ -183,14 +183,18 @@ def effective(team, user):
 
 
 def hooks_enabled(repo_root):
-    """Whether the research hooks run in this repository. Off by default; a broken user file falls back to the team file."""
-    try:
-        return load_effective(repo_root)["hooks"]
-    except ConfigError:
+    """Whether the research hooks run in this repository (off by default).
+
+    Each file's `hooks` key is read on its own, so a mistake in another setting (for example a bad autonomy level)
+    never turns off hooks that someone turned on. With the hooks on, the gate then meets the broken config and asks.
+    """
+    def opted_in(path, label):
         try:
-            return bool(load_team(repo_root).get("hooks", False))
+            return Path(path).is_file() and _read_json(path, label).get("hooks") is True
         except ConfigError:
             return False
+
+    return opted_in(Path(repo_root) / TEAM_FILE, TEAM_FILE) or opted_in(user_config_path(), "the user config")
 
 
 def team_signoff_required(repo_root):
