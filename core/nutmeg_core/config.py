@@ -60,11 +60,11 @@ def load_team(repo_root):
 
 TEAM_TYPES = {
     "max_autonomy": dict, "allow_run_then_review": bool, "persona_default": str, "approved_services": list,
-    "approved_ai_providers": list, "licences": dict, "data_in_git": str, "signoff": dict,
+    "approved_ai_providers": list, "licences": dict, "data_in_git": str, "signoff": dict, "hooks": bool,
 }
 
 
-USER_KEYS = ("persona", "autonomy_plan", "autonomy_run", "autonomy_publish", "run_then_review", "name")
+USER_KEYS = ("persona", "autonomy_plan", "autonomy_run", "autonomy_publish", "run_then_review", "name", "hooks")
 
 
 def unknown_keys(team, user):
@@ -172,7 +172,25 @@ def effective(team, user):
     signoff = team.get("signoff") or {}
     out["signoff_required"] = bool(signoff.get("required", False))
     out["data_in_git"] = data_in_git_policy(team)
+    # The research hooks (run gate, stop check) are off until the user or the team turns them on.
+    user_hooks = user.get("hooks", False)
+    if not isinstance(user_hooks, bool):
+        raise ConfigError("hooks in the user config must be true or false")
+    out["hooks"] = bool(team.get("hooks", False)) or user_hooks
+    out["reasons"]["hooks"] = ("on (team config)" if team.get("hooks") else "on (your setting)" if user_hooks
+                               else "off (turn on with `nutmeg config set --hooks on`)")
     return out
+
+
+def hooks_enabled(repo_root):
+    """Whether the research hooks run in this repository. Off by default; a broken user file falls back to the team file."""
+    try:
+        return load_effective(repo_root)["hooks"]
+    except ConfigError:
+        try:
+            return bool(load_team(repo_root).get("hooks", False))
+        except ConfigError:
+            return False
 
 
 def team_signoff_required(repo_root):

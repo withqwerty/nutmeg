@@ -1,6 +1,17 @@
+import json
+import os
 import subprocess
+from pathlib import Path
 
 import pytest
+
+
+def set_user_hooks(on):
+    """Turn the research hooks on or off in the test's user config (they are off by default)."""
+    path = Path(os.environ["NUTMEG_USER_CONFIG"])
+    current = json.loads(path.read_text()) if path.exists() else {}
+    current["hooks"] = on
+    path.write_text(json.dumps(current))
 
 
 @pytest.fixture

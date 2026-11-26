@@ -1,5 +1,5 @@
 {
-  "description": "Adds nutmeg's core football-data and research-project rules to each session. Inside an active research project, shows a gate card before runs and checks outputs against the claim ledger before a step ends.",
+  "description": "Adds nutmeg's core football-data and research-project rules to each session. When the research hooks are turned on (nutmeg config set --hooks on; off by default), shows a gate card before runs inside an active research project and checks outputs against the claim ledger before a step ends.",
   "hooks": {
     "SessionStart": [
       {

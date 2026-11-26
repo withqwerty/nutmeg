@@ -10,6 +10,8 @@ import pytest
 from nutmeg_core import gate
 from nutmeg_core.cli import main
 
+from conftest import set_user_hooks
+
 PLUGIN = Path(__file__).resolve().parents[2]
 WRAPPER = PLUGIN / "hooks" / "run-hook.sh"
 
@@ -121,7 +123,8 @@ def test_hook_output_shape(project, repo):
 
 # --- the wrapper and the hook script ---------------------------------------
 
-def _hook(repo, command, env_path=None):
+def _hook(repo, command, env_path=None, hooks=True):
+    set_user_hooks(hooks)
     env = dict(os.environ, CLAUDE_PROJECT_DIR=str(repo))
     if env_path is not None:
         env["PATH"] = env_path
@@ -153,3 +156,25 @@ def test_hook_end_to_end(project, repo):
     out = json.loads(result.stdout)["hookSpecificOutput"]
     assert out["permissionDecision"] == "ask" and "q.sql" in out["permissionDecisionReason"]
     assert _hook(repo, "git status").stdout == ""
+
+
+# --- the research hooks are off by default -----------------------------------
+
+def test_hooks_off_by_default_leave_every_command_alone(project, repo):
+    for command in ("python3 analysis.py", "nutmeg run analysis.py --sql q.sql", "python3 a.py | tee out.txt"):
+        result = _hook(repo, command, hooks=False)
+        assert result.returncode == 0 and result.stdout == "", command
+
+
+def test_team_config_turns_the_hooks_on(project, repo):
+    (repo / ".nutmeg").mkdir()
+    (repo / ".nutmeg" / "team.json").write_text(json.dumps({"hooks": True}))
+    out = json.loads(_hook(repo, "python3 analysis.py", hooks=False).stdout)
+    assert out["hookSpecificOutput"]["permissionDecision"] == "ask"
+
+
+def test_config_set_hooks_turns_them_on_and_off(project, repo, capsys):
+    assert main(["config", "set", "--hooks", "on"]) == 0
+    assert "Research hooks (run gate and stop check): on (your setting)" in capsys.readouterr().out
+    assert main(["config", "set", "--hooks", "off"]) == 0
+    assert "off (turn on with `nutmeg config set --hooks on`)" in capsys.readouterr().out

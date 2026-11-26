@@ -512,6 +512,7 @@ def cmd_config_show(args):
     for stage in STAGES:
         print(f"  {stage}: {settings['levels'][stage]} - {settings['reasons'][stage]}")
     print(f"  run-then-review: {settings['reasons']['run_then_review']}")
+    print(f"Research hooks (run gate and stop check): {settings['reasons']['hooks']}")
     print(f"Sign-off required for headline claims: {'yes' if settings['signoff_required'] else 'no'}")
     print(f"Data in git: {settings['data_in_git']}")
     if settings["approved_services"]:
@@ -534,6 +535,8 @@ def cmd_config_set(args):
         values["run_then_review"] = args.run_then_review == "yes"
     if args.name:
         values["name"] = args.name
+    if args.hooks:
+        values["hooks"] = args.hooks == "on"
     if not values:
         raise UsageError("nothing to set; see `nutmeg config set --help`")
     path = save_user(values)
@@ -744,6 +747,8 @@ def build_parser(parser_class=cards.NutmegParser):
         setter.add_argument(f"--autonomy-{stage}", choices=LEVELS, dest=f"autonomy_{stage}")
     setter.add_argument("--run-then-review", choices=("yes", "no"))
     setter.add_argument("--name", help="your name for sign-offs and notes (default: git user.name)")
+    setter.add_argument("--hooks", choices=("on", "off"),
+                        help="the research hooks: a gate card before runs and a check before a step ends (default: off)")
     setter.set_defaults(handler=cmd_config_set)
 
     claim = commands.add_parser("claim", help="add, list, show or withdraw ledger claims")

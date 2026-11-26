@@ -1,6 +1,8 @@
 """Stop hook: check the active research project's outputs before a step ends.
 
-Called through run-hook.sh, which has already found an active project. Blocks
+Called through run-hook.sh, which has already found an active project. Does
+nothing unless the research hooks are on (`nutmeg config set --hooks on`, or
+"hooks": true in the team config). Blocks
 the stop once for each new open problem, with the list; a second stop
 (stop_hook_active) is always allowed. Open problems stay in checks.json, and
 publishing refuses until each is fixed or accepted with a reason.
@@ -12,7 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "core"))
 
-from nutmeg_core import check, project  # noqa: E402
+from nutmeg_core import check, config, project  # noqa: E402
 
 
 def main():
@@ -23,6 +25,8 @@ def main():
     if data.get("stop_hook_active"):
         return 0
     repo = Path(os.environ.get("NUTMEG_REPO_ROOT") or data.get("cwd") or os.getcwd())
+    if not config.hooks_enabled(repo):  # off unless the user or the team turned the hooks on
+        return 0
     active = project.active_project(repo)
     if active is None or not check.output_files(active):
         return 0
