@@ -11,7 +11,7 @@ Help the user explore and interpret football data. Adapt depth and approach to t
 
 ## Accuracy
 
-Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
+Read and follow `references/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 
 When you report or compare a metric that has a football-docs metric card (`list_metrics`), read it with `get_metric` and name the variant ID; do not compare values from different variants, and say so when two sources disagree because they use different variants.
 ## First: check profile
@@ -107,11 +107,11 @@ Focus on rigour:
 
 ## Before you publish a claim
 
-Read `${CLAUDE_PLUGIN_ROOT}/docs/metric-misuse.md` and check each stat against it. If the user asks you to write a claim a stat cannot support (a post, headline or case), say so first and propose the better measure; draft only what the evidence supports.
+Read `references/metric-misuse.md` and check each stat against it. If the user asks you to write a claim a stat cannot support (a post, headline or case), say so first and propose the better measure; draft only what the evidence supports.
 
 ## Help the user understand
 
-Follow `${CLAUDE_PLUGIN_ROOT}/docs/understanding.md`: explain results with the user's own numbers, offer an
+Follow `references/understanding.md`: explain results with the user's own numbers, offer an
 explainer page they can edit and share at the moments it lists (a surprising result, a result they must explain
 to others), and never change a method or drop a caveat after seeing the results without saying so.
 

@@ -54,7 +54,7 @@ evals/_scaffold/   # eval harness only; the cases are private (NUTMEG_EVALS_DIR,
 ## Key conventions
 
 - Every provider-touching skill includes the accuracy guardrail section
-- Skills and agents reference plugin files as `${CLAUDE_PLUGIN_ROOT}/...` (a bare `docs/...` path resolves against the user's project, not the plugin)
+- Skills refer to shared docs as `references/<name>.md`, relative to the skill's folder, because a skills-only install (`npx skills add withqwerty/nutmeg`) gets only the skill folders. `python3 scripts/sync_skill_refs.py` copies each shared doc (`docs/`, `skills/_shared/`, another skill's `references/`) into the skills that read it; edit the source, never a copy marked "Generated", and CI checks the copies with `--check`. Agents and hooks exist only in the plugin, so they keep `${CLAUDE_PLUGIN_ROOT}/...` paths (a bare `docs/...` path resolves against the user's project, not the plugin). The `core/nutmeg.py` command also exists only in the plugin: a skill that runs it says what to do when it is not there
 - Plugin MCP tools are named `mcp__plugin_nutmeg_football-docs__<tool>`; frontmatter tool lists carry that name and the standalone `mcp__football-docs__<tool>`
 - Skills and agents do not hard-code provider facts; they look them up with `search_docs` and name the source
 - Run the eval suite before a release and compare with the previous version

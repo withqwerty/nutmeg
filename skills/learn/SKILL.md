@@ -11,7 +11,7 @@ Teach football analytics concepts, recommend resources, provide a learning path,
 
 ## Accuracy
 
-Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
+Read and follow `references/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 
 When the user asks what a metric means, read its football-docs metric card with `get_metric` (`list_metrics` shows the cards) and explain that variants exist, naming their IDs; use `search_docs` for metrics without a card.
 
@@ -21,14 +21,14 @@ Read `.nutmeg.user.md`. If it doesn't exist, continue with sensible defaults (Py
 
 ## Glossary of core concepts
 
-The glossary is in `${CLAUDE_PLUGIN_ROOT}/docs/glossary.md`: chance quality (xG, npxG, xGOT, xA, xT), possession and
+The glossary is in `references/glossary.md`: chance quality (xG, npxG, xGOT, xA, xT), possession and
 pressing (PPDA, high press, counterpressure, build-up, possession value), passing, shooting and defensive terms,
 and per 90. Read it when the user asks what a term means, and explain at their level. The research workspace page
 links the same entries. For a provider's own definition of a metric or event, use `search_docs`; the glossary
 gives the general meaning only.
 
 When the user needs to explain a concept to someone else, or keeps coming back to it, offer once to write it up
-as an explainer page they can edit and share; follow `${CLAUDE_PLUGIN_ROOT}/docs/understanding.md` section 2.
+as an explainer page they can edit and share; follow `references/understanding.md` section 2.
 
 ### Per-90 normalisation
 
@@ -115,7 +115,7 @@ Examples:
 
 ### Entity resolution
 
-For entity-resolution questions, also read `${CLAUDE_PLUGIN_ROOT}/docs/entity-resolution-routing.md`.
+For entity-resolution questions, also read `references/entity-resolution-routing.md`.
 Keep the boundary clear:
 
 - provider facts and quirks come from `football-docs`;

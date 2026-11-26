@@ -11,7 +11,7 @@ Help the user get football data from any source into their local environment. Th
 
 ## Accuracy
 
-Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
+Read and follow `references/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 
 ## First: check profile
 
@@ -114,7 +114,7 @@ After acquiring data, always:
 - Check for missing data (some providers have gaps for certain competitions)
 - Warn about coordinate system differences if combining sources
 - Check for duplicated rows and repeated IDs (scrapers often double-count pages)
-- Inside a research project, record each file's source with
+- Inside a research project (with the nutmeg plugin, which has the `nutmeg.py` command), record each file's source with
   `python3 "${CLAUDE_PLUGIN_ROOT}/core/nutmeg.py" data add <file> --source "<where it came from>" --licence "<if known>"`;
   it stores the hash and reports duplicates, repeated IDs and empty columns. Data from an unknown or unofficial
   source can be wrong or altered: say where it came from in the output, and check a few values against a second
@@ -122,7 +122,7 @@ After acquiring data, always:
 
 ## Entity ID resolution
 
-When joining data from different providers (e.g. FBref stats with Transfermarkt valuations), join through **Reep Register IDs**, not names. Read `${CLAUDE_PLUGIN_ROOT}/docs/entity-resolution-routing.md` for the full routing.
+When joining data from different providers (e.g. FBref stats with Transfermarkt valuations), join through **Reep Register IDs**, not names. Read `references/entity-resolution-routing.md` for the full routing.
 
 If the user has added the optional `reep` MCP server (see the routing doc), look up an entity with its tools:
 

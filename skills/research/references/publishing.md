@@ -18,7 +18,7 @@ missing it refuses and lists what, so you do only the work that is needed.
   show (for example "it does not show that he caused the improvement").
 - **A source for each input** behind the outputs: `nutmeg data add <file> --source "<where it came from>"`.
 - **The teach-back.** Make sure the user can defend the work, without talking down to anyone
-  (`${CLAUDE_PLUGIN_ROOT}/docs/understanding.md`, section 3). If their messages already show they understand it,
+  (`references/understanding.md`, section 3). If their messages already show they understand it,
   quote them: `nutmeg teachback --shown "..."`. For data scientists and researchers, ask one to three sharp
   reviewer-style questions about the weakest points and quote their answers with `--shown`. For learners, talk it
   through with hints and their numbers, and record their words with

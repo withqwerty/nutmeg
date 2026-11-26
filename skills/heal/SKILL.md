@@ -11,7 +11,7 @@ Diagnose and fix broken football data pipelines. When a scraper or API call fail
 
 ## Accuracy
 
-Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
+Read and follow `references/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 ## First: check profile
 
 Read `.nutmeg.user.md`. If it doesn't exist, continue with sensible defaults (Python and pandas, intermediate level) and suggest running `/nutmeg` setup at the end.

@@ -11,7 +11,7 @@ Help the user explore and choose football data visualisation approaches through 
 
 ## Accuracy
 
-Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
+Read and follow `references/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 
 ## First: check profile
 
@@ -27,9 +27,9 @@ This skill has two reference documents. Load them when relevant — don't read b
 
 | Reference | When to load | Path |
 |---|---|---|
-| **Chart Canon** | When discussing specific football chart types, conventions, or anti-patterns | `${CLAUDE_PLUGIN_ROOT}/skills/brainstorm/references/chart-canon.md` |
-| **Viz Styles** | When helping the user choose a design approach or aesthetic direction | `${CLAUDE_PLUGIN_ROOT}/skills/brainstorm/references/viz-styles.md` |
-| **Campos Bridge** | Strong React/campos signal in cwd — loads the bridge; soft signals surface a mention only | `${CLAUDE_PLUGIN_ROOT}/skills/_shared/campos-bridge.md` |
+| **Chart Canon** | When discussing specific football chart types, conventions, or anti-patterns | `references/chart-canon.md` |
+| **Viz Styles** | When helping the user choose a design approach or aesthetic direction | `references/viz-styles.md` |
+| **Campos Bridge** | Strong React/campos signal in cwd — loads the bridge; soft signals surface a mention only | `references/campos-bridge.md` |
 
 ## Process
 
@@ -45,7 +45,7 @@ Don't ask all of these upfront. Start with the most important one based on what 
 
 **Detect React/campos context before proposing approaches:**
 
-- **Strong signal** — Read cwd's `package.json`; if it contains `react` or `@withqwerty/campos-react` in `dependencies`/`devDependencies`, load `${CLAUDE_PLUGIN_ROOT}/skills/_shared/campos-bridge.md` and include campos options alongside Python/R in Phase 3.
+- **Strong signal** — Read cwd's `package.json`; if it contains `react` or `@withqwerty/campos-react` in `dependencies`/`devDependencies`, load `references/campos-bridge.md` and include campos options alongside Python/R in Phase 3.
 - **Soft signal** — user mentions React/TS/Next/Vite/campos/browser chart in conversation AND cwd does not have `pyproject.toml` / `requirements.txt` / `renv.lock` / `Gemfile`. Do not auto-load; mention the bridge exists and offer to load if the user confirms they want a React chart.
 - **Conflicting signal** — cwd is a Python/R/Ruby project. Keep the existing mplsoccer/ggplot2 path; soft signals are ignored. Strong signals still win (monorepo case).
 - **Integration-self signal** — cwd IS the campos or nutmeg repo itself (see the bridge doc for detection). Downgrade to soft — working on the integration is not the same as using it.
@@ -64,7 +64,7 @@ Before proposing options, research what works well.
    - `search_docs(query="[concept] visualisation")` — check if any provider docs cover this
 
 2. **Load the chart canon** if the question involves a standard football chart type:
-   - Read `${CLAUDE_PLUGIN_ROOT}/skills/brainstorm/references/chart-canon.md`
+   - Read `references/chart-canon.md`
    - Check conventions, known weaknesses, and anti-patterns for the chart type
 
 3. **Search the web for real-world examples:**
@@ -115,13 +115,13 @@ Once the user picks an approach:
    - Load `${CLAUDE_SKILL_DIR}/references/chart-canon.md` and check the anti-patterns section
    - Warn about common mistakes for this chart type (e.g., overloaded radars, misleading xG, context-free percentiles)
 
-4. **In a research project (research/.active exists), register the chart:**
+4. **In a research project (research/.active exists, with the nutmeg plugin installed), register the chart:**
    - Save the rows the chart plots as a CSV or JSON snapshot.
    - Run `python3 "${CLAUDE_PLUGIN_ROOT}/core/nutmeg.py" figure register <name> --data <snapshot> --source "<source>"
      --claims <claim IDs> --season "<competition and season>" --filters "<filters>" --metric "<metric>" --run <run ID>`.
    - Put the footnote it prints under the chart in small text (matplotlib `fig.text`, ggplot2 `labs(caption=)`,
      a caption in Vega-Lite or Observable Plot). The file format is in
-     `${CLAUDE_PLUGIN_ROOT}/docs/provenance-contract.md`.
+     `references/provenance-contract.md`.
 
 ## Key principles
 

@@ -5,7 +5,8 @@ stands behind it: if they cannot say what it claims, what it rests on and what w
 defend it, spot when it is wrong, or explain it to the people who will act on it.
 
 This file is shared guidance for every nutmeg skill. The `nutmeg` commands named here are in the research skill
-(`python3 "${CLAUDE_PLUGIN_ROOT}/core/nutmeg.py" <command>`).
+(`python3 "${CLAUDE_PLUGIN_ROOT}/core/nutmeg.py" <command>`). They come with the nutmeg Claude Code plugin; where it
+is not installed, give the explanation in your answer and skip the commands.
 
 ## 1. Explain with the user's own work
 

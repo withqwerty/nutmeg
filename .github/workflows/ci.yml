@@ -12,6 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Shared docs copied into each skill
+        run: python3 scripts/sync_skill_refs.py --check
+
       - name: Validate SKILL.md frontmatter
         run: |
           errors=0
