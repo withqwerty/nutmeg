@@ -35,7 +35,7 @@ Read what the user is asking. Classify it into one of these intents:
 | **Learn / explain** | "what is xG", "explain", "teach me", "resources", "how does X work" | Invoke `/nutmeg:learn` |
 | **Manage credentials** | "API key", "authentication", "set up access" | Invoke `/nutmeg:acquire` (credentials are part of acquisition) |
 | **Provider docs** | "qualifier ID", "coordinate system", "what fields does X have" | Invoke `/nutmeg:learn` (provider docs are part of learning) |
-| **Entity resolution / ID matching** | "same player", "match IDs", "provider bridge", "map Transfermarkt to Opta", "candidate match", "identity surface" | Read `${CLAUDE_PLUGIN_ROOT}/docs/entity-resolution-routing.md`; use `football-docs` for provider facts, Reep Register lookup for public IDs, and `reep-toolkit` for matching guidance |
+| **Entity resolution / ID matching** | "same player", "match IDs", "provider bridge", "map Transfermarkt to Opta", "candidate match", "identity surface" | Read `references/entity-resolution-routing.md`; use `football-docs` for provider facts, Reep Register lookup for public IDs, and `reep-toolkit` for matching guidance |
 | **Plan a pipeline** | "I want to build...", "how do I approach...", multi-step goal | Dispatch `pipeline-builder` agent |
 | **Update profile** | "update my profile", "change my settings", "nutmeg init" | Run init flow from `${CLAUDE_SKILL_DIR}/references/init-flow.md` |
 
@@ -56,7 +56,7 @@ For provider-specific lookups that are quick (single qualifier ID, one field nam
 - `compare_providers(topic, providers?)` for comparisons
 - `list_providers()` to show coverage
 
-For entity-resolution requests, read `${CLAUDE_PLUGIN_ROOT}/docs/entity-resolution-routing.md` before
+For entity-resolution requests, read `references/entity-resolution-routing.md` before
 answering. Nutmeg should route the work, not become the source of truth:
 
 - provider ID grains, quirks, and source access constraints come from
@@ -70,7 +70,7 @@ answering. Nutmeg should route the work, not become the source of truth:
 - the matching logic pack is mentioned only for users who have access to that
   private partner material.
 
-Follow the accuracy guardrail: read `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md`. Never guess provider-specific facts from training data. If a football-docs tool errors, follow the guardrail's "When the football-docs tools fail" section.
+Follow the accuracy guardrail: read `references/accuracy-guardrail.md`. Never guess provider-specific facts from training data. If a football-docs tool errors, follow the guardrail's "When the football-docs tools fail" section.
 
 ## Progressive disclosure
 

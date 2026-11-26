@@ -11,7 +11,7 @@ Dispatch specialised reviewers to check football data code and visualisations fo
 
 ## Accuracy
 
-Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts.
+Read and follow `references/accuracy-guardrail.md` before answering any question about provider-specific facts.
 
 ## First: check profile
 
@@ -27,7 +27,7 @@ Look at what the user wants reviewed. Read the relevant files. Then decide which
 | Code renders a chart or visualisation | **chart-reviewer** agent (Mode 1: Code Review) |
 | User provides a URL or says "check how it looks" | **chart-reviewer** agent (Mode 2: Visual Inspection) |
 | Chart has filters, tooltips, state, or dynamic data | **chart-reviewer** agent (Mode 3: Interactive Edge Cases) |
-| Code imports `@withqwerty/campos-*` (React + campos) | **chart-reviewer** agent (Mode 4: React + Campos) — pass `${CLAUDE_PLUGIN_ROOT}/skills/_shared/campos-bridge.md` in context |
+| Code imports `@withqwerty/campos-*` (React + campos) | **chart-reviewer** agent (Mode 4: React + Campos) — pass the full path of `references/campos-bridge.md` in this skill's folder |
 | Code does both data processing AND chart rendering | **Both agents** in parallel |
 
 **Always dispatch at least one.** If unclear, dispatch both — redundant findings are better than missed issues.
@@ -67,7 +67,7 @@ Their concern: [WHAT_THEY_SAID]
 Stack: [LANGUAGE + LIBRARIES from profile]
 [If visual inspection: URL or instructions to render]
 
-Load ${CLAUDE_PLUGIN_ROOT}/skills/brainstorm/references/chart-canon.md for convention checking.
+Load references/chart-canon.md for convention checking.
 ```
 
 ## Synthesise findings

@@ -47,7 +47,7 @@ If multiple: "Which is your primary goal?"
 
 ## Q7: Joining providers (optional)
 "Will you join data from more than one provider (for example FBref stats with Transfermarkt values)?"
-- **Yes** — offer to add the optional reep MCP server and download a local copy of the Reep Register (about 210 MB, free), following "The reep tools (optional)" in `docs/entity-resolution-routing.md` in the nutmeg plugin folder. It needs uv. Record the release stamp in the profile (the reep `status()` tool prints it). If the user does not want it, `resolve_entity` from football-docs still works.
+- **Yes** — offer to add the optional reep MCP server and download a local copy of the Reep Register (about 210 MB, free), following "The reep tools (optional)" in `references/entity-resolution-routing.md`. It needs uv. Record the release stamp in the profile (the reep `status()` tool prints it). If the user does not want it, `resolve_entity` from football-docs still works.
 - **No / later** — skip. Nutmeg will offer it when a join comes up.
 
 ## Q8: How nutmeg works with you
@@ -65,7 +65,8 @@ ends. It asks for your approval before those runs. Turn this on?" Turn them on o
 Save the answer with the nutmeg command (Python 3.10+), for example:
 `python3 "${CLAUDE_PLUGIN_ROOT}/core/nutmeg.py" config set --persona fanalyst --run-then-review yes --hooks on` or
 `... config set --persona club --autonomy-run L1`. A team config (`.nutmeg/team.json`) can set stricter limits;
-`nutmeg config show` says which apply. If Python 3.10+ is not available, skip this question.
+`nutmeg config show` says which apply. If Python 3.10+ is not available, or `core/nutmeg.py` is not there (the
+skills were installed without the plugin), skip this question.
 
 ## Write the profile
 

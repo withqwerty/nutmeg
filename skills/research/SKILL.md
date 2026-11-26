@@ -11,7 +11,7 @@ Work like a research assistant, not an autopilot. The user must be able to check
 query and every number, and see why each choice was made. A research project keeps that trail in
 files the user and their teammates can open.
 
-Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md`. Provider facts come from
+Read and follow `references/accuracy-guardrail.md`. Provider facts come from
 football-docs and IDs from the Reep Register, never from memory.
 
 ## The nutmeg command
@@ -25,6 +25,12 @@ python3 "${CLAUDE_PLUGIN_ROOT}/core/nutmeg.py" <command> ...
 Below, `nutmeg <command>` is short for that line. Run `nutmeg --help` or `nutmeg <command> --help`
 for the options. If `python3` is missing or older than 3.10, tell the user that research projects
 need Python 3.10 or newer, and continue the task without a project.
+
+The nutmeg command comes with the nutmeg Claude Code plugin. If `${CLAUDE_PLUGIN_ROOT}` is empty or
+`core/nutmeg.py` is not there (the skills were installed on their own, for example with
+`npx skills add withqwerty/nutmeg`), tell the user once that research projects need the plugin, and
+continue the task without a project: keep the question, the plan with reasons and the sources in
+your answer instead.
 
 ## When to start a project
 
@@ -72,7 +78,7 @@ nutmeg plan choose --kind metric --choice "npxG per 90" \
     `--rests-type metric --rests-ref ppda.statsbomb-hudl`); use it for any metric that has a card, so readers see
     exactly which definition a number uses;
   - `registry`: a Reep Register record;
-  - `rule`: a practitioner rule, such as `${CLAUDE_PLUGIN_ROOT}/docs/metric-misuse.md`;
+  - `rule`: a practitioner rule, such as `references/metric-misuse.md`;
   - `paper`: a paper or post;
   - `claim`: an earlier claim in this ledger;
   - `user`: the user's instruction, quoted.
@@ -207,13 +213,13 @@ results, limits on judgements, a source for each input, the teach-back), sign-of
 - `nutmeg workspace` writes `research/<slug>/workspace.html`: the review queue, question, plan with reasons, ledger
   with each claim's evidence, report, figures, runs and the glossary entries it links. Regenerate it after changes
   and tell the user where it is. It is view-only; approvals happen here in Claude Code.
-- Use terms from `${CLAUDE_PLUGIN_ROOT}/docs/glossary.md` for metrics where you can. For a metric that is not in it,
+- Use terms from `references/glossary.md` for metrics where you can. For a metric that is not in it,
   add a `definition` claim so readers know what it means: name the metric's term in its statement, or set
   `evidence.term` to it, so `nutmeg check` links the two.
 
 ## 9. Understanding
 
-Follow `${CLAUDE_PLUGIN_ROOT}/docs/understanding.md`:
+Follow `references/understanding.md`:
 
 - Explain terms, methods and results with this project's own numbers when the user is unsure.
 - Offer an explainer page at the moments that file lists, once per topic, and never again after a no

@@ -11,7 +11,7 @@ Help the user manipulate football data effectively. This skill is about the mech
 
 ## Accuracy
 
-Read and follow `${CLAUDE_PLUGIN_ROOT}/docs/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
+Read and follow `references/accuracy-guardrail.md` before answering any question about provider-specific facts (IDs, endpoints, schemas, coordinates, rate limits). Always use `search_docs` — never guess from training data.
 ## First: check profile
 
 Read `.nutmeg.user.md`. If it doesn't exist, continue with sensible defaults (Python and pandas, intermediate level) and suggest running `/nutmeg` setup at the end. Use their profile for language preference and stack.
@@ -56,7 +56,7 @@ Common joins in football data:
 | Multiple providers | Reep ID | Map each provider's `(provider, namespace, id)` to a Reep ID, then join on the Reep ID |
 | Season data + Elo | date | Join Elo rating at time of match |
 
-**Joining providers:** join through Reep Register IDs, not names (see `${CLAUDE_PLUGIN_ROOT}/docs/entity-resolution-routing.md`). Names differ across providers ("Man City" / "Manchester City"), players share names, and a fuzzy name match fails silently.
+**Joining providers:** join through Reep Register IDs, not names (see `references/entity-resolution-routing.md`). Names differ across providers ("Man City" / "Manchester City"), players share names, and a fuzzy name match fails silently.
 
 - Look up IDs with the reep tools (`resolve`, `translate`) or `resolve_entity`, or query the Reep release DuckDB for bulk joins.
 - Keep rows that do not resolve, and report how many there are per provider. Never drop them silently.
