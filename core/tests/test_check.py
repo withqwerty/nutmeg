@@ -10,6 +10,8 @@ from nutmeg_core import check as checks
 from nutmeg_core.cli import main
 from nutmeg_core.ledger import Ledger
 
+from conftest import set_user_hooks
+
 FIXTURE = Path(__file__).parent / "fixtures" / "clean_project"
 PLUGIN = Path(__file__).resolve().parents[2]
 WRAPPER = PLUGIN / "hooks" / "run-hook.sh"
@@ -124,7 +126,8 @@ def test_accept_closes_and_writes_a_receipt(project, capsys):
 
 # --- the Stop hook -----------------------------------------------------------
 
-def _stop(repo, active=False, env_path=None):
+def _stop(repo, active=False, env_path=None, hooks=True):
+    set_user_hooks(hooks)
     env = dict(os.environ, CLAUDE_PROJECT_DIR=str(repo))
     if env_path:
         env["PATH"] = env_path
@@ -281,3 +284,9 @@ def test_a_table_without_a_cited_caption_is_checked_number_by_number(tmp_path):
     (project / "report.md").write_text("Home records:\n\n| team | ppg |\n|---|---|\n| Ashby | 3.0 |\n| Brockley | 2.7 |\n")
     failures, _ = checks.run_checks(project)
     assert [f["kind"] for f in failures] == ["orphan"] and failures[0]["shown"] == "2.7"
+
+
+def test_stop_check_off_by_default(project, repo):
+    (project / "report.md").write_text("npxG/90 rose to 1.78.\n")
+    result = _stop(repo, hooks=False)
+    assert result.returncode == 0 and result.stdout == ""

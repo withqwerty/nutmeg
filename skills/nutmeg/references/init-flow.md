@@ -58,8 +58,12 @@ If multiple: "Which is your primary goal?"
   "Should runs go ahead and wait for your review afterwards (run-then-review)?"
 - **Suggest only** — level L1 for runs: nutmeg shows the code and you run it.
 
+Then ask about the research hooks, which are off unless the user turns them on:
+"Inside a research project, nutmeg can show a card before each analysis run and check the outputs before each step
+ends. It asks for your approval before those runs. Turn this on?" Turn them on only after a clear yes (`--hooks on`).
+
 Save the answer with the nutmeg command (Python 3.10+), for example:
-`python3 "${CLAUDE_PLUGIN_ROOT}/core/nutmeg.py" config set --persona fanalyst --run-then-review yes` or
+`python3 "${CLAUDE_PLUGIN_ROOT}/core/nutmeg.py" config set --persona fanalyst --run-then-review yes --hooks on` or
 `... config set --persona club --autonomy-run L1`. A team config (`.nutmeg/team.json`) can set stricter limits;
 `nutmeg config show` says which apply. If Python 3.10+ is not available, skip this question.
 

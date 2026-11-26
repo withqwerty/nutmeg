@@ -86,7 +86,7 @@ Then follow the user's plan level:
 - L1 or L2: show the user the plan and ask them to approve or change it before you fetch or compute
   anything.
 - L3: show the plan with its reasons and carry on; the user can stop you at any time, and every run
-  still goes through the gate.
+  is still recorded.
 
 ## 4. Run the analysis through the gate
 
@@ -107,16 +107,18 @@ nutmeg run analysis.py --input data/events.csv --sql queries/shots.sql -- --seas
 - Arguments after `--` go to the script.
 - Write output files to the folder in `$NUTMEG_OUTPUT_DIR`, so the run records them.
 
-Run `nutmeg run` on its own: no `&&`, `;`, pipes or redirects. Before it runs, the user sees a gate
-card with the services and data the step uses, the inputs and the exact code and SQL, and approves
-it. A re-run shows only what changed since the last run of the same file. If the user declines,
-ask what to change.
+Run `nutmeg run` on its own: no `&&`, `;`, pipes or redirects. When the research hooks are on
+(`nutmeg config show` says so; they are off unless the user or the team turned them on), the user sees
+a gate card before it runs, with the services and data the step uses, the inputs and the exact code
+and SQL, and approves it. A re-run shows only what changed since the last run of the same file. If
+the user declines, ask what to change. With the hooks off, the run goes ahead under the agent's
+normal permissions and is still recorded. Do not turn the hooks on yourself.
 
 If the user wants to see the card without running anything (or run the code themselves), use
 `nutmeg gate` with the same arguments.
 
-Inside a project, a direct `python3 script.py`, `Rscript`, `duckdb` or `psql` call raises a "not
-recorded" card. Numbers from an unrecorded run cannot go into the ledger, so use `nutmeg run`.
+Numbers from a direct `python3 script.py`, `Rscript`, `duckdb` or `psql` call are not recorded and cannot go
+into the ledger, so use `nutmeg run`. With the hooks on, such a call raises a "not recorded" card.
 
 A run must not change the files it reads: write cleaned data to a new file. If an input changes after a run (new
 data, a correction), `nutmeg check` marks the claims from that run as stale; run it again and update them.

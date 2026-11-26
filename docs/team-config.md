@@ -33,6 +33,7 @@ Persona defaults: `fanalyst` L3, `club` L2, `company` L2.
 | `approved_ai_providers` | list of strings | `[]` | The AI providers the club has sanctioned, for reference on cards and in bundles. |
 | `licences` | object | `{}` | A licence note per provider, for example `{"opta": "Internal use only; no redistribution"}`. Bundles show the note when they include raw data. |
 | `data_in_git` | `yes`, `no` or `ask` | `ask` | Whether new projects commit data, run outputs and figure snapshots. `ask` makes `nutmeg new` ask per project. A user may keep data out when the team says `yes`, never the reverse. |
+| `hooks` | boolean | `false` | `true` turns the research hooks on for everyone in the repository (see "Research hooks" below). |
 | `signoff` | object | `{"required": false}` | `{"required": true}` means a headline claim counts as verified only after a teammate who is not its author runs `nutmeg signoff`. Until then `nutmeg check` reports it and publishing refuses. |
 
 Example:
@@ -58,12 +59,27 @@ Example:
 | `autonomy_plan`, `autonomy_run`, `autonomy_publish` | `L1`, `L2` or `L3` | Per-stage levels; the team's `max_autonomy` still applies. |
 | `run_then_review` | boolean | Let runs at L3 go ahead and queue their cards for review. |
 | `name` | string | The name on sign-offs, contests and notes (default: `git config user.name`). |
+| `hooks` | boolean | Turn the research hooks on (default `false`). The team's `"hooks": true` turns them on whatever this says. |
 
 Set them with, for example:
 
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT}/core/nutmeg.py" config set --persona fanalyst --autonomy-run L3 --run-then-review yes
 ```
+
+## Research hooks
+
+The plugin has two research hooks. Both are **off by default**, and they run only in a repository with an active
+research project:
+
+- the run gate (PreToolUse on Bash): a card before each `nutmeg run`, `nutmeg publish` and `nutmeg bundle`, and an
+  approval prompt before direct `python3`, `Rscript`, `duckdb`, `sqlite3`, `psql` and `bq` calls and before compound
+  commands that contain them;
+- the stop check (Stop): checks the outputs against the claim ledger before a step ends.
+
+Turn them on with `nutmeg config set --hooks on`, or for a whole team with `"hooks": true` in `.nutmeg/team.json`.
+With the hooks off, `nutmeg run` still records every run, and `nutmeg check` and `nutmeg publish` still check the
+outputs. `nutmeg close` clears the active project, which also stops the hooks.
 
 ## Sign-off
 

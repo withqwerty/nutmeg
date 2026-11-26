@@ -5,6 +5,8 @@
 #
 # With no active project this exits at once, before Python starts, so
 # ordinary nutmeg use and Claude Code's normal permission flow are unchanged.
+# With an active project, the hook script still does nothing unless the user
+# or the team turned the research hooks on (they are off by default).
 # Without python3 >= 3.10 it warns once per repository and exits 0.
 # It uses only shell built-ins until it knows a project is active.
 
@@ -37,7 +39,7 @@ if ! command -v python3 >/dev/null 2>&1 || ! python3 -c 'import sys; sys.exit(sy
   marker="$dir/research/.python-warned"
   if [ ! -f "$marker" ]; then
     : > "$marker" 2>/dev/null
-    printf '%s\n' '{"systemMessage": "nutmeg: a research project is active, but python3 3.10 or newer was not found, so the run gate and checks are off. Install Python 3.10+ to turn them on."}'
+    printf '%s\n' '{"systemMessage": "nutmeg: a research project is active, but python3 3.10 or newer was not found, so the research hooks cannot run even if you turned them on. Install Python 3.10+ to use them."}'
   fi
   exit 0
 fi

@@ -69,7 +69,7 @@ Most users only need two commands — `/nutmeg` routes everything else automatic
 | `/nutmeg:learn` | Concepts, resources, provider docs, learning paths |
 | `/nutmeg:research` | Run analysis you will publish or decide on as a research project: a question card, a plan with reasons, a claim ledger that ties every number to its evidence, explainer pages you can edit and share, and a teach-back (the work in your own words) before anything is published |
 
-Research projects need Python 3.10 or newer (`python3`). Without it, everything else in nutmeg works as before.
+Research projects need Python 3.10 or newer (`python3`). Without it, everything else in nutmeg works as before. The research hooks (a gate card before each analysis run, and a ledger check before each step ends) are off until you turn them on with `nutmeg config set --hooks on` (see [docs/team-config.md](docs/team-config.md)).
 
 ### Sub-skills (auto-dispatched or direct)
 
